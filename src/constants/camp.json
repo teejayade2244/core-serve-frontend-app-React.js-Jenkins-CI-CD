@@ -1,0 +1,187 @@
+[
+    {
+        "id": 1,
+        "state": "Abia",
+        "camp": "Umunna, Bende LGA"
+    },
+    {
+        "id": 2,
+        "state": "Adamawa",
+        "camp": "Lapondo Road, Damare, Girei LGA"
+    },
+    {
+        "id": 3,
+        "state": "Akwa Ibom",
+        "camp": "Ikot Itie Udung, Nsit Atai LGA"
+    },
+    {
+        "id": 4,
+        "state": "Anambra",
+        "camp": "Umuawulu/Mbaukwu Awka South LGA"
+    },
+    {
+        "id": 5,
+        "state": "Bauchi",
+        "camp": "KM 60 Wailo, Ganjuwa LGA"
+    },
+    {
+        "id": 6,
+        "state": "Bayelsa",
+        "camp": "Kaiama Grammar School, Kolokoma-Opokuma LGA"
+    },
+    {
+        "id": 7,
+        "state": "Benue",
+        "camp": "Wannune, Tarka LGA"
+    },
+    {
+        "id": 8,
+        "state": "Borno",
+        "camp": "College of Peace and Disaster Management, Katsina"
+    },
+    {
+        "id": 9,
+        "state": "Cross River",
+        "camp": "Obubra, Obubra LGA"
+    },
+    {
+        "id": 10,
+        "state": "Delta",
+        "camp": "Former Martins TTC, Issele-Uku, Aniocha North LGA"
+    },
+    {
+        "id": 11,
+        "state": "Ebonyi",
+        "camp": "Macgregor College, Afikpo LGA"
+    },
+    {
+        "id": 12,
+        "state": "Edo",
+        "camp": "Okada Grammar School, Ovia North-East LGA"
+    },
+    {
+        "id": 13,
+        "state": "Ekiti",
+        "camp": "Ise-Orun/Emure LGA"
+    },
+    {
+        "id": 14,
+        "state": "Enugu",
+        "camp": "Awgu LGA"
+    },
+    {
+        "id": 15,
+        "state": "FCT (Abuja)",
+        "camp": "Kubwa, Bwari Area Council"
+    },
+    {
+        "id": 16,
+        "state": "Gombe",
+        "camp": "Science Technical College, Amada"
+    },
+    {
+        "id": 17,
+        "state": "Imo",
+        "camp": "Former Girl's Model Secondary School Eziama Obaire, Nkwerre LGA"
+    },
+    {
+        "id": 18,
+        "state": "Jigawa",
+        "camp": "opposite Army Barrack, Fanisua Dutse LGA"
+    },
+    {
+        "id": 19,
+        "state": "Kaduna",
+        "camp": "Kaduna – Abuja Road"
+    },
+    {
+        "id": 20,
+        "state": "Kano",
+        "camp": "Kusala Dam, Karaye, Karaye LGA"
+    },
+    {
+        "id": 21,
+        "state": "Katsina",
+        "camp": "Mani Road"
+    },
+    {
+        "id": 22,
+        "state": "Kebbi",
+        "camp": "Dakingari LGA"
+    },
+    {
+        "id": 23,
+        "state": "Kogi",
+        "camp": "Asaya, Kabba LGA"
+    },
+    {
+        "id": 24,
+        "state": "Kwara",
+        "camp": "Yikpata, Edu LGA"
+    },
+    {
+        "id": 25,
+        "state": "Lagos",
+        "camp": "Iyana Ipaja, Agege"
+    },
+    {
+        "id": 26,
+        "state": "Nassarawa",
+        "camp": "Keffi"
+    },
+    {
+        "id": 27,
+        "state": "Niger",
+        "camp": "Paiko"
+    },
+    {
+        "id": 28,
+        "state": "Ogun",
+        "camp": "Ikenne Road, Sagamu LGA"
+    },
+    {
+        "id": 29,
+        "state": "Ondo",
+        "camp": "Ikare-Akoko LGA"
+    },
+    {
+        "id": 30,
+        "state": "Osun",
+        "camp": "Aisu College Hospital Road, Ede North LGA"
+    },
+    {
+        "id": 31,
+        "state": "Oyo",
+        "camp": "Government Technical College, Iseyin LGA"
+    },
+    {
+        "id": 32,
+        "state": "Plateau",
+        "camp": "Mangu, Mangu LGA"
+    },
+    {
+        "id": 33,
+        "state": "Rivers",
+        "camp": "Nonwa-Gbam Tai LGA"
+    },
+    {
+        "id": 34,
+        "state": "Sokoto",
+        "camp": "Wamakko, Wamakko LGA"
+    },
+    {
+        "id": 35,
+        "state": "Taraba",
+        "camp": "Sibre Airport Road, Jalingo"
+    },
+    {
+        "id": 36,
+        "state": "Yobe",
+        "camp": "Dazigau, Nangere LGA"
+    },
+    {
+        "id": 37,
+        "state": "Zamfara",
+        "camp": "Beside FRSC Office, Tsafe LGA"
+    }
+]

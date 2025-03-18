@@ -1,0 +1,755 @@
+[
+    {
+        "id": 1,
+        "name": "Ahmadu Bello university"
+    },
+    {
+        "id": 2,
+        "name": "Bayaro University"
+    },
+    {
+        "id": 3,
+        "name": "Federal University Birnin-Kebbi"
+    },
+    {
+        "id": 4,
+        "name": "Federal University Dutse"
+    },
+    {
+        "id": 5,
+        "name": "Federal University Dutsin-ma"
+    },
+    {
+        "id": 6,
+        "name": "Federal University Gashua"
+    },
+    {
+        "id": 7,
+        "name": "Federal University Gusau"
+    },
+    {
+        "id": 8,
+        "name": "Federal University, Gusau"
+    },
+    {
+        "id": 9,
+        "name": "Federal University Kashere"
+    },
+    {
+        "id": 10,
+        "name": "Federal University Lafia"
+    },
+    {
+        "id": 11,
+        "name": "Federal University Lokoja"
+    },
+    {
+        "id": 12,
+        "name": "Federal University Ndufu-Alike"
+    },
+    {
+        "id": 13,
+        "name": "Federal University Otuoke"
+    },
+    {
+        "id": 14,
+        "name": "Federal University Oye-Ekiti"
+    },
+    {
+        "id": 15,
+        "name": "Federal University Wukari"
+    },
+    {
+        "id": 16,
+        "name": "Nigerian Defence Academy"
+    },
+    {
+        "id": 17,
+        "name": "Nigerian Police Academy"
+    },
+    {
+        "id": 18,
+        "name": "Nnamdi Azikiwe University"
+    },
+    {
+        "id": 19,
+        "name": "Obafemi Awolowo University"
+    },
+    {
+        "id": 20,
+        "name": "University of Abuja"
+    },
+    {
+        "id": 21,
+        "name": "University of Benin"
+    },
+    {
+        "id": 22,
+        "name": "University of Calabar"
+    },
+    {
+        "id": 23,
+        "name": "University of Ibadan"
+    },
+    {
+        "id": 24,
+        "name": "University of Ilorin"
+    },
+    {
+        "id": 25,
+        "name": "University of Jos"
+    },
+    {
+        "id": 26,
+        "name": "University of Lagos"
+    },
+    {
+        "id": 27,
+        "name": "University of Maiduguri"
+    },
+    {
+        "id": 28,
+        "name": "University of Nigeria Nsukka."
+    },
+    {
+        "id": 29,
+        "name": "University of Port-Harcourt"
+    },
+    {
+        "id": 30,
+        "name": "University of Uyo"
+    },
+    {
+        "id": 31,
+        "name": "Usmanu Danfodio University"
+    },
+    {
+        "id": 32,
+        "name": "National Open University of Nigerian"
+    },
+    {
+        "id": 33,
+        "name": "University of Maiduguri"
+    },
+    {
+        "id": 34,
+        "name": "University of Uyo"
+    },
+    {
+        "id": 35,
+        "name": "UsmanuDanfodio University"
+    },
+    {
+        "id": 36,
+        "name": "Adeyemi College of Education AFFILIATED To (Obafemi AwolowoUniversity, Ile-Ife, Osun State)"
+    },
+    {
+        "id": 37,
+        "name": "Federal College of Education, Gombe"
+    },
+    {
+        "id": 38,
+        "name": "Federal University of Agriculture"
+    },
+    {
+        "id": 39,
+        "name": "Federal University of Agriculture Makurdi"
+    },
+    {
+        "id": 40,
+        "name": "Michael Okpara University of Agriculture Umudike"
+    },
+    {
+        "id": 41,
+        "name": "Abubakar Tafawa Balewa University,"
+    },
+    {
+        "id": 42,
+        "name": "Federal University of Petroleum Resources"
+    },
+    {
+        "id": 43,
+        "name": "Federal University of Technology"
+    },
+    {
+        "id": 44,
+        "name": "Federal University of Technology"
+    },
+    {
+        "id": 45,
+        "name": "Modibbo Adama University of Technology"
+    },
+    {
+        "id": 46,
+        "name": "AdeniranOgunsanya College of Education AFFLLIATED To (Ekiti State University, Ado-Ekiti, Ekiti State)"
+    },
+    {
+        "id": 47,
+        "name": "AlvanI koku College of Education AFFLLIATED To ( University of Nigeria, Nsukka Enugu State )"
+    },
+    {
+        "id": 48,
+        "name": "Auchi Polytechnic AFFLLIATED To ( Nnamdi Azikiwe University,Awka,Anambra State )"
+    },
+    {
+        "id": 49,
+        "name": "Bigard Memorial Seminary AFFLLIATED To (University of Ibadan, Oyo State)"
+    },
+    {
+        "id": 50,
+        "name": "Catholic Institute of West Africa AFFLLIATED To (University of Calabar, Cross Rivers State)"
+    },
+    {
+        "id": 51,
+        "name": "Claretain Institute of Philosophy AFFLLIATED To (Imo State University, Owerri, Imo State.)"
+    },
+    {
+        "id": 52,
+        "name": "College of Arabic and Islamic Legal Studies AFFLLIATED To (Bayero University, Kano)"
+    },
+    {
+        "id": 53,
+        "name": "College of Education AFFLLIATED To (Ahmadu Bello University, Zaria, Kaduna State)"
+    },
+    {
+        "id": 54,
+        "name": "College of Education AFFLLIATED To (Delta State University, Abraka, Delta State)"
+    },
+    {
+        "id": 55,
+        "name": "College of Education AFFLLIATED To (University of Maiduguri, Borno State)"
+    },
+    {
+        "id": 56,
+        "name": "College of Education, Ankpa AFFLLIATED To (Abubakar Tafawa Balewa University, Bauchi)"
+    },
+    {
+        "id": 57,
+        "name": "College of Education, Katsina-Ala. AFFLLIATED To (University of Calabar, Calabar)"
+    },
+    {
+        "id": 58,
+        "name": "College of Education, Nsugbe AFFLLIATED To (University of Nigeria, Nsukka, Enugu State)"
+    },
+    {
+        "id": 59,
+        "name": "College of Education, Warri AFFLLIATED To (Delta State University, Abraka, Delta)"
+    },
+    {
+        "id": 60,
+        "name": "College of Education,Zing,Taraba State AFFLLIATED To (Ahmadu Bello University,Zaria)"
+    },
+    {
+        "id": 61,
+        "name": "Dominican Institute, Samonda AFFLLIATED To (University of Ibadan, Oyo State)"
+    },
+    {
+        "id": 62,
+        "name": "ECWA Theological Seminary, Igbaja AFFLLIATED To (University of Ibadan, Oyo State)"
+    },
+    {
+        "id": 63,
+        "name": "Enugu State College of Education, (Technical), Enuguv AFFLLIATED To (Nnamdi Azikiwe University, Awka, Anambra State)"
+    },
+    {
+        "id": 64,
+        "name": "EssienUkpabia Presbyterian Theological College AFFLLIATED To (University of Calabar, Calabar, Cross River State)"
+    },
+    {
+        "id": 65,
+        "name": "Fed College of Educ. (Tech.), Omoku, Rivers state AFFLLIATED To (University of Nigeria, Nsukka, Enugu State)"
+    },
+    {
+        "id": 66,
+        "name": "Fed College of Educ. (Tech.) Umunze AFFLLIATED To (Nnamdi Azikiwe University, Awka, Anambra State)"
+    },
+    {
+        "id": 67,
+        "name": "Federal College of Education, Abeokuta AFFLLIATED To (University of Ibadan, Ibadan, Oyo State)"
+    },
+    {
+        "id": 68,
+        "name": "Federal College of Education AFFLLIATED To (Ahmadu Bello University, Zaria, Kaduna State)"
+    },
+    {
+        "id": 69,
+        "name": "Federal College of Education AFFLLIATED To (Ahmadu Bello University, Zaria, Kaduna State)"
+    },
+    {
+        "id": 70,
+        "name": "Federal College of Education, Katsina AFFLLIATED To (Bayero University, Kano State)"
+    },
+    {
+        "id": 71,
+        "name": "Federal College of Education, Kontagora AFFLLIATED To (Ahmadu Bello University, Zaria, Kaduna State)"
+    },
+    {
+        "id": 72,
+        "name": "Federal College of Education, Obudu AFFLLIATED To (University of Calabar, Calabar)"
+    },
+    {
+        "id": 73,
+        "name": "Federal College of Education, Pankshin AFFLLIATED To (University of Jos, Plateau State)"
+    },
+    {
+        "id": 74,
+        "name": "Federal College of Education (Special), Oyo AFFLLIATED To (University of Ibadan, Ibadan, Oyo State)"
+    },
+    {
+        "id": 75,
+        "name": "Federal College of Education (Tech.), Bichi. AFFLLIATED To (Abubakar tafawa Balewa University, Bauchi)"
+    },
+    {
+        "id": 76,
+        "name": "Federal College of Education (Technical)"
+    },
+    {
+        "id": 77,
+        "name": "Federal College of Education (Technical), Asaba AFFLLIATED To (University of Benin, Benin City)"
+    },
+    {
+        "id": 78,
+        "name": "Federal College of Education (Technical) Gombe AFFLLIATED To (Abubakar Tafawa Balewa University, Bauchi)"
+    },
+    {
+        "id": 79,
+        "name": "Federal College of Education (Technical), Lagos State AFFLLIATED To (University of Benin, Benin City)"
+    },
+    {
+        "id": 80,
+        "name": "Federal College of Education, (Technical), Potiskum AFFLLIATED To (Federal University of Technology, Minna, Niger State)"
+    },
+    {
+        "id": 81,
+        "name": "Federal College of Education, Yola AFFLLIATED To (University of Maiduguri, Maiduguri)"
+    },
+    {
+        "id": 82,
+        "name": "Immanuel College of Technology and Christian Education AFFLLIATED To (University of Ibadan, Oyo State)"
+    },
+    {
+        "id": 83,
+        "name": "Isa Kaita College of Education, AFFLLIATED To (Ahmadu Bello University, Zaria)"
+    },
+    {
+        "id": 84,
+        "name": "Jigawa State College of Education, Gumel AFFLLIATED To (Bayero University, Kano)"
+    },
+    {
+        "id": 85,
+        "name": "Kwara State College of Education, (Technical) AFFLLIATED To (Ahmadu Bello University, Zaria, Kaduna State)"
+    },
+    {
+        "id": 86,
+        "name": "Life Theological Seminary"
+    },
+    {
+        "id": 87,
+        "name": "Michael Otedola College of Primary Education AFFLLIATED To (University of Port Harcourt, River State)"
+    },
+    {
+        "id": 88,
+        "name": "National Film Institute AFFLLIATED To (University of Jos, Jos)"
+    },
+    {
+        "id": 89,
+        "name": "National Missionary Seminary of St-Paul AFFLLIATED To (University of Port Harcourt, River State)"
+    },
+    {
+        "id": 90,
+        "name": "National Teachers Institute, Kaduna"
+    },
+    {
+        "id": 91,
+        "name": "Nigerian Christian Bible College AFFLLIATED To (University of Calabar, Calabar)"
+    },
+    {
+        "id": 92,
+        "name": "Niger State College of Education, Minna AFFLLIATED To (Ahmadu Bello University, Zaria, Kaduna State)"
+    },
+    {
+        "id": 93,
+        "name": "Osun State College of Education AFFLLIATED To (University of Ibadan, Oyo State)"
+    },
+    {
+        "id": 94,
+        "name": "Peter Achimugu College of Theology, Ankpa."
+    },
+    {
+        "id": 95,
+        "name": "Pope John Major Seminary"
+    },
+    {
+        "id": 96,
+        "name": "SaadatuRimi College of Education, Kambotso AFFLLIATED To (Bayero University, Kano)"
+    },
+    {
+        "id": 97,
+        "name": "Seat of Wisdom Seminary, Owerri AFFLLIATED To (Imo State University, Owerri, Imo State)"
+    },
+    {
+        "id": 98,
+        "name": "Seminary of All Saints, Uhiele AFFLLIATED To (University of Benin, Benin City, Edo State.)"
+    },
+    {
+        "id": 99,
+        "name": "Shehu Shagari College of Education, Sokoto AFFLLIATED To (Ahmadu Bello University, Zaria, Kaduna State )"
+    },
+    {
+        "id": 100,
+        "name": "Shehu Shagari College of Education, Sokoto AFFLLIATED To (Usmanu Danfodiyo University, Sokoto)"
+    },
+    {
+        "id": 101,
+        "name": "Spiritan School of Philosophy"
+    },
+    {
+        "id": 102,
+        "name": "St. Albert the Great Major Seminary, Abeokuta."
+    },
+    {
+        "id": 103,
+        "name": "St. Augustine�s College of Education AFFLLIATED To (University of Ibadan, Oyo State)"
+    },
+    {
+        "id": 104,
+        "name": "St-Joseph Major Seminary AFFLLIATED To (University of Uyo, Akwa-Ibom State)"
+    },
+    {
+        "id": 105,
+        "name": "St. Peter and Paul Seminary"
+    },
+    {
+        "id": 106,
+        "name": "The Apostolic Church Theological Seminary AFFLLIATED To (University of Uyo, Akwa-Ibom State)"
+    },
+    {
+        "id": 107,
+        "name": "Umar Ibn Ibrahim El-Kanemi College of Education, Science and Technology AFFLLIATED To (University of Maiduguri, Borno State)"
+    },
+    {
+        "id": 108,
+        "name": "Umar Suleiman College of Education AFFLLIATED To (University of Maiduguri, Borno State)"
+    },
+    {
+        "id": 109,
+        "name": "UMCA Ilorin AFFLLIATED To University of Ibadan, Oyo State)"
+    },
+    {
+        "id": 110,
+        "name": "West Africa Theological Seminary AFFLLIATED To (University of Nigeria, Nsukka, Enugu State)"
+    },
+    {
+        "id": 111,
+        "name": "World Harvest Bible College and Seminary AFFLLIATED To (University of Calabar, Calabar, Cross River State)"
+    },
+    {
+        "id": 112,
+        "name": "Yaba College of Technology AFFLLIATED To (University of Nigeria, Nsukka, Enugu State)"
+    },
+    {
+        "id": 113,
+        "name": "Crescent University"
+    },
+    {
+        "id": 114,
+        "name": "EDWIN CLARK"
+    },
+    {
+        "id": 115,
+        "name": "Topmost College of Education"
+    },
+    {
+        "id": 116,
+        "name": "Achievers University"
+    },
+    {
+        "id": 117,
+        "name": "Adeleke University"
+    },
+    {
+        "id": 118,
+        "name": "Afe Babalola University"
+    },
+    {
+        "id": 119,
+        "name": "Al- Hikmah University"
+    },
+    {
+        "id": 120,
+        "name": "Al- Hikmah University"
+    },
+    {
+        "id": 121,
+        "name": "Al- Hikmah University"
+    },
+    {
+        "id": 122,
+        "name": "Al-Qalam University"
+    },
+    {
+        "id": 123,
+        "name": "American University of Nigeria"
+    },
+    {
+        "id": 124,
+        "name": "Anchor University"
+    },
+    {
+        "id": 125,
+        "name": "Arthur Jarvis University"
+    },
+    {
+        "id": 126,
+        "name": "Augustine University"
+    },
+    {
+        "id": 127,
+        "name": "Babcock University"
+    },
+    {
+        "id": 128,
+        "name": "BABCOCK University Ilishan-Remo"
+    },
+    {
+        "id": 129,
+        "name": "Baze University."
+    },
+
+    {
+        "id": 130,
+        "name": "Bells University of Technology"
+    },
+    {
+        "id": 131,
+        "name": "Benson Idahosa University"
+    },
+    {
+        "id": 132,
+        "name": "Bingham University"
+    },
+    {
+        "id": 133,
+        "name": "Bowen University"
+    },
+    {
+        "id": 134,
+        "name": "Caleb University"
+    },
+    {
+        "id": 135,
+        "name": "Caritas University"
+    },
+    {
+        "id": 136,
+        "name": "Chrisland University"
+    },
+    {
+        "id": 137,
+        "name": "Christopher University"
+    },
+    {
+        "id": 138,
+        "name": "Clifford University"
+    },
+    {
+        "id": 139,
+        "name": "Coal City University"
+    },
+    {
+        "id": 140,
+        "name": "Covenant University Canaan Land"
+    },
+    {
+        "id": 141,
+        "name": "Crawford University of Apostolic Faith Mission"
+    },
+    {
+        "id": 142,
+        "name": "Crescent University"
+    },
+    {
+        "id": 143,
+        "name": "Crown Hill University"
+    },
+    {
+        "id": 144,
+        "name": "Dominican University"
+    },
+    {
+        "id": 145,
+        "name": "Eastern Palm University"
+    },
+    {
+        "id": 146,
+        "name": "Edwin Clark University"
+    },
+    {
+        "id": 147,
+        "name": "Elizade University"
+    },
+    {
+        "id": 148,
+        "name": "Evangel University"
+    },
+    {
+        "id": 149,
+        "name": "Fountain University"
+    },
+    {
+        "id": 150,
+        "name": "Godfrey Okoye University Urgwuomu- Nike"
+    },
+    {
+        "id": 151,
+        "name": "Gregory University"
+    },
+    {
+        "id": 152,
+        "name": "Hallmark University"
+    },
+    {
+        "id": 153,
+        "name": "Hezekiah University"
+    },
+    {
+        "id": 154,
+        "name": "Igbinedion University Okada"
+    },
+    {
+        "id": 155,
+        "name": "Joseph Ayo Babalola University"
+    },
+    {
+        "id": 156,
+        "name": "Kings University"
+    },
+    {
+        "id": 157,
+        "name": "Koladaisi University"
+    },
+    {
+        "id": 158,
+        "name": "KWARARRAFA University"
+    },
+    {
+        "id": 159,
+        "name": "Landmark University"
+    },
+    {
+        "id": 160,
+        "name": "Lead City University"
+    },
+    {
+        "id": 161,
+        "name": "Legacy University"
+    },
+    {
+        "id": 162,
+        "name": "Madonna University"
+    },
+    {
+        "id": 163,
+        "name": "McPherson University"
+    },
+    {
+        "id": 164,
+        "name": "Michael and Cecilia Ibru University"
+    },
+    {
+        "id": 165,
+        "name": "Mountain Top University"
+    },
+    {
+        "id": 166,
+        "name": "Nigeria Turkish Nile University"
+    },
+    {
+        "id": 167,
+        "name": "Novena University Ogume"
+    },
+    {
+        "id": 168,
+        "name": "Obong University Obong Ntak"
+    },
+    {
+        "id": 169,
+        "name": "Oduduwa University Ipetumodu"
+    },
+    {
+        "id": 170,
+        "name": "PAN-ATLANTIC University"
+    },
+    {
+        "id": 171,
+        "name": "Paul University Awka"
+    },
+    {
+        "id": 172,
+        "name": "Redeemers University"
+    },
+    {
+        "id": 173,
+        "name": "Renaissance University"
+    },
+    {
+        "id": 174,
+        "name": "Rhema University"
+    },
+    {
+        "id": 175,
+        "name": "Ritman University"
+    },
+    {
+        "id": 176,
+        "name": "Salem University"
+    },
+    {
+        "id": 177,
+        "name": "Samuel Adegboyega University"
+    },
+    {
+        "id": 178,
+        "name": "SouthWestern University"
+    },
+    {
+        "id": 179,
+        "name": "Summit University"
+    },
+    {
+        "id": 180,
+        "name": "Tansian University"
+    },
+    {
+        "id": 181,
+        "name": "University of Mkar"
+    },
+    {
+        "id": 182,
+        "name": "Veritas"
+    },
+    {
+        "id": 183,
+        "name": "Veritas University"
+    },
+    {
+        "id": 184,
+        "name": "Wellspring University"
+    },
+    {
+        "id": 185,
+        "name": "Wesley University"
+    },
+    {
+        "id": 186,
+        "name": "Western Delta University"
+    },
+    {
+        "id": 187,
+        "name": "Western Delta University"
+    },
+    {
+        "id": 188,
+        "name": "College of Education, Ikere Ekiti"
+    }
+]
