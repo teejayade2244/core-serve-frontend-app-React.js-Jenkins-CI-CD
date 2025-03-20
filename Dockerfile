@@ -12,9 +12,9 @@ COPY package*.json yarn.lock ./
 RUN yarn install --frozen-lockfile
 
 # Copy source code AFTER installing dependencies
-COPY . .
+COPY . . 
 
-# Build the frontend
+# Build the frontend (creates /app/build)
 RUN npm run build
 
 # ===========================
@@ -27,18 +27,14 @@ WORKDIR /app
 # Set environment to production
 ENV NODE_ENV=production
 
-# Create non-root user
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+# Install serve (lightweight static file server for React)
+RUN yarn global add serve
 
 # Copy only necessary files from the builder stage
-COPY --from=builder /app/package*.json /app/yarn.lock ./
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/dist ./dist
-
-# Clean up unnecessary files
-RUN yarn cache clean && rm -rf /app/node_modules/.cache
+COPY --from=builder /app/build /app/build
 
 # Set correct ownership for security
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 RUN chown -R appuser:appgroup /app
 
 # Expose port
@@ -47,5 +43,5 @@ EXPOSE 3000
 # Use non-root user
 USER appuser
 
-# Start the application
-CMD ["npm", "start"]
+# Serve the built React app
+CMD ["serve", "-s", "build", "-l", "3000"]
