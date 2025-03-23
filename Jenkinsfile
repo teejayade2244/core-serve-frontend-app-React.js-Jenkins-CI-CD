@@ -18,9 +18,7 @@ pipeline {
     stages {
         stage('Clean Workspace') {
             steps {
-                script {
-                    deleteDir()  // Deletes the workspace contents
-                }
+               checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/teejayade2244/core-serve-frontend.git']])
             }
         }
 
@@ -33,12 +31,12 @@ pipeline {
         // Dependencies installation
         stage("Install node-js dependencies") {
             steps {
-                // script {
-                //     if (env.BRANCH_NAME.contains("PR-")) {
-                //         echo "This is a PR branch... Cleaning workspace before npm install"
-                //         sh 'rm -rf node_modules package-lock.json' // Clean the workspace first
-                //     }
-                // }
+                script {
+                    if (env.BRANCH_NAME.contains("PR-")) {
+                        echo "This is a PR branch... Cleaning workspace before npm install"
+                        sh 'rm -rf node_modules package-lock.json' // Clean the workspace first
+                    }
+                }
                  sh "npm install --no-audit"
             }
         }
