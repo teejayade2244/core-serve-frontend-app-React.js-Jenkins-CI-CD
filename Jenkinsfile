@@ -23,6 +23,13 @@ pipeline {
                 }
             }
         }
+
+        stage('Debug') {
+    steps {
+        sh 'pwd'  // Check the current working directory
+        sh 'ls -la'  // List all files to confirm package.json exists
+    }
+}
         // Dependencies installation
         stage("Install node-js dependencies") {
             steps {
