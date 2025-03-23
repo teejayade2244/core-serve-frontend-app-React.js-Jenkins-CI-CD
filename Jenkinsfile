@@ -25,7 +25,7 @@ pipeline {
                         sh 'rm -rf node_modules package-lock.json' // Clean the workspace first
                     }
                 }
-                 sh "npm install --no-audit"
+                 sh "yarn install --no-audit"
             }
         }
 
