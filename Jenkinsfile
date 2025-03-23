@@ -1,7 +1,7 @@
 pipeline {
     agent any
     tools {
-        nodejs "Nodejs-22-6-0"
+        nodejs "Nodejs-0.8.6"
     }
     options {
        disableConcurrentBuilds abortPrevious: true
