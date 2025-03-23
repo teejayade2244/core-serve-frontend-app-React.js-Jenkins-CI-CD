@@ -25,7 +25,7 @@ pipeline {
                         sh 'rm -rf node_modules package-lock.json' // Clean the workspace first
                     }
                 }
-                 sh "yarn install --no-audit"
+                 sh "npm install --no-audit"
             }
         }
 
@@ -36,7 +36,7 @@ pipeline {
                     steps {
                         // Run npm audit to check for critical vulnerabilities
                         sh '''
-                            yarn audit --audit-level=critical
+                            npm audit --audit-level=critical
                             echo $?
                         '''
                     }
