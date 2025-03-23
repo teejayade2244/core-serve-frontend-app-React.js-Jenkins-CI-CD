@@ -16,6 +16,13 @@ pipeline {
     }
     
     stages {
+        stage('Clean Workspace') {
+            steps {
+                script {
+                    deleteDir()  // Deletes the workspace contents
+                }
+            }
+        }
         // Dependencies installation
         stage("Install node-js dependencies") {
             steps {
