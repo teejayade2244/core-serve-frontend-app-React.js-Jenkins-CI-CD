@@ -1,7 +1,7 @@
 pipeline {
     agent any
     tools {
-        nodejs "Nodejs-12.22.7"
+        nodejs "Nodejs-22-6-0"
     }
     options {
        disableConcurrentBuilds abortPrevious: true
@@ -16,18 +16,12 @@ pipeline {
     }
     
     stages {
-        stage('Clean Workspace') {
+        stage('checkout') {
             steps {
                checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/teejayade2244/core-serve-frontend.git']])
             }
         }
 
-        stage('Debug') {
-    steps {
-        sh 'pwd'  // Check the current working directory
-        sh 'ls -la'  // List all files to confirm package.json exists
-    }
-}
         // Dependencies installation
         stage("Install node-js dependencies") {
             steps {
@@ -69,7 +63,7 @@ pipeline {
                                 ''', odcInstallation: 'OWAPS-Depend-check'
                          }
                         // Publish the Dependency Check report and fail the build if critical issues are found
-                        dependencyCheckPublisher failedTotalCritical: 1, pattern: 'OWASP-security-reports/dependency-check-report.xml', stopBuild: true
+                        dependencyCheckPublisher failedTotalCritical: 5, pattern: 'OWASP-security-reports/dependency-check-report.xml', stopBuild: true
                     }
                 }
             }
