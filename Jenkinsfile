@@ -36,7 +36,7 @@ pipeline {
                     steps {
                         // Run npm audit to check for critical vulnerabilities
                         sh '''
-                            npm audit --audit-level=critical
+                            yarn audit --audit-level=critical
                             echo $?
                         '''
                     }
