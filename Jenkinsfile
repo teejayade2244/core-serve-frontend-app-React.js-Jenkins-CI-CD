@@ -17,7 +17,7 @@ pipeline {
     
     stages {
         // Dependencies installation
-        stage("Install nodejs dependencies") {
+        stage("Install node-js dependencies") {
             steps {
                 script {
                     if (env.BRANCH_NAME.contains("PR-")) {
