@@ -12,6 +12,7 @@ import Loader from "../../components/Loader"
 import ToastMsg from "../../components/ToastContainer"
 import { MdOutlineRemoveRedEye } from "react-icons/md"
 import { AiOutlineEyeInvisible } from "react-icons/ai"
+import logo from "../../components/Preview.png"
 // import Loader from "../../components/Loader"
 
 function LoginPage() {
@@ -69,8 +70,8 @@ function LoginPage() {
                 <div className="absolute z-10 flex flex-col items-center justify-center mt-5">
                     <Link to={"/"}>
                         <img
-                            className="sm:mb-5 cursor-pointer"
-                            src="https://portal.nysc.org.ng/nysc1/img/banner1.png"
+                            className="sm:mb-5 h-24 w-auto cursor-pointer"
+                            src={logo}
                             alt=""
                         />
                     </Link>

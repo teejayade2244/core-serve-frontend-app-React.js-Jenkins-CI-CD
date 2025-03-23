@@ -50,7 +50,7 @@ function UpdatePassword() {
                     <Sidebar />
                 </div>
                 <div className="w-full px-3">
-                    <h1 className="bg-[#CCE5CC] text-[#003300] font-Belanosima py-2 rounded-md px-5 text-[25px] w-full mb-5">
+                    <h1 className="bg-[#314ba9] text-white font-Belanosima py-2 rounded-md px-5 text-[25px] w-full mb-5">
                         Change Password
                     </h1>
 
@@ -134,7 +134,7 @@ function UpdatePassword() {
 
                             <button
                                 type="submit"
-                                className="bg-[#2B943A] text-white font-Roboto font-semibold text-[15px] py-2 px-3 md:w-[30%] w-full"
+                                className="bg-[#314ba9] text-white font-Roboto font-semibold text-[15px] py-2 px-3 md:w-[30%] w-full"
                             >
                                 Change Password
                             </button>

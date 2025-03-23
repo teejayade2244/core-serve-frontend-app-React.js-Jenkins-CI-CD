@@ -76,7 +76,7 @@ function UserProfile() {
                 <div className="bg-[#f5f5f5]">
                     <div className="flex flex-col lg:flex-row px-2 py-2 max-w-7xl mx-auto gap-x-10">
                         <div className="border py-5 px-5 w-full lg:w-[50%] bg-[#FFFFFF]/30 rounded-lg shadow-md">
-                            <div className="bg-[#2B943A] py-1 px-3 rounded-md mb-3 md:mx-2">
+                            <div className="bg-[#314ba9] py-1 px-3 rounded-md mb-3 md:mx-2">
                                 <h1 className="text-white font-Roboto text-[18px] uppercase">
                                     User Profile
                                 </h1>

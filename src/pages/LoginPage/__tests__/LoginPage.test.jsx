@@ -17,7 +17,7 @@ beforeAll(() => {
 
 const mockStore = configureStore([])
 
-describe("LoginPage Component", () => {
+describe("LoginPage", () => {
     let store
 
     beforeEach(() => {
@@ -26,6 +26,18 @@ describe("LoginPage Component", () => {
                 isLoading: false,
             },
         })
+    })
+
+    it("renders login form", () => {
+        render(
+            <Provider store={store}>
+                <Router>
+                    <LoginPage />
+                </Router>
+            </Provider>
+        )
+
+        expect(screen.getByText(/Login to your Account/i)).toBeInTheDocument()
     })
 
     it("renders the LoginPage correctly", () => {

@@ -11,6 +11,7 @@ import universities from "../../constants/universities.json"
 import { useState } from "react"
 import { MdOutlineRemoveRedEye } from "react-icons/md"
 import { AiOutlineEyeInvisible } from "react-icons/ai"
+import logo from "../../components/Preview.png"
 
 function SignUpPage() {
     //validation patterns
@@ -97,13 +98,13 @@ function SignUpPage() {
                         <div className=" flex md:items-center md:justify-center">
                             <a href="/">
                                 <img
-                                    className=""
-                                    src="https://portal.nysc.org.ng/nysc1/img/banner1.png"
+                                    className="h-24 w-auto"
+                                    src={logo}
                                     alt=""
                                 />{" "}
                             </a>
                         </div>
-                        <h2 className="bg-[#2b943a] px-5 py-2 text-center text-[18px] font-bold rounded-md text-white">
+                        <h2 className="bg-[#314ba9] px-5 py-2 text-center text-[18px] font-bold rounded-md text-white">
                             Create an Account
                         </h2>
 

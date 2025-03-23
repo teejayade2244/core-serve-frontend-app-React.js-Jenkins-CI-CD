@@ -103,7 +103,7 @@ function MainContent({ user, formattedDate, setModalOpen }) {
 function HeaderSection({ user, formattedDate }) {
     return (
         <div className="flex flex-col justify-between md:flex-row mb-10 md:items-center space-y-3">
-            <h2 className="bg-green-600 rounded-[4px] text-[15px] px-7 ml-5 text-white font-semibold text-center">
+            <h2 className="bg-[#0369a1] rounded-[4px] text-[15px] px-7 ml-5 text-white font-semibold text-center">
                 {user.email}
             </h2>
             <h3 className="md:mr-10 ml-[170px] text-[14px] text-gray-800">
@@ -119,7 +119,7 @@ function DetailsSection({ user }) {
             <h3 className="text-black bg-gray-200 font-semibold text-[18px] px-3">
                 Dashboard Basic | Details
             </h3>
-            <div className="bg-[#dff0d8] px-5 mx-5 mt-4 rounded-md">
+            <div className="bg-[#f8fafc] px-5 mx-5 mt-4 rounded-md">
                 <div className="flex flex-row justify-between">
                     <UserDetailsList user={user} />
                     <UserImage image={user.Image} />
@@ -174,11 +174,11 @@ function UserImage({ image }) {
 function Description() {
     return (
         <>
-            <h3 className="text-[#3c763d] italic mb-3 font-semibold w-full md:text-[14px]">
+            <h3 className="text-[#334155] italic mb-3 font-semibold w-full md:text-[14px]">
                 Lorem ipsum, or lipsum as it is sometimes known, is dummy text
                 used in laying out print, graphic or web designs...
             </h3>
-            <h3 className="text-[#3c763d] italic mb-5 font-semibold md:mb-10 md:text-[14px]">
+            <h3 className="text-[#334155] italic mb-5 font-semibold md:mb-10 md:text-[14px]">
                 The purpose of lorem ipsum is to create a natural looking block
                 of text...
             </h3>
@@ -189,8 +189,12 @@ function Description() {
 function ActionButtons() {
     return (
         <div className="flex items-center flex-col w-full gap-2 p-3 lg:flex-row">
-            <button className="btn">Print Slip</button>
-            <button className="btn">Relocation</button>
+            <button className="px-4 py-2 bg-[#0369a1] text-white rounded-md hover:bg-[#075985] transition-colors duration-200">
+                Print Slip
+            </button>
+            <button className="px-4 py-2 bg-[#0369a1] text-white rounded-md hover:bg-[#075985] transition-colors duration-200">
+                Relocation
+            </button>
         </div>
     )
 }
@@ -202,7 +206,7 @@ function CorrectionNotice({ setModalOpen }) {
                 If the spelling/arrangement shown above is incorrect,{" "}
                 <span
                     onClick={() => setModalOpen(true)}
-                    className="bg-[#5CB85C] text-white cursor-pointer font-Belanosima hover:underline py-[3px] px-2 rounded-md hover:text-[#0a0d1a]"
+                    className="bg-[#3b82f6] text-white cursor-pointer font-Belanosima hover:bg-blue-700 py-[3px] px-2 rounded-md hover:text-white"
                 >
                     Apply for Correction/Rearrangement of Name
                 </span>
@@ -214,9 +218,9 @@ function CorrectionNotice({ setModalOpen }) {
 function UserDetails({ title, details, testId }) {
     return (
         <div className="flex flex-col md:flex-row space-x-3 items-start">
-            <h3 className="text-[#3c763d] font-Belanosima">{title}:</h3>
+            <h3 className="text-[#0369a1] font-Belanosima">{title}:</h3>
             <h4
-                className="text-[#3c763d] font-500 text-[14px]"
+                className="text-[#334155] font-500 text-[14px]"
                 data-testid={testId}
             >
                 {details}

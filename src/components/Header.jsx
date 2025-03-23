@@ -14,6 +14,7 @@ import {
 } from "@mui/icons-material"
 import { BiMenuAltRight } from "react-icons/bi"
 import { Link, useLocation } from "react-router-dom"
+import logo from "../components/Preview.png"
 
 export function Header() {
     const [isOpen, setIsOpen] = useState(false)
@@ -39,8 +40,8 @@ export function Header() {
                 <div className="flex items-center flex-row justify-between space-x-10 ">
                     <a href="./">
                         <img
-                            className="cursor-pointer"
-                            src="https://portal.nysc.org.ng/nysc1/img/banner1.png"
+                            className="cursor-pointer h-16 w-auto object-contain"
+                            src={logo}
                             alt="logo"
                         />
                     </a>
@@ -144,9 +145,9 @@ export function Header() {
             {/* Header Bottom */}
             <div className="w-full">
                 <div className="border border-x-0 border-t-0 border-[#960000] border-b-[4px]"></div>
-                <div className="bg-[#2b943a] p-[10px] w-full">
+                <div className="bg-[#314ba9] p-[10px] w-full">
                     <h1 className="text-white md:ml-20 font-semibold sm:text-3xl text-2xl md:text-3xl font-sans tracking-wide">
-                        Welcome to the NYSC Portal{" "}
+                        Welcome to the Core Serve Portal{" "}
                         <span className="text-3xl font-sans"></span>
                     </h1>
                 </div>
