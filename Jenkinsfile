@@ -16,6 +16,15 @@ pipeline {
     }
     
     stages {
+         stage('clean workspace') {
+            steps {
+                script {
+                    echo "Cleaning workspace..."
+                    deleteDir()
+                }
+            }
+        }
+
         stage('checkout') {
             steps {
                checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/teejayade2244/core-serve-frontend.git']])
@@ -63,7 +72,7 @@ pipeline {
                                 ''', odcInstallation: 'OWAPS-Depend-check'
                          }
                         // Publish the Dependency Check report and fail the build if critical issues are found
-                        dependencyCheckPublisher failedTotalCritical: 5, pattern: 'OWASP-security-reports/dependency-check-report.xml', stopBuild: true
+                        dependencyCheckPublisher failedTotalCritical: 2, pattern: 'OWASP-security-reports/dependency-check-report.xml', stopBuild: true
                     }
                 }
             }
