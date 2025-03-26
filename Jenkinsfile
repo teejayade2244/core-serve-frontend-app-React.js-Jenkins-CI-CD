@@ -8,7 +8,7 @@ pipeline {
     }
     environment {
         AWS_REGION = credentials ('AWS-REGION')
-        ECR_REPO_NAME = 'serve-core-frontend'
+        ECR_REPO_NAME = 'core-serve-frontend-app'
         AWS_ACCOUNT_ID = credentials ('AWS-account-id')
         IMAGE_TAG = "${ECR_REPO_NAME}:${BUILD_ID}"
         DOCKER_IMAGE_NAME = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${IMAGE_TAG}"
@@ -81,38 +81,31 @@ pipeline {
         // unit testing
         stage("Unit Testing stage") {
             steps {
-              // option { retry (2) }
-              // sh 'echo MY_USERNAME - $MY_CREDENTIALS_USR'
-              // sh 'echo MY_PASSWORD - $MY_CREDENTIALS_PSW'
-            //   withCredentials([usernamePassword(credentialsId: 'env_credentials', passwordVariable: 'MY_PASSWORD', usernameVariable: 'MY_USERNAME')]) {
-            // }
                 // Run unit tests with npm
                 sh "npm test"
             } 
         }
 
         // static testing and analysis with SonarQube
-        // stage("Static Testing and Analysis with SonarQube") {
-        //     environment {
-        //             SONAR_SCANNER_HOME = tool 'sonarqube-scanner-6.1.0.477'
-        //         }
-        //     steps {
-        //         timeout(time: 5, unit: 'MINUTES') {
-        //             withSonarQubeEnv('sonarqube-server') {
-        //                 // Run SonarQube scanner with specific parameters
-        //                 sh '''
-        //                     ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
-        //                     -Dsonar.projectKey=serve-core-frontend \
-        //                     -Dsonar.sources=src \
-        //                     -Dsonar.inclusions=src/App.js \
-    
-        //                 '''
-        //             }
-        //         }
-        //         // Wait for SonarQube quality gate and fail the pipeline if it's not OK
-        //         waitForQualityGate abortPipeline: true
-        //     }
-        // }
+        stage("Static Testing and Analysis with SonarQube") {
+            environment {
+                    SONAR_SCANNER_HOME = tool 'sonarqube-scanner-6.1.0.477'
+                }
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    withSonarQubeEnv('sonarqube-server') {
+                        // Run SonarQube scanner with specific parameters
+                        sh '''
+                            ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
+                            -Dsonar.projectKey=serve-core-frontend \
+                            -Dsonar.sources=. \
+                        '''
+                    }
+                }
+                // Wait for SonarQube quality gate and fail the pipeline if it's not OK
+                waitForQualityGate abortPipeline: true
+            }
+        }
 
         // login to ECR
         stage("AWS ECR login") {
