@@ -10,8 +10,8 @@ pipeline {
         AWS_REGION = credentials ('AWS-REGION')
         ECR_REPO_NAME = 'core-serve-frontend-app'
         AWS_ACCOUNT_ID = credentials ('AWS-account-id')
-        IMAGE_TAG = '${ECR_REPO_NAME}:${BUILD_ID}'
-        DOCKER_IMAGE_NAME = '${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${IMAGE_TAG}'
+        IMAGE_TAG = "${ECR_REPO_NAME}:${BUILD_ID}"
+        DOCKER_IMAGE_NAME = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${IMAGE_TAG}"
         GITHUB_TOKEN = credentials ('Github account token')
     }
     
