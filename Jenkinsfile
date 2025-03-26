@@ -97,7 +97,7 @@ pipeline {
                         // Run SonarQube scanner with specific parameters
                         sh '''
                             ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
-                            -Dsonar.projectKey=serve-core-frontend \
+                            -Dsonar.projectKey=Serve-core-frontend \
                             -Dsonar.sources=. \
                         '''
                     }
