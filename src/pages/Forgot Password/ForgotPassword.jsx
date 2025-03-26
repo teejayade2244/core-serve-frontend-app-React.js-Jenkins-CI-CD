@@ -12,6 +12,7 @@ import { base_url } from "../../utils/axiosConfig"
 import { toast } from "react-toastify"
 import ToastMsg from "../../components/ToastContainer"
 import Loader from "../../components/Loader"
+import logo from "../../components/Preview.png"
 
 function ForgotPassword() {
     const dispatch = useDispatch()
@@ -63,14 +64,14 @@ function ForgotPassword() {
                 <div className="absolute z-10 flex flex-col items-center justify-center mt-20">
                     <Link to={"/"}>
                         <img
-                            className="sm:mb-5 cursor-pointer"
-                            src="https://portal.nysc.org.ng/nysc1/img/banner1.png"
+                            className="sm:mb-5 w-auto h-20 md:mb-4 cursor-pointer"
+                            src={logo}
                             alt=""
                         />
                     </Link>
 
                     <div className="p-5 mx-3 rounded-xl bg-white md:w-[70%] lg:w-[70%] shadow-md">
-                        <h1 className="p-3 rounded-md text-xl text-center bg-[#979aaa] font-sans font-bold">
+                        <h1 className="p-3 rounded-md text-xl text-center bg-[#0369a1] text-white font-sans font-bold">
                             Retrive Your Password
                         </h1>
                         <h2 className="text-center mt-5 text-[13px] font-sans font-semibold text-black mb-4">
@@ -101,7 +102,7 @@ function ForgotPassword() {
                             <div>
                                 <button
                                     type="submit"
-                                    className="bg-[#2B943A] text-white text-center w-full py-2 mt-5 rounded-md font-semibold font-sans cursor-pointer"
+                                    className="bg-[#0369a1] text-white text-center w-full py-2 mt-5 rounded-md font-semibold font-sans cursor-pointer"
                                 >
                                     Send Email
                                 </button>
