@@ -6,10 +6,10 @@ FROM node:18-alpine AS builder
 WORKDIR /app
 
 # Copy package files first to optimize caching
-COPY package*.json yarn.lock ./
+COPY package*.json ./
 
 # Install dependencies
-RUN yarn install --frozen-lockfile
+RUN npm install --frozen-lockfile
 
 # Copy source code AFTER installing dependencies
 COPY . . 
@@ -28,7 +28,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 
 # Install serve (lightweight static file server for React)
-RUN yarn global add serve
+RUN npm install --global serve
 
 # Copy only necessary files from the builder stage
 COPY --from=builder /app/build /app/build

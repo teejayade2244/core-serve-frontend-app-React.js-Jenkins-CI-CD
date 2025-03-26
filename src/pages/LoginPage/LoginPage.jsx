@@ -70,7 +70,7 @@ function LoginPage() {
                 <div className="absolute z-10 flex flex-col items-center justify-center mt-5">
                     <Link to={"/"}>
                         <img
-                            className="sm:mb-5 h-24 w-auto cursor-pointer"
+                            className="sm:mb-5 h-24 md:mb-5 w-auto cursor-pointer"
                             src={logo}
                             alt=""
                         />
