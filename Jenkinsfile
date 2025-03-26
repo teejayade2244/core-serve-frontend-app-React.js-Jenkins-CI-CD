@@ -19,7 +19,7 @@ pipeline {
          stage('clean workspace') {
             steps {
                 script {
-                    echo "Cleaning workspace..."
+                    echo "Cleaning workspace.."
                     deleteDir()
                 }
             }
