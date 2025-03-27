@@ -133,7 +133,7 @@ pipeline {
                   script {
                     def gitCommitTag = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
                     sh 'docker build -t ${IMAGE_TAG} .'
-                    sh'docker tag ${IMAGE_TAG} ${DOCKER_IMAGE_NAME}:${gitCommitTag}'
+                    sh 'docker tag ${IMAGE_TAG} ${DOCKER_IMAGE_NAME}:${gitCommitTag}'
                   } 
               }
         }
