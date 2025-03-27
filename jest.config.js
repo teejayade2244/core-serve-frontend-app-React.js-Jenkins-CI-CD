@@ -13,17 +13,6 @@ module.exports = {
                 titleTemplate: "{title}",
             },
         ],
-        [
-            "jest-html-reporter",
-            {
-                pageTitle: "Test Report",
-                outputPath: "test-results/test-report.html",
-                includeFailureMsg: true,
-                includeSuiteFailure: true,
-                styleOverridePath: null,
-                useCssFile: false,
-            },
-        ],
     ],
     testEnvironment: "jsdom",
     moduleNameMapper: {
