@@ -25,7 +25,7 @@ export function FirstSection() {
                             Remobilization,2023 A{" "}
                         </h2>
                         <span className="bg-white text-center text-orange-500 p-1 rounded-[4px]">
-                            Ends on 12/03/2023
+                            Ends on 12/03/2025
                         </span>
 
                         {hover && (

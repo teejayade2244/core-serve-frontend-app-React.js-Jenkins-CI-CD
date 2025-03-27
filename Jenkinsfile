@@ -14,6 +14,8 @@ pipeline {
         IMAGE_TAG = "${ECR_REPO_NAME}:${VERSION}"
         DOCKER_IMAGE_NAME = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${GIT_COMMIT}"
         GITHUB_TOKEN = credentials ('Github account token')
+        EC2_HOST = credentials ('AWS-EC2-HOST')
+        PORT = credentials ('port-number')
     }
     
     stages {
