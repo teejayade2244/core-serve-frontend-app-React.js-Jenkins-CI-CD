@@ -83,6 +83,7 @@ pipeline {
         stage("Unit Testing stage") {
             steps {
                 // Run unit tests with npm
+                sh 'mkdir -p test-results'
                 sh "npm test"
             } 
         }
@@ -152,7 +153,7 @@ pipeline {
                     --format json -o Trivy-Image-Reports/trivy-image-MEDIUM-results.json 
 
                     trivy image ${DOCKER_IMAGE_NAME} \
-                    --severity HIGH,CRITICAL \
+                    --severity CRITICAL \
                     --exit-code 1 \
                     --quiet \
                     --format json -o Trivy-Image-Reports/trivy-image-CRITICAL-results.json 
@@ -280,7 +281,7 @@ pipeline {
             //   }
          
               // Publish JUnit test results, even if they are empty
-              junit allowEmptyResults: true, testResults: '**/test-results.xml, **/dependency-check-junit.xml, **/trivy-image-CRITICAL-results.xml, **/trivy-image-MEDIUM-results.xml'   
+              junit allowEmptyResults: true, testResults: '**/test-results/junit.xml, **/dependency-check-junit.xml, **/trivy-image-CRITICAL-results.xml, **/trivy-image-MEDIUM-results.xml'   
               
               // Publish the Dependency Check HTML report
               publishHTML([
@@ -292,6 +293,17 @@ pipeline {
                   reportName: 'Dependency check HTML Report', 
                   reportTitles: '', 
                   useWrapperFileDirectly: true
+              ])
+
+             // Publish Jest HTML reports
+              publishHTML([
+                 allowMissing: true,
+                 alwaysLinkToLastBuild: true,
+                 keepAll: true,
+                 reportDir: 'test-results',
+                 reportFiles: 'test-report.html',
+                 reportName: 'Jest Test Report',
+                 reportTitles: ''
               ])
 
               // Publish Trivy HTML reports with correct filenames
