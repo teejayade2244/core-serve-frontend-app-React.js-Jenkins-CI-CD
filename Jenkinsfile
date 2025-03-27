@@ -171,11 +171,11 @@ pipeline {
                             --output Trivy-Image-Reports/trivy-image-CRITICAL-results.html Trivy-Image-Reports/trivy-image-CRITICAL-results.json
 
                         trivy convert \
-                            --format template --template "@/usr/local/share/trivy/templates/xml.tpl" \
+                            --format template --template "@/usr/local/share/trivy/templates/junit.tpl" \
                             --output Trivy-Image-Reports/trivy-image-MEDIUM-results.xml Trivy-Image-Reports/trivy-image-MEDIUM-results.json  
 
                         trivy convert \
-                            --format template --template "@/usr/local/share/trivy/templates/xml.tpl" \
+                            --format template --template "@/usr/local/share/trivy/templates/junit.tpl" \
                             --output Trivy-Image-Reports/trivy-image-CRITICAL-results.xml Trivy-Image-Reports/trivy-image-CRITICAL-results.json    
                     '''
                 }
@@ -283,11 +283,39 @@ pipeline {
               junit allowEmptyResults: true, testResults: '**/test-results.xml, **/dependency-check-junit.xml, **/trivy-image-CRITICAL-results.xml, **/trivy-image-MEDIUM-results.xml'   
               
               // Publish the Dependency Check HTML report
-              publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, keepAll: true, reportDir: './OWASP-security-reports', reportFiles: 'dependency-check-report.html', reportName: 'Dependency check HTML Report', reportTitles: '', useWrapperFileDirectly: true])
-        
-              publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, keepAll: true, reportDir: './Trivy-Image-Reports', reportFiles: 'CRITICAL-results.html', reportName: 'Trivy scan Image critical vul report', reportTitles: '', useWrapperFileDirectly: true])
+              publishHTML([
+                  allowMissing: true, 
+                  alwaysLinkToLastBuild: true, 
+                  keepAll: true, 
+                  reportDir: './OWASP-security-reports', 
+                  reportFiles: 'dependency-check-report.html', 
+                  reportName: 'Dependency check HTML Report', 
+                  reportTitles: '', 
+                  useWrapperFileDirectly: true
+              ])
 
-              publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, keepAll: true, reportDir: './Trivy-Image-Reports', reportFiles: 'MEDIUM-results.html', reportName: 'Trivy scan Image medium vul report', reportTitles: '', useWrapperFileDirectly: true])
+              // Publish Trivy HTML reports with correct filenames
+              publishHTML([
+                  allowMissing: true, 
+                  alwaysLinkToLastBuild: true, 
+                  keepAll: true, 
+                  reportDir: './Trivy-Image-Reports', 
+                  reportFiles: 'trivy-image-CRITICAL-results.html', 
+                  reportName: 'Trivy Scan Critical Vulnerabilities', 
+                  reportTitles: '', 
+                  useWrapperFileDirectly: true
+              ])
+
+              publishHTML([
+                  allowMissing: true, 
+                  alwaysLinkToLastBuild: true, 
+                  keepAll: true, 
+                  reportDir: './Trivy-Image-Reports', 
+                  reportFiles: 'trivy-image-MEDIUM-results.html', 
+                  reportName: 'Trivy Scan Medium Vulnerabilities', 
+                  reportTitles: '', 
+                  useWrapperFileDirectly: true
+              ])
           }
        }
 }
