@@ -157,37 +157,37 @@ pipeline {
                 --severity LOW,MEDIUM \
                 --exit-code 0 \
                 --quiet \
-                --format json -o trivy-image-MEDIUM-results.json
+                --format json -o trivy-image-MEDIUM-results.json >> trivy.txt
 
                  trivy image ${DOCKER_IMAGE_NAME} \
                 --severity CRITICAL \
                 --exit-code 1 \
                 --quiet \
-                --format json -o trivy-image-CRITICAL-results.json
+                --format json -o trivy-image-CRITICAL-results.json >> trivy2.txt
               '''
             }
-            post {
-              always {
-                //converting the json report format to html and junit so it can be published
-                sh '''
-                 trivy convert \
-                    --format template --template "@/usr/local/share/trivy/templates/html.tpl" \
-                    --output trivy-image-MEDIUM-results.html trivy-image-MEDIUM-results.json  
+            // post {
+            //   always {
+            //     //converting the json report format to html and junit so it can be published
+            //     sh '''
+            //      trivy convert \
+            //         --format template --template "@/usr/local/share/trivy/templates/html.tpl" \
+            //         --output trivy-image-MEDIUM-results.html trivy-image-MEDIUM-results.json  
                 
-                 trivy convert \
-                    --format template --template "@/usr/local/share/trivy/templates/html.tpl" \
-                    --output trivy-image-CRITICAL-results.html trivy-image-CRITICAL-results.json
+            //      trivy convert \
+            //         --format template --template "@/usr/local/share/trivy/templates/html.tpl" \
+            //         --output trivy-image-CRITICAL-results.html trivy-image-CRITICAL-results.json
 
-                trivy convert \
-                    --format template --template "@/usr/local/share/trivy/templates/xml.tpl" \
-                    --output trivy-image-MEDIUM-results.xml trivy-image-MEDIUM-results.json  
+            //     trivy convert \
+            //         --format template --template "@/usr/local/share/trivy/templates/xml.tpl" \
+            //         --output trivy-image-MEDIUM-results.xml trivy-image-MEDIUM-results.json  
 
-                trivy convert \
-                    --format template --template "@/usr/local/share/trivy/templates/xml.tpl" \
-                    --output trivy-image-CRITICAL-results.xml trivy-image-CRITICAL-results.json    
-                 '''
-              }
-            }
+            //     trivy convert \
+            //         --format template --template "@/usr/local/share/trivy/templates/xml.tpl" \
+            //         --output trivy-image-CRITICAL-results.xml trivy-image-CRITICAL-results.json    
+            //      '''
+            //   }
+            // }
         }
 
         // Push image to AWS ECR
@@ -291,11 +291,11 @@ pipeline {
               junit allowEmptyResults: true, testResults: '**/test-results.xml, **/dependency-check-junit.xml, **/trivy-image-CRITICAL-results.xml, **/trivy-image-MEDIUM-results.xml'   
               
               // Publish the Dependency Check HTML report
-              publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'OWASP-security-reports', reportFiles: 'dependency-check-report.html', reportName: 'Dependency check HTML Report', reportTitles: '', useWrapperFileDirectly: true])
+              publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, keepAll: true, reportDir: './OWASP-security-reports', reportFiles: 'dependency-check-report.html', reportName: 'Dependency check HTML Report', reportTitles: '', useWrapperFileDirectly: true])
         
-              publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'Trivy-Image-Reports', reportFiles: 'CRITICAL-results.html', reportName: 'Trivy scan Image critical vul report', reportTitles: '', useWrapperFileDirectly: true])
+              publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, keepAll: true, reportDir: './Trivy-Image-Reports', reportFiles: 'CRITICAL-results.html', reportName: 'Trivy scan Image critical vul report', reportTitles: '', useWrapperFileDirectly: true])
 
-              publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'Trivy-Image-Reports', reportFiles: 'MEDIUM-results.html', reportName: 'Trivy scan Image medium vul report', reportTitles: '', useWrapperFileDirectly: true])
+              publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, keepAll: true, reportDir: './Trivy-Image-Reports', reportFiles: 'MEDIUM-results.html', reportName: 'Trivy scan Image medium vul report', reportTitles: '', useWrapperFileDirectly: true])
           }
        }
 }
