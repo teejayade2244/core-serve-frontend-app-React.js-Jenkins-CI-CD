@@ -294,18 +294,7 @@ pipeline {
                   reportTitles: '', 
                   useWrapperFileDirectly: true
               ])
-
-             // Publish Jest HTML reports
-              publishHTML([
-                 allowMissing: true,
-                 alwaysLinkToLastBuild: true,
-                 keepAll: true,
-                 reportDir: 'test-results',
-                 reportFiles: 'test-report.html',
-                 reportName: 'Jest Test Report',
-                 reportTitles: ''
-              ])
-
+              
               // Publish Trivy HTML reports with correct filenames
               publishHTML([
                   allowMissing: true, 
