@@ -152,7 +152,7 @@ pipeline {
                     --format json -o Trivy-Image-Reports/trivy-image-MEDIUM-results.json 
 
                     trivy image ${DOCKER_IMAGE_NAME} \
-                    --severity CRITICAL \
+                    --severity HIGH,CRITICAL \
                     --exit-code 1 \
                     --quiet \
                     --format json -o Trivy-Image-Reports/trivy-image-CRITICAL-results.json 
