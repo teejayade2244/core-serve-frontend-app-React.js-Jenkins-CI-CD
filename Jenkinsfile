@@ -127,67 +127,59 @@ pipeline {
         }
 
         // Build Docker image
-        stage("Build docker image") {
+        stage("Docker Build and Tag") {
               steps {
                   script {
                         // Build the Docker image
                         sh '''
                             docker build -t ${IMAGE_TAG} .
+                            docker tag ${IMAGE_TAG} ${DOCKER_IMAGE_NAME}
                         '''
                   } 
               }
         }
 
-       // Tag Docker Image
-        stage("Tag Docker Image") {
-            //creates another name (tag) for the image so it matches the AWS ECR format.
-              steps {
-                  script {
-                      sh 'docker tag ${IMAGE_TAG} ${DOCKER_IMAGE_NAME}'
-                  }
-              }
-        }
 
         // scan the image for vulnerabilities before pushing to resgistry
         stage("Trivy Vulnerability scan") {
             steps {
-              sh 'mkdir -p Trivy-Image-Reports'
-              sh '''
-                trivy image ${DOCKER_IMAGE_NAME} \
-                --severity LOW,MEDIUM \
-                --exit-code 0 \
-                --quiet \
-                --format json -o trivy-image-MEDIUM-results.json >> trivy.txt
+                sh 'mkdir -p Trivy-Image-Reports'
+                sh '''
+                    trivy image ${DOCKER_IMAGE_NAME} \
+                    --severity LOW,MEDIUM \
+                    --exit-code 0 \
+                    --quiet \
+                    --format json -o Trivy-Image-Reports/trivy-image-MEDIUM-results.json 
 
-                 trivy image ${DOCKER_IMAGE_NAME} \
-                --severity CRITICAL \
-                --exit-code 1 \
-                --quiet \
-                --format json -o trivy-image-CRITICAL-results.json >> trivy2.txt
-              '''
+                    trivy image ${DOCKER_IMAGE_NAME} \
+                    --severity CRITICAL \
+                    --exit-code 1 \
+                    --quiet \
+                    --format json -o Trivy-Image-Reports/trivy-image-CRITICAL-results.json 
+                '''
             }
-            // post {
-            //   always {
-            //     //converting the json report format to html and junit so it can be published
-            //     sh '''
-            //      trivy convert \
-            //         --format template --template "@/usr/local/share/trivy/templates/html.tpl" \
-            //         --output trivy-image-MEDIUM-results.html trivy-image-MEDIUM-results.json  
-                
-            //      trivy convert \
-            //         --format template --template "@/usr/local/share/trivy/templates/html.tpl" \
-            //         --output trivy-image-CRITICAL-results.html trivy-image-CRITICAL-results.json
+            post {
+                always {
+                    // Convert the json reports to HTML and XML formats
+                    sh '''
+                        trivy convert \
+                            --format template --template "@/usr/local/share/trivy/templates/html.tpl" \
+                            --output Trivy-Image-Reports/trivy-image-MEDIUM-results.html Trivy-Image-Reports/trivy-image-MEDIUM-results.json  
+                    
+                        trivy convert \
+                            --format template --template "@/usr/local/share/trivy/templates/html.tpl" \
+                            --output Trivy-Image-Reports/trivy-image-CRITICAL-results.html Trivy-Image-Reports/trivy-image-CRITICAL-results.json
 
-            //     trivy convert \
-            //         --format template --template "@/usr/local/share/trivy/templates/xml.tpl" \
-            //         --output trivy-image-MEDIUM-results.xml trivy-image-MEDIUM-results.json  
+                        trivy convert \
+                            --format template --template "@/usr/local/share/trivy/templates/xml.tpl" \
+                            --output Trivy-Image-Reports/trivy-image-MEDIUM-results.xml Trivy-Image-Reports/trivy-image-MEDIUM-results.json  
 
-            //     trivy convert \
-            //         --format template --template "@/usr/local/share/trivy/templates/xml.tpl" \
-            //         --output trivy-image-CRITICAL-results.xml trivy-image-CRITICAL-results.json    
-            //      '''
-            //   }
-            // }
+                        trivy convert \
+                            --format template --template "@/usr/local/share/trivy/templates/xml.tpl" \
+                            --output Trivy-Image-Reports/trivy-image-CRITICAL-results.xml Trivy-Image-Reports/trivy-image-CRITICAL-results.json    
+                    '''
+                }
+            }
         }
 
         // Push image to AWS ECR
