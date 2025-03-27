@@ -12,7 +12,7 @@ pipeline {
         VERSION = "1.0.${BUILD_NUMBER}"
         AWS_ACCOUNT_ID = credentials ('AWS-account-id')
         IMAGE_TAG = "${ECR_REPO_NAME}:${VERSION}"
-        DOCKER_IMAGE_NAME = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}"
+        DOCKER_IMAGE_NAME = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${GIT_COMMIT}"
         GITHUB_TOKEN = credentials ('Github account token')
     }
     
@@ -131,9 +131,8 @@ pipeline {
         stage("Docker Build and Tag") {
               steps {
                   script {
-                    def gitCommitTag = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
                     sh 'docker build -t ${IMAGE_TAG} .'
-                    sh 'docker tag ${IMAGE_TAG} ${DOCKER_IMAGE_NAME}:${gitCommitTag}'
+                    sh 'docker tag ${IMAGE_TAG} ${DOCKER_IMAGE_NAME}'
                   } 
               }
         }
