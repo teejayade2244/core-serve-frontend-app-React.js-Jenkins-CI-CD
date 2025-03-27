@@ -60,12 +60,12 @@ pipeline {
 
                 stage("OWASP Dependency Check") { 
                     steps {
-                        // sh 'mkdir -p ${WORKSPACE}/OWASP-security-reports'
+                        sh 'mkdir -p OWASP-security-reports'
                         // Run OWASP Dependency Check scan with specific arguments
                         withCredentials([string(credentialsId: 'NVD-API-KEY', variable: 'NVD_API_KEY')]) {
                                 dependencyCheck additionalArguments: '''
-                                    --scan "${WORKSPACE}" \
-                                    --out "${WORKSPACE}/OWASP-security-reports" \
+                                    --scan "." \
+                                    --out "OWASP-security-reports" \
                                     --disableYarnAudit \
                                     --format \'ALL\' \
                                     --prettyPrint \
@@ -151,6 +151,7 @@ pipeline {
         // scan the image for vulnerabilities before pushing to resgistry
         stage("Trivy Vulnerability scan") {
             steps {
+              sh 'mkdir -p Trivy-Image-Reports'
               sh '''
                 trivy image ${DOCKER_IMAGE_NAME} \
                 --severity LOW,MEDIUM \
@@ -287,17 +288,14 @@ pipeline {
             //   }
          
               // Publish JUnit test results, even if they are empty
-              junit allowEmptyResults: true, stdioRetention: '', testResults: 'test-results.xml'
-              junit allowEmptyResults: true, stdioRetention: '', testResults: 'dependency-check-junit.xml'
-              junit allowEmptyResults: true, stdioRetention: '', testResults: 'trivy-image-CRITICAL-results.xml'
-              junit allowEmptyResults: true, stdioRetention: '', testResults: 'trivy-image-MEDIUM-results.xml'   
+              junit allowEmptyResults: true, testResults: '**/test-results.xml, **/dependency-check-junit.xml, **/trivy-image-CRITICAL-results.xml, **/trivy-image-MEDIUM-results.xml'   
               
               // Publish the Dependency Check HTML report
-              publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, keepAll: true, reportDir: '${WORKSPACE}/OWASP-security-reports', reportFiles: 'dependency-check-report.html', reportName: 'Dependency check HTML Report', reportTitles: '', useWrapperFileDirectly: true])
+              publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'OWASP-security-reports', reportFiles: 'dependency-check-report.html', reportName: 'Dependency check HTML Report', reportTitles: '', useWrapperFileDirectly: true])
         
-              publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, keepAll: true, reportDir: '${WORKSPACE}/Trivy-Image-Reports', reportFiles: 'CRITICAL-results.html', reportName: 'Trivy scan Image critical vul report', reportTitles: '', useWrapperFileDirectly: true])
+              publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'Trivy-Image-Reports', reportFiles: 'CRITICAL-results.html', reportName: 'Trivy scan Image critical vul report', reportTitles: '', useWrapperFileDirectly: true])
 
-              publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, keepAll: true, reportDir: '${WORKSPACE}/Trivy-Image-Reports', reportFiles: 'MEDIUM-results.html', reportName: 'Trivy scan Image medium vul report', reportTitles: '', useWrapperFileDirectly: true])
+              publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'Trivy-Image-Reports', reportFiles: 'MEDIUM-results.html', reportName: 'Trivy scan Image medium vul report', reportTitles: '', useWrapperFileDirectly: true])
           }
        }
 }
