@@ -229,48 +229,48 @@ pipeline {
             }
         }
         // Update the image tag in the Kubernetes deployment file
-        // stage('K8S Update Image Tag') {
-        //     when {
-        //         branch 'PR*' // Trigger this stage only for branches matching 'PR*'
-        //     }
-        //     steps {
-        //         script {
-        //             // Clone the GitOps repository
-        //             sh '''
-        //                 git clone -b master https://github.com/teejayade2244/gitOps-approach.git
-        //             '''
+        stage('K8S Update Image Tag') {
+            when {
+                branch 'PR*' // Trigger this stage only for branches matching 'PR*'
+            }
+            steps {
+                script {
+                    // Clone the GitOps repository
+                    sh '''
+                        git clone -b master https://github.com/teejayade2244/gitOps-approach.git
+                    '''
 
-        //             // Navigate to the Kubernetes directory
-        //             dir("gitOps-approach/Kubernetes") {
-        //                 // Replace the Docker image tag in the deployment file
-        //                 sh '''
-        //                     ls -la
-        //                     git checkout -b feature-$BUILD_ID
-        //                     sed -i "s#${AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/counter-project:.*#${AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/counter-project:${GIT_COMMIT}#g" deployment.yaml
-        //                     cat deployment.yaml
-        //                 '''
-        //                 withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS access and secrete Keys', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-        //                     script {
-        //                         sh '''
-        //                             aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
-        //                         '''
-        //                     }
-        //                 }
-        //                 // Commit and push the changes to the feature branch
-        //                 withCredentials([string(credentialsId: 'Github account token', variable: 'GITHUB_TOKEN')]) {
-        //                     sh '''
-        //                         git config --global user.email "temitope224468@gmail.com"
-        //                         git remote set-url origin https://${GITHUB_TOKEN}@github.com/teejayade2244/gitOps-approach
-        //                         git add deployment.yaml
-        //                         git commit -m "Updated docker image to ${GIT_COMMIT}"
-        //                         git push -u origin feature-$BUILD_ID
+                    // Navigate to the Kubernetes directory
+                    dir("gitOps-approach/Kubernetes") {
+                        // Replace the Docker image tag in the deployment file
+                        sh '''
+                            ls -la
+                            git checkout -b feature-$BUILD_ID
+                            sed -i "s#${AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/counter-project:.*#${AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/counter-project:${GIT_COMMIT}#g" deployment.yaml
+                            cat deployment.yaml
+                        '''
+                        withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS access and secrete Keys', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                            script {
+                                sh '''
+                                    aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+                                '''
+                            }
+                        }
+                        // Commit and push the changes to the feature branch
+                        withCredentials([string(credentialsId: 'Github account token', variable: 'GITHUB_TOKEN')]) {
+                            sh '''
+                                git config --global user.email "temitope224468@gmail.com"
+                                git remote set-url origin https://${GITHUB_TOKEN}@github.com/teejayade2244/gitOps-approach
+                                git add deployment.yaml
+                                git commit -m "Updated docker image to ${GIT_COMMIT}"
+                                git push -u origin feature-$BUILD_ID
                                 
-        //                     '''
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
+                            '''
+                        }
+                    }
+                }
+            }
+        }
 
 
         // stage('GitHub - Raise PR') {
