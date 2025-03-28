@@ -183,7 +183,7 @@ pipeline {
         }
 
         // Push image to AWS ECR
-        stage("Push to AWS ECR") {
+        stage("Push to AWS-ECR") {
             steps {
                script {
                     sh '''
