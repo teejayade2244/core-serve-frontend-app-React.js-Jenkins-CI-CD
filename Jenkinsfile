@@ -308,11 +308,11 @@ pipeline {
     // post actions
         post {
           always {
-            //   script {
-            //      if (fileExists("gitOps-approach")) {
-            //         sh 'rm -rf gitOps-approach'
-            //      }
-            //   }
+              script {
+                 if (fileExists("gitOps-approach")) {
+                    sh 'rm -rf gitOps-approach'
+                 }
+              }
          
               // Publish JUnit test results, even if they are empty
               junit allowEmptyResults: true, testResults: '**/test-results/junit.xml, **/dependency-check-junit.xml, **/trivy-image-CRITICAL-results.xml, **/trivy-image-MEDIUM-results.xml'   
