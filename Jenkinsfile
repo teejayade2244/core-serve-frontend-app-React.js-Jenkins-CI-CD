@@ -12,12 +12,14 @@ pipeline {
         VERSION = "1.0.${BUILD_NUMBER}"
         AWS_ACCOUNT_ID = credentials ('AWS-account-id')
         IMAGE_TAG = "${ECR_REPO_NAME}:${VERSION}"
-        DOCKER_IMAGE_NAME = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}"
+        DOCKER_IMAGE_NAME = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${GIT_COMMIT}"
         GITHUB_TOKEN = credentials ('Github account token')
+        EC2_HOST = credentials ('AWS-EC2-HOST')
+        PORT = credentials ('port-number')
     }
     
     stages {
-         stage('clean workspace') {
+        stage('clean workspace') {
             steps {
                 script {
                     echo "Cleaning workspace.."
@@ -131,9 +133,8 @@ pipeline {
         stage("Docker Build and Tag") {
               steps {
                   script {
-                    def gitCommitTag = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
                     sh 'docker build -t ${IMAGE_TAG} .'
-                    sh'docker tag ${IMAGE_TAG} ${DOCKER_IMAGE_NAME}:${gitCommitTag}'
+                    sh 'docker tag ${IMAGE_TAG} ${DOCKER_IMAGE_NAME}'
                   } 
               }
         }
@@ -191,8 +192,43 @@ pipeline {
                 }
             }
         }
-
-
+        
+        // CD - Deploy to AWS EC2
+        stage("Deploy to AWS EC2") {
+            steps {
+                script {
+                    try {
+                        sshagent(['SSH-ACCESS']) {
+                            sh '''
+                                ssh -o StrictHostKeyChecking=no ${EC2_HOST} '
+                                    if docker ps -a | grep -i "${ECR_REPO_NAME}"; then
+                                        echo "Container found. Stopping and removing..."
+                                        sudo docker stop ${ECR_REPO_NAME} || true
+                                        sudo docker rm ${ECR_REPO_NAME} || true
+                                    fi
+                                    
+                                    echo "Pulling new image..."
+                                    sudo docker pull ${DOCKER_IMAGE_NAME}
+                                    
+                                    echo "Starting new container..."
+                                    sudo docker run -d \
+                                        --name ${ECR_REPO_NAME} \
+                                        --restart unless-stopped \
+                                        -p ${PORT}:${PORT} \
+                                        ${DOCKER_IMAGE_NAME}
+                                        
+                                    echo "Cleaning up old images..."
+                                    sudo docker image prune -f
+                                '
+                            '''
+                        }
+                    } catch (Exception e) {
+                        error "Deployment failed: ${e.getMessage()}"
+                    }
+                }
+            }
+        }
+        // Update the image tag in the Kubernetes deployment file
         // stage('K8S Update Image Tag') {
         //     when {
         //         branch 'PR*' // Trigger this stage only for branches matching 'PR*'
