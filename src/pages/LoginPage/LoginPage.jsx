@@ -70,13 +70,13 @@ function LoginPage() {
                 <div className="absolute z-10 flex flex-col items-center justify-center mt-5">
                     <Link to={"/"}>
                         <img
-                            className="sm:mb-5 h-24 w-auto cursor-pointer"
+                            className="sm:mb-5 h-24 md:mb-5 w-auto cursor-pointer"
                             src={logo}
                             alt=""
                         />
                     </Link>
                     <div className="p-5 mx-3 rounded-xl bg-white shadow-md md:w-[70%] lg:w-[70%]">
-                        <h1 className="p-3 rounded-md text-xl bg-[#979aaa] font-sans font-bold">
+                        <h1 className="p-3 rounded-md text-xl bg-[#0369a1] text-white text-center font-sans font-bold">
                             Login to your Account
                         </h1>
                         <h2 className="text-center mt-5 text-[16px] font-sans font-semibold text-black mb-6">

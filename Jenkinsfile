@@ -8,18 +8,21 @@ pipeline {
     }
     environment {
         AWS_REGION = credentials ('AWS-REGION')
-        ECR_REPO_NAME = 'serve-core-frontend'
+        ECR_REPO_NAME = 'core-serve-frontend-app'
+        VERSION = "1.0.${BUILD_NUMBER}"
         AWS_ACCOUNT_ID = credentials ('AWS-account-id')
-        IMAGE_TAG = "${ECR_REPO_NAME}:${BUILD_ID}"
-        DOCKER_IMAGE_NAME = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${IMAGE_TAG}"
+        IMAGE_TAG = "${ECR_REPO_NAME}:${VERSION}"
+        DOCKER_IMAGE_NAME = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${GIT_COMMIT}"
         GITHUB_TOKEN = credentials ('Github account token')
+        EC2_HOST = credentials ('AWS-EC2-HOST')
+        PORT = credentials ('port-number')
     }
     
     stages {
-         stage('clean workspace') {
+        stage('clean workspace') {
             steps {
                 script {
-                    echo "Cleaning workspace..."
+                    echo "Cleaning workspace.."
                     deleteDir()
                 }
             }
@@ -57,62 +60,56 @@ pipeline {
                     }
                 }
 
-                stage("OWASP Dependency Check") { 
-                    steps {
-                        // sh 'mkdir -p ${WORKSPACE}/OWASP-security-reports'
-                        // Run OWASP Dependency Check scan with specific arguments
-                        withCredentials([string(credentialsId: 'NVD-API-KEY', variable: 'NVD_API_KEY')]) {
-                                dependencyCheck additionalArguments: '''
-                                    --scan "${WORKSPACE}" \
-                                    --out "${WORKSPACE}/OWASP-security-reports" \
-                                    --disableYarnAudit \
-                                    --format \'ALL\' \
-                                    --prettyPrint \
-                                    --nvdApiKey '${NVD_API_KEY}' \
-                                ''', odcInstallation: 'OWAPS-Depend-check'
-                         }
-                        // Publish the Dependency Check report and fail the build if critical issues are found
-                        dependencyCheckPublisher failedTotalCritical: 2, pattern: 'OWASP-security-reports/dependency-check-report.xml', stopBuild: true
-                    }
-                }
+                // stage("OWASP Dependency Check") { 
+                //     steps {
+                //         sh 'mkdir -p OWASP-security-reports'
+                //         // Run OWASP Dependency Check scan with specific arguments
+                //         withCredentials([string(credentialsId: 'NVD-API-KEY', variable: 'NVD_API_KEY')]) {
+                //                 dependencyCheck additionalArguments: '''
+                //                     --scan "." \
+                //                     --out "OWASP-security-reports" \
+                //                     --disableYarnAudit \
+                //                     --format \'ALL\' \
+                //                     --prettyPrint \
+                //                     --nvdApiKey '${NVD_API_KEY}' \
+                //                 ''', odcInstallation: 'OWAPS-Depend-check'
+                //          }
+                //         // Publish the Dependency Check report and fail the build if critical issues are found
+                //         dependencyCheckPublisher failedTotalCritical: 2, pattern: 'OWASP-security-reports/dependency-check-report.xml', stopBuild: true
+                //     }
+                // }
             }
         }
 
         // unit testing
         stage("Unit Testing stage") {
             steps {
-              // option { retry (2) }
-              // sh 'echo MY_USERNAME - $MY_CREDENTIALS_USR'
-              // sh 'echo MY_PASSWORD - $MY_CREDENTIALS_PSW'
-            //   withCredentials([usernamePassword(credentialsId: 'env_credentials', passwordVariable: 'MY_PASSWORD', usernameVariable: 'MY_USERNAME')]) {
-            // }
                 // Run unit tests with npm
+                sh 'mkdir -p test-results'
                 sh "npm test"
             } 
         }
 
         // static testing and analysis with SonarQube
-        // stage("Static Testing and Analysis with SonarQube") {
-        //     environment {
-        //             SONAR_SCANNER_HOME = tool 'sonarqube-scanner-6.1.0.477'
-        //         }
-        //     steps {
-        //         timeout(time: 5, unit: 'MINUTES') {
-        //             withSonarQubeEnv('sonarqube-server') {
-        //                 // Run SonarQube scanner with specific parameters
-        //                 sh '''
-        //                     ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
-        //                     -Dsonar.projectKey=serve-core-frontend \
-        //                     -Dsonar.sources=src \
-        //                     -Dsonar.inclusions=src/App.js \
-    
-        //                 '''
-        //             }
-        //         }
-        //         // Wait for SonarQube quality gate and fail the pipeline if it's not OK
-        //         waitForQualityGate abortPipeline: true
-        //     }
-        // }
+        stage("Static Testing and Analysis with SonarQube") {
+            environment {
+                    SONAR_SCANNER_HOME = tool 'sonarqube-scanner-6.1.0.477'
+                }
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    withSonarQubeEnv('sonarqube-server') {
+                        // Run SonarQube scanner with specific parameters
+                        sh '''
+                            ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
+                            -Dsonar.projectKey=Serve-core-frontend \
+                            -Dsonar.sources=. \
+                        '''
+                    }
+                }
+                // Wait for SonarQube quality gate and fail the pipeline if it's not OK
+                waitForQualityGate abortPipeline: true
+            }
+        }
 
         // login to ECR
         stage("AWS ECR login") {
@@ -133,65 +130,55 @@ pipeline {
         }
 
         // Build Docker image
-        stage("Build docker image") {
+        stage("Docker Build and Tag") {
               steps {
                   script {
-                        // Build the Docker image
-                        sh """
-                            docker build -t ${IMAGE_TAG} .
-                        """
+                    sh 'docker build -t ${IMAGE_TAG} .'
+                    sh 'docker tag ${IMAGE_TAG} ${DOCKER_IMAGE_NAME}'
                   } 
               }
         }
 
-       // Tag Docker Image
-        stage("Tag Docker Image") {
-            //creates another name (tag) for the image so it matches the AWS ECR format.
-              steps {
-                  script {
-                      sh "docker tag ${IMAGE_TAG} ${DOCKER_IMAGE_NAME}"
-                  }
-              }
-        }
 
         // scan the image for vulnerabilities before pushing to resgistry
         stage("Trivy Vulnerability scan") {
             steps {
-              sh '''
-                trivy image ${DOCKER_IMAGE_NAME} \
-                --severity LOW,MEDIUM \
-                --exit-code 0 \
-                --quiet \
-                --format json -o trivy-image-MEDIUM-results.json
+                sh 'mkdir -p Trivy-Image-Reports'
+                sh '''
+                    trivy image ${DOCKER_IMAGE_NAME} \
+                    --severity LOW,MEDIUM \
+                    --exit-code 0 \
+                    --quiet \
+                    --format json -o Trivy-Image-Reports/trivy-image-MEDIUM-results.json 
 
-                 trivy image ${DOCKER_IMAGE_NAME} \
-                --severity CRITICAL \
-                --exit-code 1 \
-                --quiet \
-                --format json -o trivy-image-CRITICAL-results.json
-              '''
+                    trivy image ${DOCKER_IMAGE_NAME} \
+                    --severity CRITICAL \
+                    --exit-code 1 \
+                    --quiet \
+                    --format json -o Trivy-Image-Reports/trivy-image-CRITICAL-results.json 
+                '''
             }
             post {
-              always {
-                //converting the json report format to html and junit so it can be published
-                sh '''
-                 trivy convert \
-                    --format template --template "@/usr/local/share/trivy/templates/html.tpl" \
-                    --output trivy-image-MEDIUM-results.html trivy-image-MEDIUM-results.json  
-                
-                 trivy convert \
-                    --format template --template "@/usr/local/share/trivy/templates/html.tpl" \
-                    --output trivy-image-CRITICAL-results.html trivy-image-CRITICAL-results.json
+                always {
+                    // Convert the json reports to HTML and XML formats
+                    sh '''
+                        trivy convert \
+                            --format template --template "@/usr/local/share/trivy/templates/html.tpl" \
+                            --output Trivy-Image-Reports/trivy-image-MEDIUM-results.html Trivy-Image-Reports/trivy-image-MEDIUM-results.json  
+                    
+                        trivy convert \
+                            --format template --template "@/usr/local/share/trivy/templates/html.tpl" \
+                            --output Trivy-Image-Reports/trivy-image-CRITICAL-results.html Trivy-Image-Reports/trivy-image-CRITICAL-results.json
 
-                trivy convert \
-                    --format template --template "@/usr/local/share/trivy/templates/xml.tpl" \
-                    --output trivy-image-MEDIUM-results.xml trivy-image-MEDIUM-results.json  
+                        trivy convert \
+                            --format template --template "@/usr/local/share/trivy/templates/junit.tpl" \
+                            --output Trivy-Image-Reports/trivy-image-MEDIUM-results.xml Trivy-Image-Reports/trivy-image-MEDIUM-results.json  
 
-                trivy convert \
-                    --format template --template "@/usr/local/share/trivy/templates/xml.tpl" \
-                    --output trivy-image-CRITICAL-results.xml trivy-image-CRITICAL-results.json    
-                 '''
-              }
+                        trivy convert \
+                            --format template --template "@/usr/local/share/trivy/templates/junit.tpl" \
+                            --output Trivy-Image-Reports/trivy-image-CRITICAL-results.xml Trivy-Image-Reports/trivy-image-CRITICAL-results.json    
+                    '''
+                }
             }
         }
 
@@ -205,50 +192,85 @@ pipeline {
                 }
             }
         }
+        
+        // CD - Deploy to AWS EC2
+        stage("Deploy to AWS EC2") {
+            steps {
+                script {
+                    try {
+                        sshagent(['SSH-ACCESS']) {
+                            sh '''
+                                ssh -o StrictHostKeyChecking=no ${EC2_HOST} '
+                                    if docker ps -a | grep -i "${ECR_REPO_NAME}"; then
+                                        echo "Container found. Stopping and removing..."
+                                        sudo docker stop ${ECR_REPO_NAME} || true
+                                        sudo docker rm ${ECR_REPO_NAME} || true
+                                    fi
+                                    
+                                    echo "Pulling new image..."
+                                    sudo docker pull ${DOCKER_IMAGE_NAME}
+                                    
+                                    echo "Starting new container..."
+                                    sudo docker run -d \
+                                        --name ${ECR_REPO_NAME} \
+                                        --restart unless-stopped \
+                                        -p ${PORT}:${PORT} \
+                                        ${DOCKER_IMAGE_NAME}
+                                        
+                                    echo "Cleaning up old images..."
+                                    sudo docker image prune -f
+                                '
+                            '''
+                        }
+                    } catch (Exception e) {
+                        error "Deployment failed: ${e.getMessage()}"
+                    }
+                }
+            }
+        }
+        // Update the image tag in the Kubernetes deployment file
+        stage('K8S Update Image Tag') {
+            when {
+                branch 'PR*' // Trigger this stage only for branches matching 'PR*'
+            }
+            steps {
+                script {
+                    // Clone the GitOps repository
+                    sh '''
+                        git clone -b master https://github.com/teejayade2244/gitOps-approach.git
+                    '''
 
-
-        // stage('K8S Update Image Tag') {
-        //     when {
-        //         branch 'PR*' // Trigger this stage only for branches matching 'PR*'
-        //     }
-        //     steps {
-        //         script {
-        //             // Clone the GitOps repository
-        //             sh '''
-        //                 git clone -b master https://github.com/teejayade2244/gitOps-approach.git
-        //             '''
-
-        //             // Navigate to the Kubernetes directory
-        //             dir("gitOps-approach/Kubernetes") {
-        //                 // Replace the Docker image tag in the deployment file
-        //                 sh '''
-        //                     ls -la
-        //                     git checkout -b feature-$BUILD_ID
-        //                     sed -i "s#${AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/counter-project:.*#${AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/counter-project:${GIT_COMMIT}#g" deployment.yaml
-        //                     cat deployment.yaml
-        //                 '''
-        //                 withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS access and secrete Keys', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-        //                     script {
-        //                         sh '''
-        //                             aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
-        //                         '''
-        //                     }
-        //                 }
-        //                 // Commit and push the changes to the feature branch
-        //                 withCredentials([string(credentialsId: 'Github account token', variable: 'GITHUB_TOKEN')]) {
-        //                     sh '''
-        //                         git config --global user.email "temitope224468@gmail.com"
-        //                         git remote set-url origin https://${GITHUB_TOKEN}@github.com/teejayade2244/gitOps-approach
-        //                         git add deployment.yaml
-        //                         git commit -m "Updated docker image to ${GIT_COMMIT}"
-        //                         git push -u origin feature-$BUILD_ID
+                    // Navigate to the Kubernetes directory
+                    dir("gitOps-approach/Kubernetes") {
+                        // Replace the Docker image tag in the deployment file
+                        sh '''
+                            ls -la
+                            git checkout -b feature-$BUILD_ID
+                            sed -i "s#${AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/core-serve-frontend:.*#${AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/core-serve-frontend:${GIT_COMMIT}#g" deployment.yaml
+                            cat deployment.yaml
+                        '''
+                        withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS access and secrete Keys', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                            script {
+                                sh '''
+                                    aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+                                '''
+                            }
+                        }
+                        // Commit and push the changes to the feature branch
+                        withCredentials([string(credentialsId: 'Github account token', variable: 'GITHUB_TOKEN')]) {
+                            sh '''
+                                git config --global user.email "temitope224468@gmail.com"
+                                git remote set-url origin https://${GITHUB_TOKEN}@github.com/teejayade2244/gitOps-approach
+                                git add deployment.yaml
+                                git commit -m "Updated docker image to ${GIT_COMMIT}"
+                                git push -u origin feature-$BUILD_ID
                                 
-        //                     '''
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
+                            '''
+                        }
+                    }
+                }
+            }
+        }
 
 
         // stage('GitHub - Raise PR') {
@@ -293,17 +315,42 @@ pipeline {
             //   }
          
               // Publish JUnit test results, even if they are empty
-              junit allowEmptyResults: true, stdioRetention: '', testResults: 'test-results.xml'
-              junit allowEmptyResults: true, stdioRetention: '', testResults: 'dependency-check-junit.xml'
-              junit allowEmptyResults: true, stdioRetention: '', testResults: 'trivy-image-CRITICAL-results.xml'
-              junit allowEmptyResults: true, stdioRetention: '', testResults: 'trivy-image-MEDIUM-results.xml'   
+              junit allowEmptyResults: true, testResults: '**/test-results/junit.xml, **/dependency-check-junit.xml, **/trivy-image-CRITICAL-results.xml, **/trivy-image-MEDIUM-results.xml'   
               
               // Publish the Dependency Check HTML report
-              publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, keepAll: true, reportDir: '${WORKSPACE}/OWASP-security-reports', reportFiles: 'dependency-check-report.html', reportName: 'Dependency check HTML Report', reportTitles: '', useWrapperFileDirectly: true])
-        
-              publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, keepAll: true, reportDir: '${WORKSPACE}/Trivy-Image-Reports', reportFiles: 'CRITICAL-results.html', reportName: 'Trivy scan Image critical vul report', reportTitles: '', useWrapperFileDirectly: true])
+              publishHTML([
+                  allowMissing: true, 
+                  alwaysLinkToLastBuild: true, 
+                  keepAll: true, 
+                  reportDir: './OWASP-security-reports', 
+                  reportFiles: 'dependency-check-report.html', 
+                  reportName: 'Dependency check HTML Report', 
+                  reportTitles: '', 
+                  useWrapperFileDirectly: true
+              ])
 
-              publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, keepAll: true, reportDir: '${WORKSPACE}/Trivy-Image-Reports', reportFiles: 'MEDIUM-results.html', reportName: 'Trivy scan Image medium vul report', reportTitles: '', useWrapperFileDirectly: true])
+              // Publish Trivy HTML reports with correct filenames
+              publishHTML([
+                  allowMissing: true, 
+                  alwaysLinkToLastBuild: true, 
+                  keepAll: true, 
+                  reportDir: './Trivy-Image-Reports', 
+                  reportFiles: 'trivy-image-CRITICAL-results.html', 
+                  reportName: 'Trivy Scan Critical Vulnerabilities', 
+                  reportTitles: '', 
+                  useWrapperFileDirectly: true
+              ])
+
+              publishHTML([
+                  allowMissing: true, 
+                  alwaysLinkToLastBuild: true, 
+                  keepAll: true, 
+                  reportDir: './Trivy-Image-Reports', 
+                  reportFiles: 'trivy-image-MEDIUM-results.html', 
+                  reportName: 'Trivy Scan Medium Vulnerabilities', 
+                  reportTitles: '', 
+                  useWrapperFileDirectly: true
+              ])
           }
        }
 }

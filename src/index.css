@@ -121,7 +121,7 @@
     }
 
     .login_text {
-        @apply text-[16px] font-normal text-black tracking-[1px] font-Belanosima;
+        @apply text-[16px] font-normal text-black tracking-[1px] font-belanosima;
     }
 
     .sidebar_options {
@@ -142,13 +142,13 @@
 
     .label_text {
         @apply w-full border border-black py-2 border-x-0 border-t-0 mb-5
-        font-Belanosima text-[17px];
+       font-belanosima text-[17px];
     }
     .input {
         @apply outline-none border w-full mt-2 py-2 px-4 rounded-md  font-normal;
     }
     .text {
-        @apply font-Roboto font-semibold text-[15px];
+        @apply font-roboto font-semibold text-[15px];
     }
     .sidebar {
         @apply w-full px-3 md:w-[25%] lg:w-[20%] md:px-7 h-[600px] md:h-[800px] 

@@ -7,6 +7,7 @@ import axios from "axios"
 import { toast } from "react-toastify"
 import ToastMsg from "../../components/ToastContainer"
 
+
 function UpdatePassword() {
     const {
         register,

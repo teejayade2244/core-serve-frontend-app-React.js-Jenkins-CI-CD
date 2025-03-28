@@ -1,5 +1,19 @@
-// filepath: /d:/Downloads/nysc-project/jest.config.js
 module.exports = {
+    reporters: [
+        "default",
+        [
+            "jest-junit",
+            {
+                outputDirectory: "test-results",
+                outputName: "junit.xml",
+                ancestorSeparator: " › ",
+                uniqueOutputName: "false",
+                suiteNameTemplate: "{filepath}",
+                classNameTemplate: "{classname}",
+                titleTemplate: "{title}",
+            },
+        ],
+    ],
     testEnvironment: "jsdom",
     moduleNameMapper: {
         "\\.(png|jpg|jpeg|gif|webp|svg)$": "<rootDir>/__mocks__/fileMock.js",
