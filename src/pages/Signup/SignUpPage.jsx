@@ -105,7 +105,7 @@ function SignUpPage() {
                             </a>
                         </div>
                         <h2 className="bg-[#314ba9] px-5 py-2 text-center text-[18px] font-bold rounded-md text-white">
-                            Create an Account
+                            Create Account
                         </h2>
 
                         <div className="p-[16px]">
