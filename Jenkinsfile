@@ -193,7 +193,7 @@ pipeline {
             }
         }
         
-        // CD - Deploy to AWS EC2
+        // Continuous Deployment - Deploy to AWS EC2
         stage("Deploy to AWS EC2") {
             steps {
                 script {
@@ -228,6 +228,7 @@ pipeline {
                 }
             }
         }
+
         // Update the image tag in the Kubernetes deployment file
         stage('K8S Update Image Tag') {
             when {
@@ -301,6 +302,20 @@ pipeline {
                         currentBuild.result = 'FAILURE'
                     }
                 }
+            }
+        }
+
+        stage('Upload Build reports to AWS s3') {
+            when {
+                branch 'PR*'  // Runs when a feature branch is pushed
+            }
+            steps {
+               sh '''
+                 mkdir -p reports-$BUILD_ID
+                 cp -r  test-results Trivy-Image-Reports reports-$BUILD_ID
+                 ls -ltr reports-$BUILD_ID
+
+               '''
             }
         }
     }
