@@ -199,33 +199,38 @@ pipeline {
                 script {
                     try {
                         sshagent(['SSH-ACCESS']) {
-                           withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS access and secrete Keys', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                             sh '''
-                                ssh -o StrictHostKeyChecking=no ${EC2_HOST} '
-                                    if docker ps -a | grep -i "${ECR_REPO_NAME}"; then
-                                        echo "Container found. Stopping and removing..."
-                                        sudo docker stop ${ECR_REPO_NAME} || true
-                                        sudo docker rm ${ECR_REPO_NAME} || true
+                            withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS access and secrete Keys', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                            sh '''
+                                ssh -o StrictHostKeyChecking=no ${EC2_HOST} "
+                                    # Check if container exists and remove it
+                                    if sudo docker ps -a | grep -i \"${ECR_REPO_NAME}\"; then
+                                        echo \"Container found. Stopping and removing...\"
+                                        sudo docker stop \"${ECR_REPO_NAME}\" || true
+                                        sudo docker rm \"${ECR_REPO_NAME}\" || true
                                     fi
-                                    aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
-                                    echo "Pulling new image..."
+                                    
+                                    # Login to ECR
+                                    aws ecr get-login-password --region ${AWS_REGION} | sudo docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+                                    
+                                    echo \"Pulling new image...\"
                                     sudo docker pull ${DOCKER_IMAGE_NAME}
                                     
-                                    echo "Starting new container..."
-                                    sudo docker run -d \
-                                        --name ${ECR_REPO_NAME} \
-                                        --restart unless-stopped \
-                                        -p ${PORT}:${PORT} \
+                                    echo \"Starting new container...\"
+                                    sudo docker run -d \\
+                                        --name \"${ECR_REPO_NAME}\" \\
+                                        --restart unless-stopped \\
+                                        -p ${PORT}:${PORT} \\
                                         ${DOCKER_IMAGE_NAME}
                                         
-                                    echo "Cleaning up old images..."
+                                    echo \"Cleaning up old images...\"
                                     sudo docker image prune -f
-                                '
+                                "
                             '''
-                           } 
+                           }
                         }
                     } catch (Exception e) {
-                        error "Deployment failed: ${e.getMessage()}"
+                        echo "Deployment failed: ${e.message}"
+                        throw e
                     }
                 }
             }
@@ -249,7 +254,7 @@ pipeline {
                         sh '''
                             ls -la
                             git checkout -b feature-$BUILD_ID
-                            sed -i "s#${AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/core-serve-frontend:.*#${AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/core-serve-frontend:${GIT_COMMIT}#g" deployment.yaml
+                            sed -i "s#${AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/${ECR_REPO_NAME}:.*#${DOCKER_IMAGE_NAME}#g" deployment.yaml
                             cat deployment.yaml
                         '''
                         withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS access and secrete Keys', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
