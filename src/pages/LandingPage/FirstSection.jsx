@@ -71,7 +71,7 @@ export function FirstSection() {
                         }}
                         className="text-2xl font-serif text-[#000080]"
                     >
-                        New: Online Application for Remobilization!!
+                        New: Online Application for Remobilization
                     </motion.span>
                     <Link to={"/apply"}>
                         <h3 className="text-gray-400 text-lg cursor-pointer hover:underline">

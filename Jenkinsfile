@@ -199,14 +199,15 @@ pipeline {
                 script {
                     try {
                         sshagent(['SSH-ACCESS']) {
-                            sh '''
+                           withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS access and secrete Keys', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                             sh '''
                                 ssh -o StrictHostKeyChecking=no ${EC2_HOST} '
                                     if docker ps -a | grep -i "${ECR_REPO_NAME}"; then
                                         echo "Container found. Stopping and removing..."
                                         sudo docker stop ${ECR_REPO_NAME} || true
                                         sudo docker rm ${ECR_REPO_NAME} || true
                                     fi
-                                    
+                                    aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
                                     echo "Pulling new image..."
                                     sudo docker pull ${DOCKER_IMAGE_NAME}
                                     
@@ -221,6 +222,7 @@ pipeline {
                                     sudo docker image prune -f
                                 '
                             '''
+                           } 
                         }
                     } catch (Exception e) {
                         error "Deployment failed: ${e.getMessage()}"
