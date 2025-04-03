@@ -1,46 +1,104 @@
-# Getting Started with Create React App and Redux
+Project Name: Core Serve Frontend Website
+A modern frontend application built with React.js, containerized with Docker, and deployed using CI/CD and GitOps best practices.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app), using the [Redux](https://redux.js.org/) and [Redux Toolkit](https://redux-toolkit.js.org/) template.
+📌 Table of Contents
+- [🌟 Features](#-features)
+- [🔧 Installation](#-installation)
+- [📂 Project Structure](#-project-structure)
+- [🚀 Running the Project](#-running-the-project)
+- [🐳 Docker Setup](#-docker-setup)
+- [📦 CI/CD Pipeline](#-cicd-pipeline)
+- [🚀 Deployment with ArgoCD Helm & Kubernetes](#-deployment-with-helm--kubernetes)
+- Infrastructure as Code (IaC) with Terraform
+- [📜 License](#-license)
+- [👨‍💻 Author](#-author)
+  
+## 🌟 Features
+✅ Modern UI built with
+- **React.js**
+- **Redux Toolkit with Redux Persist**
+- **Tailwind CSS**
+- **Material UI**
+- **Axios for API calls**
+- **Jest for testing**
+- **Fully responsive design**
+- **User Authentication**
+- **Password Management (Forgot/Change Password)**
+- **Batch Registration System**
+- **Responsive Design**
+- **User Dashboard**
+- **Profile Management**
+  
+✅ Automated CI/CD using **Jenkins**  
+✅ Containerized using **Docker**  
+✅ Kubernetes deployment with **Helm and ArgoCD**  
+✅ Security scanning with **Trivy, OWAPS, ZAP & SonarQube**  
+✅ Deployed to **AWS**  
 
-## Available Scripts
+## 🔧 Installation
 
-In the project directory, you can run:
+### **1️⃣ Clone the Repository**
+```sh
+git clone https://github.com/your-username/your-repo.git
+cd your-repo
+```
 
-### `npm start`
+### **2️⃣ Install Dependencies**
+```sh
+npm install  # or yarn install
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## 📂 Project Structure
+```
+/your-repo
+│── /public          # Static assets
+│── /src             # Source code
+│── /tests           # Test cases
+│── .github/workflows # CI/CD pipeline
+│── Jenkinsfile      # Jenkins pipeline configuration
+│── Dockerfile       # Docker container setup
+│── helm-chart/      # Helm configuration for Kubernetes
+│── README.md        # Documentation
+│── package.json     # Project metadata
+```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 🐳 Docker Setup
+To containerize the application:
+```sh
+docker build -t my-frontend-app .
+```
+## To test the if the application is succesfully running in the container
+```sh
+docker run -p 3000:3000 my-frontend-app
+```
+Now, open **http://localhost:3000**.
 
-### `npm test`
+## 📦 CI/CD Pipeline
+### **Proposed CI/CD Pipeline strategy with PR Integration**
+1️⃣ Continuous Integration (CI)
+Checkout Code – Fetch latest feature branch code.
+Install Dependencies – Install required packages.
+Security Scans – OWASP Dependency Check (Generates HTML/XML reports).
+Run Unit Tests – Jest test suites.
+Static Code Analysis – SonarQube.
+Build Artifacts – Build and create Docker image.
+Container Security Scan – Trivy for LOW/MEDIUM/CRITICAL vulnerabilities (Generates HTML & XML reports).
+Upload Build Reports to AWS S3 – Store scan and test reports for analysis.
+Deploy to Dev Testing Environment – EC2 for Integration testing.
+If CI passes, a PR will be raised.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+2️⃣ Pull Request Process
+PR is raised for review.
 
-### `npm run build`
+3️⃣ Post-Merge Continuous Deployment pipeline (CD) ang GitOps
+Manifest Repo – Dedicated repository for Kubernetes manifests.
+PR Branch – Create a new branch for updating image tags.
+Clone Manifest Repo and Update K8S Image Tag – Update Kubernetes deployment with the latest image.
+Raise PR on the Manifest Repo using GitHub API – Automate PR creation for Kubernetes manifests.
+PR is reviewed and merged to Main Branch in Manifest Repo – Ensures controlled deployment updates.
+ArgoCD Deployment – ArgoCD syncs changes from the manifest repo.
+Deploy to AWS EKS Staging Environment – Application is deployed to the staging cluster.
+DAST (Dynamic Application Security Testing) – Perform security testing on the running application using OWASP ZAP.
+Final Approval Step – Manual production approval.
+Deploy to Production!!!
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
