@@ -76,29 +76,29 @@ Now, open **http://localhost:3000**.
 ## 📦 CI/CD Pipeline
 ### **Proposed CI/CD Pipeline strategy with PR Integration**
 1️⃣ Continuous Integration (CI)
-Checkout Code – Fetch latest feature branch code.
-Install Dependencies – Install required packages.
-Security Scans – OWASP Dependency Check (Generates HTML/XML reports).
-Run Unit Tests – Jest test suites.
-Static Code Analysis – SonarQube.
-Build Artifacts – Build and create Docker image.
-Container Security Scan – Trivy for LOW/MEDIUM/CRITICAL vulnerabilities (Generates HTML & XML reports).
-Upload Build Reports to AWS S3 – Store scan and test reports for analysis.
-Deploy to Dev Testing Environment – EC2 for Integration testing.
-If CI passes, a PR will be raised.
+- Checkout Code – Fetch latest feature branch code.
+- Install Dependencies – Install required packages.
+- Security Scans – OWASP Dependency Check (Generates HTML/XML reports).
+- Run Unit Tests – Jest test suites.
+- Static Code Analysis – SonarQube.
+- Build Artifacts – Build and create Docker image.
+- Container Security Scan – Trivy for LOW/MEDIUM/CRITICAL vulnerabilities (Generates HTML & XML reports).
+- Upload Build Reports to AWS S3 – Store scan and test reports for analysis.
+- Deploy to Dev Testing Environment – EC2 for Integration testing.
+- If CI passes, a PR will be raised.
 
 2️⃣ Pull Request Process
 PR is raised for review.
 
 3️⃣ Post-Merge Continuous Deployment pipeline (CD) ang GitOps
-Manifest Repo – Dedicated repository for Kubernetes manifests.
-PR Branch – Create a new branch for updating image tags.
-Clone Manifest Repo and Update K8S Image Tag – Update Kubernetes deployment with the latest image.
-Raise PR on the Manifest Repo using GitHub API – Automate PR creation for Kubernetes manifests.
-PR is reviewed and merged to Main Branch in Manifest Repo – Ensures controlled deployment updates.
-ArgoCD Deployment – ArgoCD syncs changes from the manifest repo.
-Deploy to AWS EKS Staging Environment – Application is deployed to the staging cluster.
-DAST (Dynamic Application Security Testing) – Perform security testing on the running application using OWASP ZAP.
-Final Approval Step – Manual production approval.
-Deploy to Production!!!
+- Manifest Repo – Dedicated repository for Kubernetes manifests.
+- PR Branch – Create a new branch for updating image tags.
+- Clone Manifest Repo and Update K8S Image Tag – Update Kubernetes deployment with the latest image.
+- Raise PR on the Manifest Repo using GitHub API – Automate PR creation for Kubernetes manifests.
+- PR is reviewed and merged to Main Branch in Manifest Repo – Ensures controlled deployment updates.
+- ArgoCD Deployment – ArgoCD syncs changes from the manifest repo.
+- Deploy to AWS EKS Staging Environment – Application is deployed to the staging cluster.
+- DAST (Dynamic Application Security Testing) – Perform security testing on the running application using OWASP ZAP.
+- Final Approval Step – Manual production approval.
+- Deploy to Production!!!
 
