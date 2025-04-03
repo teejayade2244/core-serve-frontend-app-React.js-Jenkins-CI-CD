@@ -139,7 +139,6 @@ pipeline {
               }
         }
 
-
         // scan the image for vulnerabilities before pushing to resgistry
         stage("Trivy Vulnerability scan") {
             steps {
@@ -317,12 +316,19 @@ pipeline {
                 branch 'PR*'  // Runs when a feature branch is pushed
             }
             steps {
+               withAWS(credentials: 'AWS access and secrete Keys', region: 'eu-west-2') {
                sh '''
                  mkdir -p reports-$BUILD_ID
                  cp -r  test-results Trivy-Image-Reports reports-$BUILD_ID
                  ls -ltr reports-$BUILD_ID
-
                '''
+               s3Upload(file:"reports-$BUILD_ID", bucket:'core-serve-frontend-jenkins-build-reports', path:"Jenkins-$BUILD_ID-reports/")
+               }
+               
+               script {
+                  // Clean up the reports directory after upload
+                  sh 'rm -rf reports-$BUILD_ID'
+               }
             }
         }
     }
