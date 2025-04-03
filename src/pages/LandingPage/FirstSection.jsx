@@ -75,7 +75,7 @@ export function FirstSection() {
                     </motion.span>
                     <Link to={"/apply"}>
                         <h3 className="text-gray-400 text-lg cursor-pointer hover:underline">
-                            Click here to Apply for Remobilisation
+                            Apply for Remobilisation
                         </h3>
                     </Link>
                 </div>
