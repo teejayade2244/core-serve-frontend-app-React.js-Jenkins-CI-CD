@@ -53,8 +53,8 @@ pipeline {
         // dependencies scanning
         stage("Dependency Check scanning") {
             parallel {
-                agent { label 'worker-2' }
                 stage("NPM dependencies audit") {
+                    agent { label 'worker-2' }
                     steps {
                         // Run npm audit to check for critical vulnerabilities
                         sh '''
@@ -65,6 +65,7 @@ pipeline {
                 }
 
                 stage("OWASP Dependency Check") { 
+                    agent { label 'worker-2' }
                     steps {
                         sh 'mkdir -p OWASP-security-reports'
                         // Run OWASP Dependency Check scan with specific arguments
