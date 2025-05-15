@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent none
     tools {
         nodejs "Nodejs-22-6-0"
     }
@@ -20,6 +20,7 @@ pipeline {
     
     stages {
         stage('clean workspace') {
+            agent { label 'worker-1' }
             steps {
                 script {
                     echo "Cleaning workspace.."
@@ -29,6 +30,7 @@ pipeline {
         }
 
         stage('checkout') {
+            agent { label 'worker-1' }
             steps {
                checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/teejayade2244/core-serve-frontend.git']])
             }
@@ -36,6 +38,7 @@ pipeline {
 
         // Dependencies installation
         stage("Install node-js dependencies") {
+            agent { label 'worker-1' }
             steps {
                 script {
                     if (env.BRANCH_NAME.contains("PR-")) {
@@ -49,6 +52,7 @@ pipeline {
 
         // dependencies scanning
         stage("Dependency Check scanning") {
+            agent { label 'worker-2' }
             parallel {
                 stage("NPM dependencies audit") {
                     steps {
@@ -60,29 +64,30 @@ pipeline {
                     }
                 }
 
-                // stage("OWASP Dependency Check") { 
-                //     steps {
-                //         sh 'mkdir -p OWASP-security-reports'
-                //         // Run OWASP Dependency Check scan with specific arguments
-                //         withCredentials([string(credentialsId: 'NVD-API-KEY', variable: 'NVD_API_KEY')]) {
-                //                 dependencyCheck additionalArguments: '''
-                //                     --scan "." \
-                //                     --out "OWASP-security-reports" \
-                //                     --disableYarnAudit \
-                //                     --format \'ALL\' \
-                //                     --prettyPrint \
-                //                     --nvdApiKey '${NVD_API_KEY}' \
-                //                 ''', odcInstallation: 'OWAPS-Depend-check'
-                //          }
-                //         // Publish the Dependency Check report and fail the build if critical issues are found
-                //         dependencyCheckPublisher failedTotalCritical: 2, pattern: 'OWASP-security-reports/dependency-check-report.xml', stopBuild: true
-                //     }
-                // }
+                stage("OWASP Dependency Check") { 
+                    steps {
+                        sh 'mkdir -p OWASP-security-reports'
+                        // Run OWASP Dependency Check scan with specific arguments
+                        withCredentials([string(credentialsId: 'NVD-API-KEY', variable: 'NVD_API_KEY')]) {
+                                dependencyCheck additionalArguments: '''
+                                    --scan "." \
+                                    --out "OWASP-security-reports" \
+                                    --disableYarnAudit \
+                                    --format \'ALL\' \
+                                    --prettyPrint \
+                                    --nvdApiKey '${NVD_API_KEY}' \
+                                ''', odcInstallation: 'OWAPS-Depend-check'
+                         }
+                        // Publish the Dependency Check report and fail the build if critical issues are found
+                        dependencyCheckPublisher failedTotalCritical: 2, pattern: 'OWASP-security-reports/dependency-check-report.xml', stopBuild: true
+                    }
+                }
             }
         }
 
         // unit testing
         stage("Unit Testing stage") {
+            agent { label 'worker-1' }
             steps {
                 // Run unit tests with npm
                 sh 'mkdir -p test-results'
@@ -92,6 +97,7 @@ pipeline {
 
         // static testing and analysis with SonarQube
         stage("Static Testing and Analysis with SonarQube") {
+            agent { label 'worker-2' }
             environment {
                     SONAR_SCANNER_HOME = tool 'sonarqube-scanner-6.1.0.477'
                 }
@@ -113,9 +119,9 @@ pipeline {
 
         // login to ECR
         stage("AWS ECR login") {
+            agent { label 'worker-1' }
               // authenticate with ECR so docker has Docker has permission to push images to AWS ECR
               steps {
-                  withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS access and secrete Keys', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                      script {
                         // Get ECR login token and execute Docker login. AWSCLI is already configured with both the secret and access keys on the jankins agent 
                         // this command retrieves a temporary authentication password for AWS ECR, and its passed as a stdin to docker 
@@ -124,13 +130,14 @@ pipeline {
                             aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
                         '''
                      }
-                  }
+                  
                   
               }
         }
 
         // Build Docker image
         stage("Docker Build and Tag") {
+            agent { label 'worker-1' }
               steps {
                   script {
                     sh 'docker build -t ${IMAGE_TAG} .'
@@ -141,6 +148,7 @@ pipeline {
 
         // scan the image for vulnerabilities before pushing to resgistry
         stage("Trivy Vulnerability scan") {
+            agent { label 'worker-2' }
             steps {
                 sh 'mkdir -p Trivy-Image-Reports'
                 sh '''
@@ -183,6 +191,7 @@ pipeline {
 
         // Push image to AWS ECR
         stage("Push to AWS-ECR") {
+            agent { label 'worker-1' }
             steps {
                script {
                     sh '''
@@ -194,11 +203,11 @@ pipeline {
         
         // Continuous Deployment - Deploy to AWS EC2
         stage("Deploy to AWS EC2") {
+            agent { label 'worker-2' }
             steps {
                 script {
                     try {
                         sshagent(['SSH-ACCESS']) {
-                            withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS access and secrete Keys', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                             sh '''
                                 ssh -o StrictHostKeyChecking=no ${EC2_HOST} "
                                     # Check if container exists and remove it
@@ -225,7 +234,6 @@ pipeline {
                                     sudo docker image prune -f
                                 "
                             '''
-                           }
                         }
                     } catch (Exception e) {
                         echo "Deployment failed: ${e.message}"
@@ -236,101 +244,97 @@ pipeline {
         }
 
         // Update the image tag in the Kubernetes deployment file
-        stage('K8S Update Image Tag') {
-            when {
-                branch 'PR*' // Trigger this stage only for branches matching 'PR*'
-            }
-            steps {
-                script {
-                    // Clone the GitOps repository
-                    sh '''
-                        git clone -b master https://github.com/teejayade2244/gitOps-approach.git
-                    '''
+        // stage('K8S Update Image Tag') {
+        //     when {
+        //         branch 'PR*' // Trigger this stage only for branches matching 'PR*'
+        //     }
+        //     steps {
+        //         script {
+        //             // Clone the GitOps repository
+        //             sh '''
+        //                 git clone -b master https://github.com/teejayade2244/gitOps-approach.git
+        //             '''
 
-                    // Navigate to the Kubernetes directory
-                    dir("gitOps-approach/Kubernetes") {
-                        // Replace the Docker image tag in the deployment file
-                        sh '''
-                            ls -la
-                            git checkout -b feature-$BUILD_ID
-                            sed -i "s#${AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/${ECR_REPO_NAME}:.*#${DOCKER_IMAGE_NAME}#g" deployment.yaml
-                            cat deployment.yaml
-                        '''
-                        withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS access and secrete Keys', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                            script {
-                                sh '''
-                                    aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
-                                '''
-                            }
-                        }
-                        // Commit and push the changes to the feature branch
-                        withCredentials([string(credentialsId: 'Github account token', variable: 'GITHUB_TOKEN')]) {
-                            sh '''
-                                git config --global user.email "temitope224468@gmail.com"
-                                git remote set-url origin https://${GITHUB_TOKEN}@github.com/teejayade2244/gitOps-approach
-                                git add deployment.yaml
-                                git commit -m "Updated docker image to ${GIT_COMMIT}"
-                                git push -u origin feature-$BUILD_ID
+        //             // Navigate to the Kubernetes directory
+        //             dir("gitOps-approach/Kubernetes") {
+        //                 // Replace the Docker image tag in the deployment file
+        //                 sh '''
+        //                     ls -la
+        //                     git checkout -b feature-$BUILD_ID
+        //                     sed -i "s#${AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/${ECR_REPO_NAME}:.*#${DOCKER_IMAGE_NAME}#g" deployment.yaml
+        //                     cat deployment.yaml
+        //                 '''
+        //                     script {
+        //                         sh '''
+        //                             aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+        //                         '''
+        //                     }
+        //                 // Commit and push the changes to the feature branch
+        //                 withCredentials([string(credentialsId: 'Github account token', variable: 'GITHUB_TOKEN')]) {
+        //                     sh '''
+        //                         git config --global user.email "temitope224468@gmail.com"
+        //                         git remote set-url origin https://${GITHUB_TOKEN}@github.com/teejayade2244/gitOps-approach
+        //                         git add deployment.yaml
+        //                         git commit -m "Updated docker image to ${GIT_COMMIT}"
+        //                         git push -u origin feature-$BUILD_ID
                                 
-                            '''
-                        }
-                    }
-                }
-            }
-        }
+        //                     '''
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
+        // stage('GitHub - Raise PR') {
+        //     when {
+        //         branch 'PR*'  // Runs when a feature branch is pushed
+        //     }
+        //     steps {
+        //         script {
+        //             try {
+        //             // Attempt to create a PR
+        //             sh '''
+        //                 curl -X POST https://api.github.com/repos/teejayade2244/gitOps-approach/pulls \
+        //                 -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+        //                 -H "Accept: application/vnd.github.v3+json" \
+        //                 -H "Content-Type: application/json" \
+        //                 -d '{
+        //                     "title": "Updated Docker Image to '"${GIT_COMMIT}"'",
+        //                     "body": "Updated Docker Image in deployment manifest",
+        //                     "head": "feature-'"${BUILD_ID}"'",
+        //                     "base": "master",
+        //                     "assignees": ["teejayade2244"]
+        //                 }'
+        //             '''
+        //             } catch (Exception e) {
+        //                 // Handle the error
+        //                 echo "Failed to create PR: ${e}"
+        //                 // Optionally, fail the pipeline or take other actions
+        //                 currentBuild.result = 'FAILURE'
+        //             }
+        //         }
+        //     }
+        // }
 
-        stage('GitHub - Raise PR') {
-            when {
-                branch 'PR*'  // Runs when a feature branch is pushed
-            }
-            steps {
-                script {
-                    try {
-                    // Attempt to create a PR
-                    sh '''
-                        curl -X POST https://api.github.com/repos/teejayade2244/gitOps-approach/pulls \
-                        -H "Authorization: Bearer ${GITHUB_TOKEN}" \
-                        -H "Accept: application/vnd.github.v3+json" \
-                        -H "Content-Type: application/json" \
-                        -d '{
-                            "title": "Updated Docker Image to '"${GIT_COMMIT}"'",
-                            "body": "Updated Docker Image in deployment manifest",
-                            "head": "feature-'"${BUILD_ID}"'",
-                            "base": "master",
-                            "assignees": ["teejayade2244"]
-                        }'
-                    '''
-                    } catch (Exception e) {
-                        // Handle the error
-                        echo "Failed to create PR: ${e}"
-                        // Optionally, fail the pipeline or take other actions
-                        currentBuild.result = 'FAILURE'
-                    }
-                }
-            }
-        }
-
-        stage('Upload Build reports to AWS s3') {
-            when {
-                branch 'PR*'  // Runs when a feature branch is pushed
-            }
-            steps {
-               withAWS(credentials: 'AWS access and secrete Keys', region: 'eu-west-2') {
-               sh '''
-                 mkdir -p reports-$BUILD_ID
-                 cp -r  test-results Trivy-Image-Reports reports-$BUILD_ID
-                 ls -ltr reports-$BUILD_ID
-               '''
-               s3Upload(file:"reports-$BUILD_ID", bucket:'core-serve-frontend-jenkins-build-reports', path:"Jenkins-$BUILD_ID-reports/")
-               }
+        // stage('Upload Build reports to AWS s3') {
+        //     when {
+        //         branch 'PR*'  // Runs when a feature branch is pushed
+        //     }
+        //     steps {
+        //        sh '''
+        //          mkdir -p reports-$BUILD_ID
+        //          cp -r  test-results Trivy-Image-Reports reports-$BUILD_ID
+        //          ls -ltr reports-$BUILD_ID
+        //        '''
+        //        s3Upload(file:"reports-$BUILD_ID", bucket:'core-serve-frontend-jenkins-build-reports', path:"Jenkins-$BUILD_ID-reports/")
                
-               script {
-                  // Clean up the reports directory after upload
-                  sh 'rm -rf reports-$BUILD_ID'
-               }
-            }
-        }
+               
+        //        script {
+        //           // Clean up the reports directory after upload
+        //           sh 'rm -rf reports-$BUILD_ID'
+        //        }
+        //     }
+        // }
     }
        
     // post actions.
