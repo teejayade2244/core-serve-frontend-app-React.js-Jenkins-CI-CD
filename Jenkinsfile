@@ -52,8 +52,8 @@ pipeline {
 
         // dependencies scanning
         stage("Dependency Check scanning") {
-            agent { label 'worker-2' }
             parallel {
+                agent { label 'worker-2' }
                 stage("NPM dependencies audit") {
                     steps {
                         // Run npm audit to check for critical vulnerabilities
