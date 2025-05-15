@@ -32,8 +32,7 @@ export function FirstSection() {
                             <div className="p-2 bg-gray-900 text-white font-sans font-semibold absolute bottom-0 right-80 rounded-md -left-56 w-48">
                                 <p className="text-xs">
                                     Lorem Ipsum is simply dummy text of the
-                                    printing and typesetting industry. Lorem
-                                    Ipsum has been the industry's
+                                    printing and typesetting industry.
                                 </p>
                             </div>
                         )}
