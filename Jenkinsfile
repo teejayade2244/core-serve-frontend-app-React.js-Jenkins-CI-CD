@@ -128,6 +128,8 @@ pipeline {
                         // this command retrieves a temporary authentication password for AWS ECR, and its passed as a stdin to docker 
                         // this allows docker Logs into your AWS ECR repository using the temporary password.
                         sh '''
+                            echo "Region: $AWS_REGION"
+                            echo "Account ID: $AWS_ACCOUNT_ID"
                             aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
                         '''
                      }
