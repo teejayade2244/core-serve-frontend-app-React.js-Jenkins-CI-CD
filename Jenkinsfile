@@ -127,15 +127,9 @@ pipeline {
                         // Get ECR login token and execute Docker login. AWSCLI is already configured with both the secret and access keys on the jankins agent 
                         // this command retrieves a temporary authentication password for AWS ECR, and its passed as a stdin to docker 
                         // this allows docker Logs into your AWS ECR repository using the temporary password.
-                        withEnv(["AWS_REGION=${AWS_REGION}", "AWS_ACCOUNT_ID=${AWS_ACCOUNT_ID}"]) {
-                sh '''
-                    # Get ECR login password
-                    ECR_PASSWORD=$(aws ecr get-login-password --region ${AWS_REGION})
-                    
-                    # Use echo to pipe the password to docker login
-                    echo ${ECR_PASSWORD} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
-                '''
-            }
+                        sh '''
+                            aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+                        '''
                      }
                   
                   
