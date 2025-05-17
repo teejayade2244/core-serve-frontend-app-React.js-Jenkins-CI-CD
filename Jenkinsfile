@@ -122,6 +122,10 @@ pipeline {
         stage("AWS ECR login") {
             agent { label 'worker-1' }
               // authenticate with ECR so docker has Docker has permission to push images to AWS ECR
+            environment {
+                AWS_REGION = credentials ('AWS-REGION')           
+                AWS_ACCOUNT_ID = credentials ('AWS-account-id')   
+            }
             steps {
                 withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS access and secrete Keys', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                      script {
