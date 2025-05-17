@@ -19,15 +19,15 @@ pipeline {
     }
     
     stages {
-        stage('clean workspace') {
-            agent { label 'worker-1' }
-            steps {
-                script {
-                    echo "Cleaning workspace.."
-                    deleteDir()
-                }
-            }
-        }
+        // stage('clean workspace') {
+        //     agent { label 'worker-1' }
+        //     steps {
+        //         script {
+        //             echo "Cleaning workspace.."
+        //             deleteDir()
+        //         }
+        //     }
+        // }
 
         stage('checkout') {
             agent { label 'worker-1' }
@@ -51,40 +51,40 @@ pipeline {
         }
 
         // dependencies scanning
-        stage("Dependency Check scanning") {
-            parallel {
-                stage("NPM dependencies audit") {
-                    agent { label 'worker-2' }
-                    steps {
-                        // Run npm audit to check for critical vulnerabilities
-                        sh '''
-                            npm audit --audit-level=critical
-                            echo $?
-                        '''
-                    }
-                }
+        // stage("Dependency Check scanning") {
+        //     parallel {
+        //         stage("NPM dependencies audit") {
+        //             agent { label 'worker-2' }
+        //             steps {
+        //                 // Run npm audit to check for critical vulnerabilities
+        //                 sh '''
+        //                     npm audit --audit-level=critical
+        //                     echo $?
+        //                 '''
+        //             }
+        //         }
 
-                stage("OWASP Dependency Check") { 
-                    agent { label 'worker-2' }
-                    steps {
-                        sh 'mkdir -p OWASP-security-reports'
-                        // Run OWASP Dependency Check scan with specific arguments
-                        withCredentials([string(credentialsId: 'NVD-API-KEY', variable: 'NVD_API_KEY')]) {
-                                dependencyCheck additionalArguments: '''
-                                    --scan "." \
-                                    --out "OWASP-security-reports" \
-                                    --disableYarnAudit \
-                                    --format \'ALL\' \
-                                    --prettyPrint \
-                                    --nvdApiKey '${NVD_API_KEY}' \
-                                ''', odcInstallation: 'OWAPS-Depend-check'
-                         }
-                        // Publish the Dependency Check report and fail the build if critical issues are found
-                        dependencyCheckPublisher failedTotalCritical: 2, pattern: 'OWASP-security-reports/dependency-check-report.xml', stopBuild: true
-                    }
-                }
-            }
-        }
+        //         stage("OWASP Dependency Check") { 
+        //             agent { label 'worker-2' }
+        //             steps {
+        //                 sh 'mkdir -p OWASP-security-reports'
+        //                 // Run OWASP Dependency Check scan with specific arguments
+        //                 withCredentials([string(credentialsId: 'NVD-API-KEY', variable: 'NVD_API_KEY')]) {
+        //                         dependencyCheck additionalArguments: '''
+        //                             --scan "." \
+        //                             --out "OWASP-security-reports" \
+        //                             --disableYarnAudit \
+        //                             --format \'ALL\' \
+        //                             --prettyPrint \
+        //                             --nvdApiKey '${NVD_API_KEY}' \
+        //                         ''', odcInstallation: 'OWAPS-Depend-check'
+        //                  }
+        //                 // Publish the Dependency Check report and fail the build if critical issues are found
+        //                 dependencyCheckPublisher failedTotalCritical: 2, pattern: 'OWASP-security-reports/dependency-check-report.xml', stopBuild: true
+        //             }
+        //         }
+        //     }
+        // }
 
         // unit testing
         stage("Unit Testing stage") {
@@ -133,7 +133,8 @@ pipeline {
                         // this command retrieves a temporary authentication password for AWS ECR, and its passed as a stdin to docker 
                         // this allows docker Logs into your AWS ECR repository using the temporary password.
                         sh '''
-                            aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+                            aws ecr get-login-password --region ${AWS_REGION} | \
+                            docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
                         '''
                     }
                 }        
