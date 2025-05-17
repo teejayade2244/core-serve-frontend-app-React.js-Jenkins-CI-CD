@@ -1,5 +1,5 @@
 pipeline {
-    agent none
+    agent { label 'worker-1' } 
     tools {
         nodejs "Nodejs-22-6-0"
     }
@@ -20,7 +20,6 @@ pipeline {
     
     stages {
         // stage('clean workspace') {
-        //     agent { label 'worker-1' }
         //     steps {
         //         script {
         //             echo "Cleaning workspace.."
@@ -30,7 +29,6 @@ pipeline {
         // }
 
         stage('checkout') {
-            agent { label 'worker-1' }
             steps {
                checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/teejayade2244/core-serve-frontend.git']])
             }
@@ -38,7 +36,6 @@ pipeline {
 
         // Dependencies installation
         stage("Install node-js dependencies") {
-            agent { label 'worker-1' }
             steps {
                 script {
                     if (env.BRANCH_NAME.contains("PR-")) {
@@ -54,7 +51,6 @@ pipeline {
         // stage("Dependency Check scanning") {
         //     parallel {
         //         stage("NPM dependencies audit") {
-        //             agent { label 'worker-2' }
         //             steps {
         //                 // Run npm audit to check for critical vulnerabilities
         //                 sh '''
@@ -65,7 +61,6 @@ pipeline {
         //         }
 
         //         stage("OWASP Dependency Check") { 
-        //             agent { label 'worker-2' }
         //             steps {
         //                 sh 'mkdir -p OWASP-security-reports'
         //                 // Run OWASP Dependency Check scan with specific arguments
@@ -88,7 +83,6 @@ pipeline {
 
         // unit testing
         // stage("Unit Testing stage") {
-        //     agent { label 'worker-1' }
         //     steps {
         //         // Run unit tests with npm
         //         sh 'mkdir -p test-results'
@@ -98,7 +92,6 @@ pipeline {
 
         // static testing and analysis with SonarQube
         // stage("Static Testing and Analysis with SonarQube") {
-        //     agent { label 'worker-2' }
         //     environment {
         //             SONAR_SCANNER_HOME = tool 'sonarqube-scanner-6.1.0.477'
         //         }
@@ -120,7 +113,6 @@ pipeline {
 
         // login to ECR
         stage("AWS ECR login") {
-            agent { label 'worker-1' }
             steps {
                 script {
                 // Get ECR login token and execute Docker login. AWSCLI is already configured with both the secret and access keys on the jankins agent 
@@ -133,7 +125,6 @@ pipeline {
 
         // Build Docker image
         stage("Docker Build and Tag") {
-            agent { label 'worker-1' }
               steps {
                   script {
                     sh 'docker build -t ${IMAGE_TAG} .'
@@ -144,7 +135,6 @@ pipeline {
 
         // scan the image for vulnerabilities before pushing to resgistry
         stage("Trivy Vulnerability scan") {
-            agent { label 'worker-1' }
             steps {
                 sh 'mkdir -p Trivy-Image-Reports'
                 sh '''
@@ -187,7 +177,6 @@ pipeline {
 
         // Push image to AWS ECR
         stage("Push to AWS-ECR") {
-            agent { label 'worker-1' }
             steps {
                script {
                     sh '''
@@ -198,46 +187,45 @@ pipeline {
         }
         
         // Continuous Deployment - Deploy to AWS EC2
-        stage("Deploy to AWS EC2") {
-            agent { label 'worker-1' }
-            steps {
-                script {
-                    try {
-                        sshagent(['SSH-ACCESS']) {
-                            sh '''
-                                ssh -o StrictHostKeyChecking=no ${EC2_HOST} "
-                                    # Check if container exists and remove it
-                                    if sudo docker ps -a | grep -i \"${ECR_REPO_NAME}\"; then
-                                        echo \"Container found. Stopping and removing...\"
-                                        sudo docker stop \"${ECR_REPO_NAME}\" || true
-                                        sudo docker rm \"${ECR_REPO_NAME}\" || true
-                                    fi
+        // stage("Deploy to AWS EC2") {
+        //     steps {
+        //         script {
+        //             try {
+        //                 sshagent(['SSH-ACCESS']) {
+        //                     sh '''
+        //                         ssh -o StrictHostKeyChecking=no ${EC2_HOST} "
+        //                             # Check if container exists and remove it
+        //                             if sudo docker ps -a | grep -i \"${ECR_REPO_NAME}\"; then
+        //                                 echo \"Container found. Stopping and removing...\"
+        //                                 sudo docker stop \"${ECR_REPO_NAME}\" || true
+        //                                 sudo docker rm \"${ECR_REPO_NAME}\" || true
+        //                             fi
                                     
-                                    # Login to ECR
-                                    aws ecr get-login-password --region ${AWS_REGION} | sudo docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+        //                             # Login to ECR
+        //                             aws ecr get-login-password --region ${AWS_REGION} | sudo docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
                                     
-                                    echo \"Pulling new image...\"
-                                    sudo docker pull ${DOCKER_IMAGE_NAME}
+        //                             echo \"Pulling new image...\"
+        //                             sudo docker pull ${DOCKER_IMAGE_NAME}
                                     
-                                    echo \"Starting new container...\"
-                                    sudo docker run -d \\
-                                        --name \"${ECR_REPO_NAME}\" \\
-                                        --restart unless-stopped \\
-                                        -p ${PORT}:${PORT} \\
-                                        ${DOCKER_IMAGE_NAME}
+        //                             echo \"Starting new container...\"
+        //                             sudo docker run -d \\
+        //                                 --name \"${ECR_REPO_NAME}\" \\
+        //                                 --restart unless-stopped \\
+        //                                 -p ${PORT}:${PORT} \\
+        //                                 ${DOCKER_IMAGE_NAME}
                                         
-                                    echo \"Cleaning up old images...\"
-                                    sudo docker image prune -f
-                                "
-                            '''
-                        }
-                    } catch (Exception e) {
-                        echo "Deployment failed: ${e.message}"
-                        throw e
-                    }
-                }
-            }
-        }
+        //                             echo \"Cleaning up old images...\"
+        //                             sudo docker image prune -f
+        //                         "
+        //                     '''
+        //                 }
+        //             } catch (Exception e) {
+        //                 echo "Deployment failed: ${e.message}"
+        //                 throw e
+        //             }
+        //         }
+        //     }
+        // }
 
         // Update the image tag in the Kubernetes deployment file
         // stage('K8S Update Image Tag') {
