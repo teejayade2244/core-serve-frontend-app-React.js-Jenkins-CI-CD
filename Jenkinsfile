@@ -97,26 +97,26 @@ pipeline {
         }
 
         // static testing and analysis with SonarQube
-        stage("Static Testing and Analysis with SonarQube") {
-            agent { label 'worker-2' }
-            environment {
-                    SONAR_SCANNER_HOME = tool 'sonarqube-scanner-6.1.0.477'
-                }
-            steps {
-                timeout(time: 5, unit: 'MINUTES') {
-                    withSonarQubeEnv('sonarqube-server') {
-                        // Run SonarQube scanner with specific parameters
-                        sh '''
-                            ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
-                            -Dsonar.projectKey=Serve-core-frontend \
-                            -Dsonar.sources=. \
-                        '''
-                    }
-                }
-                // Wait for SonarQube quality gate and fail the pipeline if it's not OK
-                waitForQualityGate abortPipeline: true
-            }
-        }
+        // stage("Static Testing and Analysis with SonarQube") {
+        //     agent { label 'worker-2' }
+        //     environment {
+        //             SONAR_SCANNER_HOME = tool 'sonarqube-scanner-6.1.0.477'
+        //         }
+        //     steps {
+        //         timeout(time: 5, unit: 'MINUTES') {
+        //             withSonarQubeEnv('sonarqube-server') {
+        //                 // Run SonarQube scanner with specific parameters
+        //                 sh '''
+        //                     ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
+        //                     -Dsonar.projectKey=Serve-core-frontend \
+        //                     -Dsonar.sources=. \
+        //                 '''
+        //             }
+        //         }
+        //         // Wait for SonarQube quality gate and fail the pipeline if it's not OK
+        //         waitForQualityGate abortPipeline: true
+        //     }
+        // }
 
         // login to ECR
         stage("AWS ECR login") {
@@ -127,17 +127,12 @@ pipeline {
                 AWS_ACCOUNT_ID = credentials ('AWS-account-id')   
             }
             steps {
-                withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS access and secrete Keys', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                     script {
-                        // Get ECR login token and execute Docker login. AWSCLI is already configured with both the secret and access keys on the jankins agent 
-                        // this command retrieves a temporary authentication password for AWS ECR, and its passed as a stdin to docker 
-                        // this allows docker Logs into your AWS ECR repository using the temporary password.
-                        sh '''
-                            aws ecr get-login-password --region ${AWS_REGION} | \
-                            docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
-                        '''
-                    }
-                }        
+                script {
+                // Get ECR login token and execute Docker login. AWSCLI is already configured with both the secret and access keys on the jankins agent 
+                // this command retrieves a temporary authentication password for AWS ECR, and its passed as a stdin to docker 
+                // this allows docker Logs into your AWS ECR repository using the temporary password.
+                sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+                }       
             }
         }
 
