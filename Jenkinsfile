@@ -7,19 +7,16 @@ pipeline {
        disableConcurrentBuilds abortPrevious: true
     }
     environment {
-    AWS_REGION = credentials('AWS-REGION')
-    ECR_REPO_NAME = 'core-serve-frontend-app'
-    VERSION = "1.0.${BUILD_NUMBER}"
-    AWS_ACCOUNT_ID = credentials('AWS-account-id')
-    IMAGE_TAG = "${ECR_REPO_NAME}:${VERSION}"
-    // Use either GIT_COMMIT or VERSION, not both
-    DOCKER_IMAGE_NAME = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${VERSION}"
-    GITHUB_TOKEN = credentials('GitHub-account-token')
-    EC2_HOST = credentials('AWS-EC2-HOST')
-    PORT = credentials('port-number')
-    // Add GIT_COMMIT if you want to use it
-    GIT_COMMIT = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
-}
+        AWS_REGION = credentials ('AWS-REGION')
+        ECR_REPO_NAME = 'core-serve-frontend-app'
+        VERSION = "1.0.${BUILD_NUMBER}"
+        AWS_ACCOUNT_ID = credentials ('AWS-account-id')
+        IMAGE_TAG = "${ECR_REPO_NAME}:${VERSION}"
+        DOCKER_IMAGE_NAME = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${GIT_COMMIT}"
+        GITHUB_TOKEN = credentials ('GitHub-account-token')
+        EC2_HOST = credentials ('AWS-EC2-HOST')
+        PORT = credentials ('port-number')
+    }
     
     stages {
         // stage('clean workspace') {
