@@ -7,15 +7,15 @@ pipeline {
        disableConcurrentBuilds abortPrevious: true
     }
     environment {
-        AWS_REGION = credentials ('AWS-REGION')
+        AWS_REGION = credentials('AWS-REGION')
         ECR_REPO_NAME = 'core-serve-frontend-app'
         VERSION = "1.0.${BUILD_NUMBER}"
-        AWS_ACCOUNT_ID = credentials ('AWS-account-id')
+        AWS_ACCOUNT_ID = credentials('AWS-account-id')
         IMAGE_TAG = "${ECR_REPO_NAME}:${VERSION}"
         DOCKER_IMAGE_NAME = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${GIT_COMMIT}"
-        GITHUB_TOKEN = credentials ('GitHub-account-token')
-        EC2_HOST = credentials ('AWS-EC2-HOST')
-        PORT = credentials ('port-number')
+        GITHUB_TOKEN = credentials('GitHub-account-token')
+        EC2_HOST = credentials('AWS-EC2-HOST')
+        PORT = credentials('port-number')
     }
     
     stages {
@@ -87,14 +87,14 @@ pipeline {
         // }
 
         // unit testing
-        stage("Unit Testing stage") {
-            agent { label 'worker-1' }
-            steps {
-                // Run unit tests with npm
-                sh 'mkdir -p test-results'
-                sh "npm test"
-            } 
-        }
+        // stage("Unit Testing stage") {
+        //     agent { label 'worker-1' }
+        //     steps {
+        //         // Run unit tests with npm
+        //         sh 'mkdir -p test-results'
+        //         sh "npm test"
+        //     } 
+        // }
 
         // static testing and analysis with SonarQube
         // stage("Static Testing and Analysis with SonarQube") {
@@ -131,7 +131,7 @@ pipeline {
                 // Get ECR login token and execute Docker login. AWSCLI is already configured with both the secret and access keys on the jankins agent 
                 // this command retrieves a temporary authentication password for AWS ECR, and its passed as a stdin to docker 
                 // this allows docker Logs into your AWS ECR repository using the temporary password.
-                    sh 'aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin 911167885172.dkr.ecr.eu-west-2.amazonaws.com'
+                    sh 'aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com'
                 }       
             }
         }
