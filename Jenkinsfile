@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'worker-1' } 
+    agent any
     tools {
         nodejs "Nodejs-22-6-0"
     }
