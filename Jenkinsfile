@@ -122,16 +122,16 @@ pipeline {
         stage("AWS ECR login") {
             agent { label 'worker-1' }
               // authenticate with ECR so docker has Docker has permission to push images to AWS ECR
-            environment {
-                AWS_REGION = credentials ('AWS-REGION')           
-                AWS_ACCOUNT_ID = credentials ('AWS-account-id')   
-            }
+            // environment {
+            //     AWS_REGION = credentials ('AWS-REGION')           
+            //     AWS_ACCOUNT_ID = credentials ('AWS-account-id')   
+            // }
             steps {
                 script {
                 // Get ECR login token and execute Docker login. AWSCLI is already configured with both the secret and access keys on the jankins agent 
                 // this command retrieves a temporary authentication password for AWS ECR, and its passed as a stdin to docker 
                 // this allows docker Logs into your AWS ECR repository using the temporary password.
-                sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+                sh 'aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin 911167885172.dkr.ecr.eu-west-2.amazonaws.com'
                 }       
             }
         }
