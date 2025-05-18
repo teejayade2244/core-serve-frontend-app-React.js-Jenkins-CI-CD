@@ -113,14 +113,14 @@ pipeline {
 
         // login to ECR
         stage("Image Push to AWS ECR") {
-            environment {
+            steps {
+                environment {
                 AWS_REGION = credentials('AWS-REGION')
                 ECR_REPO_NAME = 'core-serve-frontend-app'
                 AWS_ACCOUNT_ID = credentials('AWS-account-id')
                 IMAGE_TAG = "${ECR_REPO_NAME}:${VERSION}"
                 DOCKER_IMAGE_NAME = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${BUILD_NUMBER}"
             }
-            steps {
                 script {
                     sh 'aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin {AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com'
                     sh 'docker build -t ${IMAGE_TAG} .'
