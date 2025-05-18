@@ -28,11 +28,11 @@ pipeline {
             }
         }
 
-        stage('checkout') {
-            steps {
-               checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/teejayade2244/core-serve-frontend.git']])
-            }
-        }
+        // stage('checkout') {
+        //     steps {
+        //        checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/teejayade2244/core-serve-frontend.git']])
+        //     }
+        // }
 
         // Dependencies installation
         stage("Install node-js dependencies") {
@@ -113,6 +113,13 @@ pipeline {
 
         // login to ECR
         stage("Image Push to AWS ECR") {
+            environment {
+                AWS_REGION = credentials('AWS-REGION')
+                ECR_REPO_NAME = 'core-serve-frontend-app'
+                AWS_ACCOUNT_ID = credentials('AWS-account-id')
+                IMAGE_TAG = "${ECR_REPO_NAME}:${VERSION}"
+                DOCKER_IMAGE_NAME = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${BUILD_NUMBER}"
+            }
             steps {
                 script {
                     sh 'aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin {AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com'
