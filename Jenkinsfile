@@ -19,14 +19,14 @@ pipeline {
     }
     
     stages {
-        // stage('clean workspace') {
-        //     steps {
-        //         script {
-        //             echo "Cleaning workspace.."
-        //             deleteDir()
-        //         }
-        //     }
-        // }
+        stage('clean workspace') {
+            steps {
+                script {
+                    echo "Cleaning workspace.."
+                    deleteDir()
+                }
+            }
+        }
 
         stage('checkout') {
             steps {
