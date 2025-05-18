@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent { label 'worker-1' } 
     tools {
         nodejs "Nodejs-22-6-0"
     }
@@ -12,7 +12,7 @@ pipeline {
         VERSION = "1.0.${BUILD_NUMBER}"
         AWS_ACCOUNT_ID = credentials('AWS-account-id')
         IMAGE_TAG = "${ECR_REPO_NAME}:${VERSION}"
-        DOCKER_IMAGE_NAME = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${GIT_COMMIT}"
+        DOCKER_IMAGE_NAME = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${BUILD_NUMBER}"
         GITHUB_TOKEN = credentials('GitHub-account-token')
         EC2_HOST = credentials('AWS-EC2-HOST')
         PORT = credentials('port-number')
@@ -35,7 +35,7 @@ pipeline {
         }
 
         // Dependencies installation
-        stage("Install nodejs dependencies") {
+        stage("Install node-js dependencies") {
             steps {
                 script {
                     if (env.BRANCH_NAME.contains("PR-")) {
@@ -112,25 +112,14 @@ pipeline {
         // }
 
         // login to ECR
-        stage("AWS ECR login") {
+        stage("Image Push to AWS ECR") {
             steps {
                 script {
-                // Get ECR login token and execute Docker login. AWSCLI is already configured with both the secret and access keys on the jankins agent 
-                // this command retrieves a temporary authentication password for AWS ECR, and its passed as a stdin to docker 
-                // this allows docker Logs into your AWS ECR repository using the temporary password.
-                    sh 'aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com'
-                }       
-            }
-        }
-
-        // Build Docker image
-        stage("Docker Build and Tag") {
-              steps {
-                  script {
+                    sh 'aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin {AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com'
                     sh 'docker build -t ${IMAGE_TAG} .'
                     sh 'docker tag ${IMAGE_TAG} ${DOCKER_IMAGE_NAME}'
-                  } 
-              }
+                }       
+            }
         }
 
         // scan the image for vulnerabilities before pushing to resgistry
