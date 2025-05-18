@@ -19,20 +19,20 @@ pipeline {
     }
     
     stages {
-        stage('clean workspace') {
-            steps {
-                script {
-                    echo "Cleaning workspace.."
-                    deleteDir()
-                }
-            }
-        }
-
-        // stage('checkout') {
+        // stage('clean workspace') {
         //     steps {
-        //        checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/teejayade2244/core-serve-frontend.git']])
+        //         script {
+        //             echo "Cleaning workspace.."
+        //             deleteDir()
+        //         }
         //     }
         // }
+
+        stage('checkout') {
+            steps {
+               checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/teejayade2244/core-serve-frontend.git']])
+            }
+        }
 
         // Dependencies installation
         stage("Install node-js dependencies") {
