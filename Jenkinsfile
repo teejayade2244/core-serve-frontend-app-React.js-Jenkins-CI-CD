@@ -13,7 +13,7 @@ pipeline {
         AWS_ACCOUNT_ID = credentials('AWS-account-id')
         IMAGE_TAG = "${ECR_REPO_NAME}:${VERSION}"
         DOCKER_IMAGE_NAME = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${BUILD_NUMBER}"
-        GITHUB_TOKEN = credentials('GitHub-account-token')
+        GITHUB_TOKEN = credentials('Github-account-token')
         EC2_HOST = credentials('AWS-EC2-HOST')
         PORT = credentials('port-number')
     }
