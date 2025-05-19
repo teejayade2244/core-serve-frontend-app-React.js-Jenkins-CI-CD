@@ -65,14 +65,14 @@ pipeline {
                         sh 'mkdir -p OWASP-security-reports'
                         // Run OWASP Dependency Check scan with specific arguments
                         withCredentials([string(credentialsId: 'NVD-API-KEY', variable: 'NVD_API_KEY')]) {
-                                dependencyCheck additionalArguments: """
+                                dependencyCheck additionalArguments: '''
                                     --scan "." \
                                     --out "OWASP-security-reports" \
                                     --disableYarnAudit \
                                     --format \'ALL\' \
                                     --prettyPrint \
-                                    --nvdApiKey "${NVD_API_KEY}" \
-                                """, odcInstallation: 'OWAPS-Depend-check'
+                                    --nvdApiKey '${NVD_API_KEY}' \
+                                ''', odcInstallation: 'OWAPS-Depend-check'
                          }
                         // Publish the Dependency Check report and fail the build if critical issues are found
                         dependencyCheckPublisher failedTotalCritical: 2, pattern: 'OWASP-security-reports/dependency-check-report.xml', stopBuild: true
@@ -168,8 +168,8 @@ pipeline {
         stage("Push to AWS-ECR") {
             steps {
                script {
-                    sh 'docker push ${DOCKER_IMAGE_NAME}'
                     sh "echo ${DOCKER_IMAGE_NAME}"
+                    sh 'docker push ${DOCKER_IMAGE_NAME}' 
                 }
             }
         }
