@@ -27,7 +27,7 @@ pipeline {
                 }
             }
         }
-
+        // Checkout the code from GitHub
         stage('checkout') {
             steps {
                checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/teejayade2244/core-serve-frontend.git']])
