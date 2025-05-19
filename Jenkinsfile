@@ -19,14 +19,14 @@ pipeline {
     }
     
     stages {
-        stage('clean workspace') {
-            steps {
-                script {
-                    echo "Cleaning workspace.."
-                    deleteDir()
-                }
-            }
-        }
+        // stage('clean workspace') {
+        //     steps {
+        //         script {
+        //             echo "Cleaning workspace.."
+        //             deleteDir()
+        //         }
+        //     }
+        // }
         // Checkout the code from GitHub
         stage('checkout') {
             steps {
@@ -115,7 +115,7 @@ pipeline {
         stage("Image Build and Tag") {
             steps {
                 script {
-                    sh 'aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin {AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com'
+                    sh 'aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com'
                     sh 'docker build -t ${IMAGE_TAG} .'
                     sh 'docker tag ${IMAGE_TAG} ${DOCKER_IMAGE_NAME}'
                 }       
