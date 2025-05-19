@@ -19,14 +19,14 @@ pipeline {
     }
     
     stages {
-        // stage('clean workspace') {
-        //     steps {
-        //         script {
-        //             echo "Cleaning workspace.."
-        //             deleteDir()
-        //         }
-        //     }
-        // }
+        stage('clean workspace') {
+            steps {
+                script {
+                    echo "Cleaning workspace.."
+                    deleteDir()
+                }
+            }
+        }
         // Checkout the code from GitHub
         stage('checkout') {
             steps {
@@ -168,9 +168,7 @@ pipeline {
         stage("Push to AWS-ECR") {
             steps {
                script {
-                    sh '''
-                        docker push ${DOCKER_IMAGE_NAME}
-                    '''
+                    sh 'docker push ${DOCKER_IMAGE_NAME}'
                 }
             }
         }
