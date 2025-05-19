@@ -169,6 +169,7 @@ pipeline {
             steps {
                script {
                     sh 'docker push ${DOCKER_IMAGE_NAME}'
+                    sh "echo ${DOCKER_IMAGE_NAME}"
                 }
             }
         }
