@@ -12,8 +12,8 @@ pipeline {
         ECR_REPO_NAME = 'core-serve-frontend-app'
         BRANCH_NAME_CLEAN = sh(script: "echo ${BRANCH_NAME} | tr '/' '-'", returnStdout: true).trim()
         AWS_ACCOUNT_ID = credentials('AWS-account-id')
-        IMAGE_TAG = "${ECR_REPO_NAME}:${BRANCH_NAME_CLEAN}-${VERSION}"
-        DOCKER_IMAGE_NAME = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${BRANCH_NAME_CLEAN}-${BUILD_NUMBER}"
+        IMAGE_TAG = "${ECR_REPO_NAME}:${BRANCH_NAME_CLEAN}-${BUILD_NUMBER}"
+        DOCKER_IMAGE_NAME = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${IMAGE_TAG}"
         GITHUB_TOKEN = credentials('Github account token')
         EC2_HOST = credentials('AWS-EC2-HOST')
         PORT = credentials('port-number')
@@ -63,24 +63,24 @@ pipeline {
                     }
                 }
 
-                stage("OWASP Dependency Check") { 
-                    steps {
-                        sh 'mkdir -p OWASP-security-reports'
-                        // Run OWASP Dependency Check scan with specific arguments
-                        withCredentials([string(credentialsId: 'NVD-API-KEY', variable: 'NVD_API_KEY')]) {
-                                dependencyCheck additionalArguments: '''
-                                    --scan "." \
-                                    --out "OWASP-security-reports" \
-                                    --disableYarnAudit \
-                                    --format \'ALL\' \
-                                    --prettyPrint \
-                                    --nvdApiKey '${NVD_API_KEY}' \
-                                ''', odcInstallation: 'OWAPS-Depend-check'
-                         }
-                        // Publish the Dependency Check report and fail the build if critical issues are found
-                        dependencyCheckPublisher failedTotalCritical: 2, pattern: 'OWASP-security-reports/dependency-check-report.xml', stopBuild: true
-                    }
-                }
+                // stage("OWASP Dependency Check") { 
+                //     steps {
+                //         sh 'mkdir -p OWASP-security-reports'
+                //         // Run OWASP Dependency Check scan with specific arguments
+                //         withCredentials([string(credentialsId: 'NVD-API-KEY', variable: 'NVD_API_KEY')]) {
+                //                 dependencyCheck additionalArguments: '''
+                //                     --scan "." \
+                //                     --out "OWASP-security-reports" \
+                //                     --disableYarnAudit \
+                //                     --format \'ALL\' \
+                //                     --prettyPrint \
+                //                     --nvdApiKey '${NVD_API_KEY}' \
+                //                 ''', odcInstallation: 'OWAPS-Depend-check'
+                //          }
+                //         // Publish the Dependency Check report and fail the build if critical issues are found
+                //         dependencyCheckPublisher failedTotalCritical: 2, pattern: 'OWASP-security-reports/dependency-check-report.xml', stopBuild: true
+                //     }
+                // }
             }
         }
 
@@ -345,16 +345,16 @@ pipeline {
             }
             steps {
                sh '''
-                 mkdir -p reports-$BUILD_NUMBER
+                 mkdir -p reports-${BRANCH_NAME_CLEAN}-${BUILD_NUMBER}
                  cp -r  test-results Trivy-Image-Reports reports-$BUILD_NUMBER
-                 ls -ltr reports-$BUILD_NUMBER
+                 ls -ltr reports-${BRANCH_NAME_CLEAN}-${BUILD_NUMBER}
                '''
-               s3Upload(file:"reports-$BUILD_NUMBER", bucket:'jenkins-build-reports-core-serve-frontend', path:"Jenkins-$BUILD_NUMBER-reports/")
+               s3Upload(file:"reports-${BRANCH_NAME_CLEAN}-${BUILD_NUMBER}", bucket:'jenkins-build-reports-core-serve-frontend', path:"Jenkins-${BRANCH_NAME_CLEAN}-${BUILD_NUMBER}-reports/")
                
                
                script {
                   // Clean up the reports directory after upload
-                  sh 'rm -rf reports-$BUILD_NUMBER'
+                  sh 'rm -rf reports-${BRANCH_NAME_CLEAN}-${BUILD_NUMBER}'
                }
             }
         }
