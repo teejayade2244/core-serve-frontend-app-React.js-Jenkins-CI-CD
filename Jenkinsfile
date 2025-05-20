@@ -182,7 +182,7 @@ pipeline {
                     try {
                         sshagent(['SSH-ACCESS']) {
                             sh '''
-                                sudo chmod 600 ${SSH_ACCESS}
+                                chmod 600 ${SSH_ACCESS}
                                 ssh -o StrictHostKeyChecking=no ${EC2_HOST} "
                                     # Check if container exists and remove it
                                     if sudo docker ps -a | grep -i \"${ECR_REPO_NAME}\"; then
