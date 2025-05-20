@@ -10,13 +10,10 @@ pipeline {
     environment {
         AWS_REGION = credentials('AWS-REGION')
         ECR_REPO_NAME = 'core-serve-frontend-app'
-        GIT_COMMIT_SHORT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
         BRANCH_NAME_CLEAN = sh(script: "echo ${BRANCH_NAME} | tr '/' '-'", returnStdout: true).trim()
-        BUILD_DATE = sh(script: "date +'%Y%m%d'", returnStdout: true).trim()
-        VERSION = "${BUILD_DATE}-${GIT_COMMIT_SHORT}"
         AWS_ACCOUNT_ID = credentials('AWS-account-id')
         IMAGE_TAG = "${ECR_REPO_NAME}:${BRANCH_NAME_CLEAN}-${VERSION}"
-        DOCKER_IMAGE_NAME = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${BRANCH_NAME_CLEAN}-${VERSION}"
+        DOCKER_IMAGE_NAME = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${BRANCH_NAME_CLEAN}-${BUILD_NUMBER}"
         GITHUB_TOKEN = credentials('Github account token')
         EC2_HOST = credentials('AWS-EC2-HOST')
         PORT = credentials('port-number')
@@ -182,45 +179,45 @@ pipeline {
         }
         
         // Continuous Deployment - Deploy to AWS EC2
-        stage("Deploy to AWS EC2") {
-            steps {
-                script {
-                    try {
-                        sshagent(['SSH-ACCESS']) {
-                            sh '''
-                                ssh -o StrictHostKeyChecking=no ${EC2_HOST} "
-                                    # Check if container exists and remove it
-                                    if sudo docker ps -a | grep -i \"${ECR_REPO_NAME}\"; then
-                                        echo \"Container found. Stopping and removing...\"
-                                        sudo docker stop \"${ECR_REPO_NAME}\" || true
-                                        sudo docker rm \"${ECR_REPO_NAME}\" || true
-                                    fi
+        // stage("Deploy to AWS EC2") {
+        //     steps {
+        //         script {
+        //             try {
+        //                 sshagent(['SSH-ACCESS']) {
+        //                     sh '''
+        //                         ssh -o StrictHostKeyChecking=no ${EC2_HOST} "
+        //                             # Check if container exists and remove it
+        //                             if sudo docker ps -a | grep -i \"${ECR_REPO_NAME}\"; then
+        //                                 echo \"Container found. Stopping and removing...\"
+        //                                 sudo docker stop \"${ECR_REPO_NAME}\" || true
+        //                                 sudo docker rm \"${ECR_REPO_NAME}\" || true
+        //                             fi
                                     
-                                    # Login to ECR
-                                    aws ecr get-login-password --region ${AWS_REGION} | sudo docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+        //                             # Login to ECR
+        //                             aws ecr get-login-password --region ${AWS_REGION} | sudo docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
                                     
-                                    echo \"Pulling new image...\"
-                                    sudo docker pull ${DOCKER_IMAGE_NAME}
+        //                             echo \"Pulling new image...\"
+        //                             sudo docker pull ${DOCKER_IMAGE_NAME}
                                     
-                                    echo \"Starting new container...\"
-                                    sudo docker run -d \\
-                                        --name \"${ECR_REPO_NAME}\" \\
-                                        --restart unless-stopped \\
-                                        -p ${PORT}:${PORT} \\
-                                        ${DOCKER_IMAGE_NAME}
+        //                             echo \"Starting new container...\"
+        //                             sudo docker run -d \\
+        //                                 --name \"${ECR_REPO_NAME}\" \\
+        //                                 --restart unless-stopped \\
+        //                                 -p ${PORT}:${PORT} \\
+        //                                 ${DOCKER_IMAGE_NAME}
                                         
-                                    echo \"Cleaning up old images...\"
-                                    sudo docker image prune -f
-                                "
-                            '''
-                        }
-                    } catch (Exception e) {
-                        echo "Deployment failed: ${e.message}"
-                        throw e
-                    }
-                }
-            }
-        }
+        //                             echo \"Cleaning up old images...\"
+        //                             sudo docker image prune -f
+        //                         "
+        //                     '''
+        //                 }
+        //             } catch (Exception e) {
+        //                 echo "Deployment failed: ${e.message}"
+        //                 throw e
+        //             }
+        //         }
+        //     }
+        // }
 
         // Update the image tag in the Kubernetes deployment file
         stage('K8S Update Image Tag') {
@@ -239,7 +236,7 @@ pipeline {
                         // Replace the Docker image tag in the deployment file
                         sh '''
                             ls -la
-                            git checkout -b feature-$IMAGE_TAG
+                            git checkout -b feature-$BUILD_NUMBER
                             sed -i "s#${AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/${ECR_REPO_NAME}:.*#${DOCKER_IMAGE_NAME}#g" deployment.yaml
                             cat deployment.yaml
                         '''
@@ -255,7 +252,7 @@ pipeline {
                                 git remote set-url origin https://${GITHUB_TOKEN}@github.com/teejayade2244/gitOps-approach
                                 git add deployment.yaml
                                 git commit -m "Updated docker image to ${GIT_COMMIT}"
-                                git push -u origin feature-$IMAGE_TAG
+                                git push -u origin feature-$BUILD_NUMBER
                                 
                             '''
                         }
@@ -281,7 +278,7 @@ pipeline {
                         -d '{
                             "title": "Updated Docker Image to '"${GIT_COMMIT}"'",
                             "body": "Updated Docker Image in deployment manifest",
-                            "head": "feature-'"${IMAGE_TAG}"'",
+                            "head": "feature-'"${BUILD_NUMBER}"'",
                             "base": "master",
                             "assignees": ["teejayade2244"]
                         }'
@@ -351,16 +348,16 @@ pipeline {
             }
             steps {
                sh '''
-                 mkdir -p reports-$IMAGE_TAG
-                 cp -r  test-results Trivy-Image-Reports reports-$IMAGE_TAG
-                 ls -ltr reports-$IMAGE_TAG
+                 mkdir -p reports-$BUILD_NUMBER
+                 cp -r  test-results Trivy-Image-Reports reports-$BUILD_NUMBER
+                 ls -ltr reports-$BUILD_NUMBER
                '''
-               s3Upload(file:"reports-$IMAGE_TAG", bucket:'jenkins-build-reports-core-serve-frontend', path:"Jenkins-$IMAGE_TAG-reports/")
+               s3Upload(file:"reports-$BUILD_NUMBER", bucket:'jenkins-build-reports-core-serve-frontend', path:"Jenkins-$BUILD_NUMBER-reports/")
                
                
                script {
                   // Clean up the reports directory after upload
-                  sh 'rm -rf reports-$IMAGE_TAG'
+                  sh 'rm -rf reports-$BUILD_NUMBER'
                }
             }
         }
