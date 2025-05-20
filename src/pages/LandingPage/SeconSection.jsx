@@ -37,7 +37,7 @@ export function SecondSection() {
                 <DataOne
                     imageSrc="https://portal.nysc.org.ng/nysc1/img/mainsite.png"
                     title="Visit the Main Site"
-                    linkText="Visit the Nysc Website for More Information"
+                    linkText="Visit the Core-serve Website for More Information"
                     linkURL="/home"
                 />
             </motion.div>

@@ -64,16 +64,16 @@ pipeline {
                     steps {
                         sh 'mkdir -p OWASP-security-reports'
                         // Run OWASP Dependency Check scan with specific arguments
-                        // withCredentials([string(credentialsId: 'NVD-API-KEY', variable: 'NVD_API_KEY')]) {
+                        withCredentials([string(credentialsId: 'NVD-API-KEY', variable: 'NVD_API_KEY')]) {
                                 dependencyCheck additionalArguments: '''
                                     --scan "." \
                                     --out "OWASP-security-reports" \
                                     --disableYarnAudit \
                                     --format \'ALL\' \
                                     --prettyPrint \
-                                     
+                                    --nvdApiKey '${NVD_API_KEY}' \
                                 ''', odcInstallation: 'OWAPS-Depend-check'
-                         
+                         }
                         // Publish the Dependency Check report and fail the build if critical issues are found
                         dependencyCheckPublisher failedTotalCritical: 2, pattern: 'OWASP-security-reports/dependency-check-report.xml', stopBuild: true
                     }
@@ -290,15 +290,52 @@ pipeline {
             }
         }
 
-        // Upload build reports to AWS S3
-        stage('Upload Build reports to AWS s3') {
+        stage('Manually approve PR') {
             when {
                 branch 'PR*'  // Runs when a feature branch is pushed
             }
             steps {
+                timeout(time: 2, unit: 'DAYS') {
+                    script {
+                        // Wait for the PR to be merged
+                        def prMerged = input(
+                            message: 'Is the PR merged?',
+                            ok: 'Yes, PR is merged to Master Branch and synced via ArgoCD'
+                        )
+                        if (prMerged) {
+                            // Proceed with the deployment
+                            echo "PR has been merged. Proceeding with deployment."
+                        } else {
+                            error("PR not merged. Aborting deployment.") 
+                        }
+                    }
+                }   
+            }
+        }
+
+        stage('DSAT') {
+            when {
+                branch 'PR*'  
+            }
+            steps {
+               sh '''
+                 mkdir -p ZAP-reports
+                 docker run -v $(pwd):/zap/wrk/:rw -t ghcr.io/zaproxy/zaproxy:stable zap-full-scan.py \
+                 -t http://13.40.56.183:3000 -g gen.conf -r DAST-report.html -J DAST-report.json
+                 cp -r DAST-report*  ZAP-reports/
+               '''
+            }
+        }
+
+        // Upload build reports to AWS S3
+        stage('Upload Build reports to AWS s3') {
+            when {
+                branch 'PR*'  
+            }
+            steps {
                sh '''
                  mkdir -p reports-$BUILD_ID
-                 cp -r  test-results Trivy-Image-Reports reports-$BUILD_ID
+                 cp -r  test-results Trivy-Image-Reports ZAP-reports reports-$BUILD_ID
                  ls -ltr reports-$BUILD_ID
                '''
                s3Upload(file:"reports-$BUILD_ID", bucket:'jenkins-build-reports-core-serve-frontend', path:"Jenkins-$BUILD_ID-reports/")
