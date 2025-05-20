@@ -296,26 +296,14 @@ pipeline {
             }
             steps {
                 timeout(time: 2, unit: 'DAYS') {
-                    script {
-                        // Wait for the PR to be merged
-                        def prMerged = input(
-                            message: 'Is the PR merged?',
-                            ok: 'Yes, PR is merged to Master Branch and synced via ArgoCD'
-                        )
-                        if (prMerged) {
-                            // Proceed with the deployment
-                            echo "PR has been merged. Proceeding with deployment."
-                        } else {
-                            error("PR not merged. Aborting deployment.") 
-                        }
-                    }
+                        input message: 'Please approve the PR to proceed with deployment', ok: 'Approved, PR is merged to Master Branch and synced via ArgoCD'
                 }   
             }
         }
 
         stage('DSAT') {
             when {
-                branch 'PR*'  
+                branch 'master'  
             }
             steps {
                sh '''
