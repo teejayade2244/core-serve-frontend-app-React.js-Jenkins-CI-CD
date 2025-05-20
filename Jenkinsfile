@@ -306,12 +306,31 @@ pipeline {
                 branch 'master'  
             }
             steps {
-               sh '''
-                 mkdir -p ZAP-reports
-                 docker run -v $(pwd):/zap/wrk/:rw -t ghcr.io/zaproxy/zaproxy:stable zap-full-scan.py \
-                 -t http://13.40.56.183:3000 -g gen.conf -r DAST-report.html -J DAST-report.json
-                 cp -r DAST-report*  ZAP-reports/
-               '''
+                script {
+                    sh 'mkdir -p ZAP-reports && chmod 777 ZAP-reports'
+                    try {
+                    // Run ZAP full scan with proper volume mounting
+                        sh '''
+                            docker run --rm \
+                                -v $(pwd)/ZAP-reports:/zap/wrk/:rw \
+                                -e ZAP_JVM_OPTIONS="-Xmx4g" \
+                                ghcr.io/zaproxy/zaproxy:stable \
+                                zap-full-scan.py \
+                                -t http://13.40.56.183:3000 \
+                                -g gen.conf \
+                                -r DAST-report.html \
+                                -J DAST-report.json \
+                                -x DAST-report.xml \
+                                --hook=/zap/auth_hook.py \
+                                -d
+                        '''
+                    } catch (Exception e) {
+                        echo "DAST Scan failed: ${e.getMessage()}"  
+                        // Continue pipeline but mark build as unstable
+                        currentBuild.result = 'FAILED'
+                    }
+                       archiveArtifacts artifacts: 'ZAP-reports/DAST-report.*', allowEmptyArchive: true
+                }
             }
         }
 
@@ -383,6 +402,17 @@ pipeline {
                   reportDir: './Trivy-Image-Reports', 
                   reportFiles: 'trivy-image-MEDIUM-results.html', 
                   reportName: 'Trivy Scan Medium Vulnerabilities', 
+                  reportTitles: '', 
+                  useWrapperFileDirectly: true
+              ])
+
+              publishHTML([
+                  allowMissing: true, 
+                  alwaysLinkToLastBuild: true, 
+                  keepAll: true, 
+                  reportDir: './ZAP-reports', 
+                  reportFiles: 'DAST-report.html ', 
+                  reportName: 'DAST Vulnerabilities', 
                   reportTitles: '', 
                   useWrapperFileDirectly: true
               ])
