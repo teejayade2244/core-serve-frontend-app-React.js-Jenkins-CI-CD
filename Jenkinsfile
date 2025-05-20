@@ -112,10 +112,10 @@ pipeline {
         }
 
         // login to ECR
-        stage("Image Push to AWS ECR") {
+        stage("Image Build and Tag") {
             steps {
                 script {
-                    sh 'aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin {AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com'
+                    sh 'aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com'
                     sh 'docker build -t ${IMAGE_TAG} .'
                     sh 'docker tag ${IMAGE_TAG} ${DOCKER_IMAGE_NAME}'
                 }       
@@ -168,53 +168,54 @@ pipeline {
         stage("Push to AWS-ECR") {
             steps {
                script {
-                    sh '''
-                        docker push ${DOCKER_IMAGE_NAME}
-                    '''
+                    sh 'aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com'
+                    sh "echo ${DOCKER_IMAGE_NAME}"
+                    sh 'docker push ${DOCKER_IMAGE_NAME}' 
                 }
             }
         }
         
         // Continuous Deployment - Deploy to AWS EC2
-        // stage("Deploy to AWS EC2") {
-        //     steps {
-        //         script {
-        //             try {
-        //                 sshagent(['SSH-ACCESS']) {
-        //                     sh '''
-        //                         ssh -o StrictHostKeyChecking=no ${EC2_HOST} "
-        //                             # Check if container exists and remove it
-        //                             if sudo docker ps -a | grep -i \"${ECR_REPO_NAME}\"; then
-        //                                 echo \"Container found. Stopping and removing...\"
-        //                                 sudo docker stop \"${ECR_REPO_NAME}\" || true
-        //                                 sudo docker rm \"${ECR_REPO_NAME}\" || true
-        //                             fi
+        stage("Deploy to AWS EC2") {
+            steps {
+                script {
+                    try {
+                        sshagent(['SSH-ACCESS']) {
+                            sh '''
+                                chmod 600 ${SSH_ACCESS}
+                                ssh -o StrictHostKeyChecking=no ${EC2_HOST} "
+                                    # Check if container exists and remove it
+                                    if sudo docker ps -a | grep -i \"${ECR_REPO_NAME}\"; then
+                                        echo \"Container found. Stopping and removing...\"
+                                        sudo docker stop \"${ECR_REPO_NAME}\" || true
+                                        sudo docker rm \"${ECR_REPO_NAME}\" || true
+                                    fi
                                     
-        //                             # Login to ECR
-        //                             aws ecr get-login-password --region ${AWS_REGION} | sudo docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+                                    # Login to ECR
+                                    aws ecr get-login-password --region ${AWS_REGION} | sudo docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
                                     
-        //                             echo \"Pulling new image...\"
-        //                             sudo docker pull ${DOCKER_IMAGE_NAME}
+                                    echo \"Pulling new image...\"
+                                    sudo docker pull ${DOCKER_IMAGE_NAME}
                                     
-        //                             echo \"Starting new container...\"
-        //                             sudo docker run -d \\
-        //                                 --name \"${ECR_REPO_NAME}\" \\
-        //                                 --restart unless-stopped \\
-        //                                 -p ${PORT}:${PORT} \\
-        //                                 ${DOCKER_IMAGE_NAME}
+                                    echo \"Starting new container...\"
+                                    sudo docker run -d \\
+                                        --name \"${ECR_REPO_NAME}\" \\
+                                        --restart unless-stopped \\
+                                        -p ${PORT}:${PORT} \\
+                                        ${DOCKER_IMAGE_NAME}
                                         
-        //                             echo \"Cleaning up old images...\"
-        //                             sudo docker image prune -f
-        //                         "
-        //                     '''
-        //                 }
-        //             } catch (Exception e) {
-        //                 echo "Deployment failed: ${e.message}"
-        //                 throw e
-        //             }
-        //         }
-        //     }
-        // }
+                                    echo \"Cleaning up old images...\"
+                                    sudo docker image prune -f
+                                "
+                            '''
+                        }
+                    } catch (Exception e) {
+                        echo "Deployment failed: ${e.message}"
+                        throw e
+                    }
+                }
+            }
+        }
 
         // Update the image tag in the Kubernetes deployment file
         // stage('K8S Update Image Tag') {
