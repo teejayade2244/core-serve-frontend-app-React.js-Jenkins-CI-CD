@@ -307,7 +307,7 @@ pipeline {
 
         stage('DSAT') {
             when {
-                branch 'master'  
+                branch 'PR*'  // Runs when a feature branch is pushed
             }
             steps {
                 script {
