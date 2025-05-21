@@ -341,7 +341,7 @@ pipeline {
         // Upload build reports to AWS S3
         stage('Upload Build reports to AWS s3') {
             when {
-                branch 'PR*'  // For PR branches
+                branch 'PR*'  
             }
             steps {
                sh '''
