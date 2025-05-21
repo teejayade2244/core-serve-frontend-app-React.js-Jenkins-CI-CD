@@ -341,12 +341,12 @@ pipeline {
         // Upload build reports to AWS S3
         stage('Upload Build reports to AWS s3') {
             when {
-                branch 'PR*'  // For PR branches
+                branch 'PR*'  
             }
             steps {
                sh '''
                  mkdir -p reports-${BRANCH_NAME_CLEAN}-${BUILD_NUMBER}
-                 cp -r  test-results Trivy-Image-Reports reports-$BUILD_NUMBER
+                 cp -r  test-results Trivy-Image-Reports reports-{BRANCH_NAME_CLEAN}-${BUILD_NUMBER}
                  ls -ltr reports-${BRANCH_NAME_CLEAN}-${BUILD_NUMBER}
                '''
                s3Upload(file:"reports-${BRANCH_NAME_CLEAN}-${BUILD_NUMBER}", bucket:'jenkins-build-reports-core-serve-frontend', path:"Jenkins-${BRANCH_NAME_CLEAN}-${BUILD_NUMBER}-reports/")
