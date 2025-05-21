@@ -13,6 +13,7 @@ pipeline {
         BRANCH_NAME_CLEAN = sh(script: "echo ${BRANCH_NAME} | tr '/' '-'", returnStdout: true).trim()
         AWS_ACCOUNT_ID = credentials('AWS-account-id')
         IMAGE_TAG = "${ECR_REPO_NAME}:${BRANCH_NAME_CLEAN}-${BUILD_NUMBER}"
+        TAG = "${BRANCH_NAME_CLEAN}-${BUILD_NUMBER}"
         DOCKER_IMAGE_NAME = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${IMAGE_TAG}"
         GITHUB_TOKEN = credentials('Github account token')
         EC2_HOST = credentials('AWS-EC2-HOST')
@@ -345,16 +346,16 @@ pipeline {
             }
             steps {
                sh '''
-                 mkdir -p reports-${BRANCH_NAME_CLEAN}-${BUILD_NUMBER}
-                 cp -r  test-results Trivy-Image-Reports reports-{BRANCH_NAME_CLEAN}-${BUILD_NUMBER}
-                 ls -ltr reports-${BRANCH_NAME_CLEAN}-${BUILD_NUMBER}
+                 mkdir -p reports-${TAG}
+                 cp -r  test-results Trivy-Image-Reports reports-${TAG}
+                 ls -ltr reports-${TAG}
                '''
-               s3Upload(file:"reports-${BRANCH_NAME_CLEAN}-${BUILD_NUMBER}", bucket:'jenkins-build-reports-core-serve-frontend', path:"Jenkins-${BRANCH_NAME_CLEAN}-${BUILD_NUMBER}-reports/")
+               s3Upload(file:"reports-${TAG}", bucket:'jenkins-build-reports-core-serve-frontend', path:"Jenkins-${TAG}-reports/")
                
                
                script {
                   // Clean up the reports directory after upload
-                  sh 'rm -rf reports-${BRANCH_NAME_CLEAN}-${BUILD_NUMBER}'
+                  sh 'rm -rf reports-${TAG}'
                }
             }
         }
