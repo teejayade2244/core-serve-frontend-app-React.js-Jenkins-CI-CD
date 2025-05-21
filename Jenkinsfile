@@ -253,7 +253,7 @@ pipeline {
                                 git remote set-url origin https://${GITHUB_TOKEN}@github.com/teejayade2244/gitOps-approach
                                 git add deployment.yaml
                                 git commit -m "Updated docker image to ${IMAGE_TAG}"
-                                git push -u origin feature-$TAGR
+                                git push -u origin feature-$TAG
                                 
                             '''
                         }
