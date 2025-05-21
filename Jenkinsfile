@@ -363,7 +363,7 @@ pipeline {
         }
         
         // Deploy to production using ArgoCD
-        stage('Manually approve PR') {
+        stage('Production ?') {
             when {
                 branch 'master'
             }
