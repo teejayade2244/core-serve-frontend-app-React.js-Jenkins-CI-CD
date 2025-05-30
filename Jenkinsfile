@@ -220,7 +220,7 @@ pipeline {
         //     }
         // }
 
-        // Update the image tag in the Kubernetes deployment file
+        // Update the image tag in the Kubernetes deployment file GitOps repository
         stage('K8S Update Image Tag') {
             when {
                 branch 'PR*' // Trigger this stage only for branches matching 'PR*'
@@ -237,7 +237,7 @@ pipeline {
                         // Replace the Docker image tag in the deployment file
                         sh '''
                             ls -la
-                            git checkout -b feature-$BUILD_NUMBER
+                            git checkout -b feature-$TAG
                             sed -i "s#${AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/${ECR_REPO_NAME}:.*#${DOCKER_IMAGE_NAME}#g" deployment.yaml
                             cat deployment.yaml
                         '''
@@ -252,8 +252,8 @@ pipeline {
                                 git config --global user.email "temitope224468@gmail.com"
                                 git remote set-url origin https://${GITHUB_TOKEN}@github.com/teejayade2244/gitOps-approach
                                 git add deployment.yaml
-                                git commit -m "Updated docker image to ${GIT_COMMIT}"
-                                git push -u origin feature-$BUILD_NUMBER
+                                git commit -m "Updated docker image to ${IMAGE_TAG}"
+                                git push -u origin feature-$TAG
                                 
                             '''
                         }
@@ -262,7 +262,7 @@ pipeline {
             }
         }
 
-        // Create a Pull Request on GitHub
+        // Create a Pull Request in GitOps repository
         stage('GitHub - Raise PR') {
             when {
                 branch 'PR*'  // Runs when a feature branch is pushed
@@ -277,9 +277,9 @@ pipeline {
                         -H "Accept: application/vnd.github.v3+json" \
                         -H "Content-Type: application/json" \
                         -d '{
-                            "title": "Updated Docker Image to '"${GIT_COMMIT}"'",
+                            "title": "Updated Docker Image to '"${IMAGE_TAG}"'",
                             "body": "Updated Docker Image in deployment manifest",
-                            "head": "feature-'"${BUILD_NUMBER}"'",
+                            "head": "feature-'"${TAG}"'",
                             "base": "master",
                             "assignees": ["teejayade2244"]
                         }'
@@ -294,6 +294,7 @@ pipeline {
             }
         }
 
+        // Manually approve the PR in GitOps repository
         stage('Manually approve PR') {
             when {
                 branch 'PR*'  // Runs when a feature branch is pushed
@@ -305,9 +306,31 @@ pipeline {
             }
         }
 
+        // Upload build reports to AWS S3
+        stage('Upload Build reports to AWS s3') {
+            when {
+                branch 'PR*'  
+            }
+            steps {
+               sh '''
+                 mkdir -p reports-${TAG}
+                 cp -r  test-results Trivy-Image-Reports reports-${TAG}
+                 ls -ltr reports-${TAG}
+               '''
+               s3Upload(file:"reports-${TAG}", bucket:'jenkins-build-reports-core-serve-frontend', path:"Jenkins-${TAG}-reports/")
+               
+               
+               script {
+                  // Clean up the reports directory after upload
+                  sh 'rm -rf reports-${TAG}'
+               }
+            }
+        }
+
+        // Run DAST scan using OWASP ZAP on master branch
         stage('DSAT') {
             when {
-                branch 'master'  
+                branch 'master'  // Runs when a feature branch is pushed
             }
             steps {
                 script {
@@ -338,27 +361,19 @@ pipeline {
                 }
             }
         }
-
-        // Upload build reports to AWS S3
-        stage('Upload Build reports to AWS s3') {
+        
+        // Deploy to production using ArgoCD
+        stage('Production ?') {
             when {
-                branch 'PR*'  
+                branch 'master'
             }
             steps {
-               sh '''
-                 mkdir -p reports-${TAG}
-                 cp -r  test-results Trivy-Image-Reports reports-${TAG}
-                 ls -ltr reports-${TAG}
-               '''
-               s3Upload(file:"reports-${TAG}", bucket:'jenkins-build-reports-core-serve-frontend', path:"Jenkins-${TAG}-reports/")
-               
-               
-               script {
-                  // Clean up the reports directory after upload
-                  sh 'rm -rf reports-${TAG}'
-               }
+                timeout(time: 2, unit: 'DAYS') {
+                        input message: 'Please approve to deploy to Production', ok: 'Approved, Deploy to Production'
+                }   
             }
         }
+        
     }
        
     // post actions.
