@@ -229,11 +229,11 @@ pipeline {
                 script {
                     // Clone the GitOps repository
                     sh '''
-                        git clone -b master https://github.com/teejayade2244/gitOps-approach.git
+                        git clone -b master https://github.com/teejayade2244/GitOps-Terraform-Iac-and-Kubernetes-manifests-Core-Serve-App.git
                     '''
 
                     // Navigate to the Kubernetes directory
-                    dir("gitOps-approach/Kubernetes") {
+                    dir("GitOps-Terraform-Iac-and-Kubernetes-manifests-Core-Serve-App/Kubernetes/frontend/") {
                         // Replace the Docker image tag in the deployment file
                         sh '''
                             ls -la
@@ -250,7 +250,7 @@ pipeline {
                         withCredentials([string(credentialsId: 'Github account token', variable: 'GITHUB_TOKEN')]) {
                             sh '''
                                 git config --global user.email "temitope224468@gmail.com"
-                                git remote set-url origin https://${GITHUB_TOKEN}@github.com/teejayade2244/gitOps-approach
+                                git remote set-url origin https://${GITHUB_TOKEN}@github.com/teejayade2244/GitOps-Terraform-Iac-and-Kubernetes-manifests-Core-Serve-App.git
                                 git add deployment.yaml
                                 git commit -m "Updated docker image to ${IMAGE_TAG}"
                                 git push -u origin feature-$TAG
@@ -272,7 +272,7 @@ pipeline {
                     try {
                     // Attempt to create a PR
                     sh '''
-                        curl -X POST https://api.github.com/repos/teejayade2244/gitOps-approach/pulls \
+                        curl -X POST https://api.github.com/repos/github.com/teejayade2244/GitOps-Terraform-Iac-and-Kubernetes-manifests-Core-Serve-App.git/pulls \
                         -H "Authorization: Bearer ${GITHUB_TOKEN}" \
                         -H "Accept: application/vnd.github.v3+json" \
                         -H "Content-Type: application/json" \
@@ -380,8 +380,8 @@ pipeline {
         post {
           always {
               script {
-                 if (fileExists("gitOps-approach")) {
-                    sh 'rm -rf gitOps-approach'
+                 if (fileExists("GitOps-Terraform-Iac-and-Kubernetes-manifests-Core-Serve-App")) {
+                    sh 'rm -rf GitOps-Terraform-Iac-and-Kubernetes-manifests-Core-Serve-App'
                  }
               }
          

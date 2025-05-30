@@ -22,7 +22,7 @@ export function FirstSection() {
                 >
                     <div className=" relative hover:bg-[#008000] hover:text-white hover:p-3 transform hover:scale-105 transition duration-500 ease-out">
                         <h2 className="text-white font-bold mb-2 font-sans text-xl cursor-pointer ">
-                            Remobilization,2023 A{" "}
+                            Lorem Ipsum,2023 A{" "}
                         </h2>
                         <span className="bg-white text-center text-orange-500 p-1 rounded-[4px]">
                             Ends on 12/03/2025
@@ -70,7 +70,7 @@ export function FirstSection() {
                         }}
                         className="text-2xl font-serif text-[#000080]"
                     >
-                        New: Online Application for Remobilization
+                        New: Online Application Lorem Ipsum
                     </motion.span>
                     <Link to={"/apply"}>
                         <h3 className="text-gray-400 text-lg cursor-pointer hover:underline">
