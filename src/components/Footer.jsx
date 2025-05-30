@@ -11,14 +11,14 @@ export function Footer() {
                             className="cursor-pointer hover:underline text-[15px]"
                             href="temitope"
                         >
-                            Powered by TEMITOPE{" "}
+                            Powered by Core serve{" "}
                         </a>
                     </h4>
 
                     <div className="text-center">
                         <h4 className="text-[12px]">
-                            Copyright © 2023 Core Serve. All
-                            rights reserved <span>Privacy Policy</span>
+                            Copyright © 2025 Core Serve. All rights reserved{" "}
+                            <span>Privacy Policy</span>
                         </h4>
                     </div>
                 </div>
