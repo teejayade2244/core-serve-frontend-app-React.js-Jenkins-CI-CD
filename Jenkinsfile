@@ -272,7 +272,7 @@ pipeline {
                     try {
                     // Attempt to create a PR
                     sh '''
-                        curl -X POST https://api.github.com/repos/github.com/teejayade2244/GitOps-Terraform-Iac-and-Kubernetes-manifests-Core-Serve-App.git/pulls \
+                        curl -X POST https://api.github.com/repos/teejayade2244/GitOps-Terraform-Iac-and-Kubernetes-manifests-Core-Serve-App.git/pulls \
                         -H "Authorization: Bearer ${GITHUB_TOKEN}" \
                         -H "Accept: application/vnd.github.v3+json" \
                         -H "Content-Type: application/json" \
