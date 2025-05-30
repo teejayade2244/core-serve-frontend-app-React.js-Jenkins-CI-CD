@@ -11,7 +11,7 @@ export function Footer() {
                             className="cursor-pointer hover:underline text-[15px]"
                             href="temitope"
                         >
-                            Powered by TEMITOPE{" "}
+                            Powered by Core serve{" "}
                         </a>
                     </h4>
 
