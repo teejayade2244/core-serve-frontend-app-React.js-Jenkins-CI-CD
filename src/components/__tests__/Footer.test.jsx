@@ -11,9 +11,9 @@ describe("Footer Component", () => {
             </Router>
         )
 
-        expect(screen.getByText(/Powered by Core serve/i)).toBeInTheDocument()
+        expect(screen.getByText(/Powered by TEMITOPE/i)).toBeInTheDocument()
         expect(
-            screen.getByText(/Copyright © 2025 Core Serve/i)
+            screen.getByText(/Copyright © 2023 Core Serve/i)
         ).toBeInTheDocument()
         expect(screen.getByText(/Privacy Policy/i)).toBeInTheDocument()
     })
