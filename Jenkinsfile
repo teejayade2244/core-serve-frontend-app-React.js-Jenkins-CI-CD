@@ -223,7 +223,7 @@ pipeline {
         // Update the image tag in the Kubernetes deployment file GitOps repository
         stage('K8S Update Image Tag') {
             when {
-                branch 'PR*' // Trigger this stage only for branches matching 'PR*'
+                branch 'PR*'
             }
             steps {
                 script {
@@ -233,28 +233,26 @@ pipeline {
                     '''
 
                     // Navigate to the Kubernetes directory
-                    dir("GitOps-Terraform-Iac-and-Kubernetes-manifests-Core-Serve-App/Kubernetes/frontend/") {
-                        // Replace the Docker image tag in the deployment file
+                    dir("GitOps-Terraform-Iac-and-Kubernetes-manifests-Core-Serve-App/Helm/core-serve-frontend/values") {
                         sh '''
                             ls -la
                             git checkout -b feature-$TAG
-                            sed -i "s#${AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/${ECR_REPO_NAME}:.*#${DOCKER_IMAGE_NAME}#g" deployment.yaml
-                            cat deployment.yaml
+                            
+                            # Update only the tag in staging.yaml
+                            sed -i "s/tag:.*\$/tag: ${TAG}/" staging.yaml
+                            
+                            # Verify the changes
+                            cat staging.yaml
                         '''
-                            script {
-                                sh '''
-                                    aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
-                                '''
-                            }
+
                         // Commit and push the changes to the feature branch
                         withCredentials([string(credentialsId: 'Github account token', variable: 'GITHUB_TOKEN')]) {
                             sh '''
                                 git config --global user.email "temitope224468@gmail.com"
                                 git remote set-url origin https://${GITHUB_TOKEN}@github.com/teejayade2244/GitOps-Terraform-Iac-and-Kubernetes-manifests-Core-Serve-App.git
-                                git add deployment.yaml
-                                git commit -m "Updated docker image to ${IMAGE_TAG}"
+                                git add staging.yaml
+                                git commit -m "Updated image tag to ${TAG} in staging environment"
                                 git push -u origin feature-$TAG
-                                
                             '''
                         }
                     }
@@ -343,7 +341,7 @@ pipeline {
                                 -e ZAP_JVM_OPTIONS="-Xmx4g" \
                                 ghcr.io/zaproxy/zaproxy:stable \
                                 zap-full-scan.py \
-                                -t http://13.40.56.183:3000 \
+                                -t http://a0bd629c8c1994870836f96ba4cd1321-1704283740.eu-west-2.elb.amazonaws.com:3000/ \
                                 -g gen.conf \
                                 -I \
                                 -r DAST-report.html \
