@@ -22,3 +22,4 @@ describe("Footer Component", () => {
         ).toHaveAttribute("href", "temitope")
     })
 })
+
