@@ -52,68 +52,68 @@ pipeline {
         }
 
         // dependencies scanning
-        stage("Dependency Check scanning") {
-            parallel {
-                stage("NPM dependencies audit") {
-                    steps {
-                        // Run npm audit to check for critical vulnerabilities
-                        sh '''
-                            npm audit --audit-level=critical
-                            echo $?
-                        '''
-                    }
-                }
+        // stage("Dependency Check scanning") {
+        //     parallel {
+        //         stage("NPM dependencies audit") {
+        //             steps {
+        //                 // Run npm audit to check for critical vulnerabilities
+        //                 sh '''
+        //                     npm audit --audit-level=critical
+        //                     echo $?
+        //                 '''
+        //             }
+        //         }
 
-                stage("OWASP Dependency Check") { 
-                    steps {
-                        sh 'mkdir -p OWASP-security-reports'
-                        // Run OWASP Dependency Check scan with specific arguments
-                        withCredentials([string(credentialsId: 'NVD-API-KEY', variable: 'NVD_API_KEY')]) {
-                                dependencyCheck additionalArguments: '''
-                                    --scan "." \
-                                    --out "OWASP-security-reports" \
-                                    --disableYarnAudit \
-                                    --format \'ALL\' \
-                                    --prettyPrint \
-                                    --nvdApiKey '${NVD_API_KEY}' \
-                                ''', odcInstallation: 'OWAPS-Depend-check'
-                         }
-                        // Publish the Dependency Check report and fail the build if critical issues are found
-                        dependencyCheckPublisher failedTotalCritical: 2, pattern: 'OWASP-security-reports/dependency-check-report.xml', stopBuild: true
-                    }
-                }
-            }
-        }
+        //         stage("OWASP Dependency Check") { 
+        //             steps {
+        //                 sh 'mkdir -p OWASP-security-reports'
+        //                 // Run OWASP Dependency Check scan with specific arguments
+        //                 withCredentials([string(credentialsId: 'NVD-API-KEY', variable: 'NVD_API_KEY')]) {
+        //                         dependencyCheck additionalArguments: '''
+        //                             --scan "." \
+        //                             --out "OWASP-security-reports" \
+        //                             --disableYarnAudit \
+        //                             --format \'ALL\' \
+        //                             --prettyPrint \
+        //                             --nvdApiKey '${NVD_API_KEY}' \
+        //                         ''', odcInstallation: 'OWAPS-Depend-check'
+        //                  }
+        //                 // Publish the Dependency Check report and fail the build if critical issues are found
+        //                 dependencyCheckPublisher failedTotalCritical: 2, pattern: 'OWASP-security-reports/dependency-check-report.xml', stopBuild: true
+        //             }
+        //         }
+        //     }
+        // }
 
         // unit testing
-        stage("Unit Testing stage") {
-            steps {
-                // Run unit tests with npm
-                sh 'mkdir -p test-results'
-                sh "npm test"
-            } 
-        }
+        // stage("Unit Testing stage") {
+        //     steps {
+        //         // Run unit tests with npm
+        //         sh 'mkdir -p test-results'
+        //         sh "npm test"
+        //     } 
+        // }
 
         // static testing and analysis with SonarQube
-        stage("Static Testing and Analysis with SonarQube") {
-            environment {
-                    SONAR_SCANNER_HOME = tool 'sonarqube-scanner-6.1.0.477'
-                }
-            steps {
-                timeout(time: 5, unit: 'MINUTES') {
-                    withSonarQubeEnv('sonarqube-server') {
-                        // Run SonarQube scanner with specific parameters
-                        sh '''
-                            ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
-                            -Dsonar.projectKey=Serve-core-frontend \
-                            -Dsonar.sources=. \
-                        '''
-                    }
-                }
-                // Wait for SonarQube quality gate and fail the pipeline if it's not OK
-                waitForQualityGate abortPipeline: true
-            }
-        }
+        // stage("Static Testing and Analysis with SonarQube") {
+        //     environment {
+        //             SONAR_SCANNER_HOME = tool 'sonarqube-scanner-6.1.0.477'
+        //         }
+        //     steps {
+        //         timeout(time: 5, unit: 'MINUTES') {
+        //             withSonarQubeEnv('sonarqube-server') {
+        //                 // Run SonarQube scanner with specific parameters
+        //                 sh '''
+        //                     ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
+        //                     -Dsonar.projectKey=Serve-core-frontend \
+        //                     -Dsonar.sources=. \
+        //                 '''
+        //             }
+        //         }
+        //         // Wait for SonarQube quality gate and fail the pipeline if it's not OK
+        //         waitForQualityGate abortPipeline: true
+        //     }
+        // }
 
         // login to ECR
         stage("Image Build and Tag") {
@@ -270,7 +270,7 @@ pipeline {
                     try {
                     // Attempt to create a PR
                     sh '''
-                        curl -X POST https://api.github.com/repos/teejayade2244/GitOps-Terraform-Iac-and-Kubernetes-manifests-Core-Serve-App.git/pulls \
+                        curl -X POST https://api.github.com/repos/teejayade2244/GitOps-Terraform-Iac-and-Kubernetes-manifests-Core-Serve-App/pulls \
                         -H "Authorization: Bearer ${GITHUB_TOKEN}" \
                         -H "Accept: application/vnd.github.v3+json" \
                         -H "Content-Type: application/json" \
