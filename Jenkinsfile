@@ -115,7 +115,7 @@ pipeline {
         //     }
         // }
 
-        // login to ECR
+        //login to ECR
         stage("Image Build and Tag") {
             steps {
                 script {
