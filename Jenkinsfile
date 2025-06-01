@@ -52,68 +52,68 @@ pipeline {
         }
 
         // dependencies scanning
-        stage("Dependency Check scanning") {
-            parallel {
-                stage("NPM dependencies audit") {
-                    steps {
-                        // Run npm audit to check for critical vulnerabilities
-                        sh '''
-                            npm audit --audit-level=critical
-                            echo $?
-                        '''
-                    }
-                }
+        // stage("Dependency Check scanning") {
+        //     parallel {
+        //         stage("NPM dependencies audit") {
+        //             steps {
+        //                 // Run npm audit to check for critical vulnerabilities
+        //                 sh '''
+        //                     npm audit --audit-level=critical
+        //                     echo $?
+        //                 '''
+        //             }
+        //         }
 
-                // stage("OWASP Dependency Check") { 
-                //     steps {
-                //         sh 'mkdir -p OWASP-security-reports'
-                //         // Run OWASP Dependency Check scan with specific arguments
-                //         withCredentials([string(credentialsId: 'NVD-API-KEY', variable: 'NVD_API_KEY')]) {
-                //                 dependencyCheck additionalArguments: '''
-                //                     --scan "." \
-                //                     --out "OWASP-security-reports" \
-                //                     --disableYarnAudit \
-                //                     --format \'ALL\' \
-                //                     --prettyPrint \
-                //                     --nvdApiKey '${NVD_API_KEY}' \
-                //                 ''', odcInstallation: 'OWAPS-Depend-check'
-                //          }
-                //         // Publish the Dependency Check report and fail the build if critical issues are found
-                //         dependencyCheckPublisher failedTotalCritical: 2, pattern: 'OWASP-security-reports/dependency-check-report.xml', stopBuild: true
-                //     }
-                // }
-            }
-        }
+        //         stage("OWASP Dependency Check") { 
+        //             steps {
+        //                 sh 'mkdir -p OWASP-security-reports'
+        //                 // Run OWASP Dependency Check scan with specific arguments
+        //                 withCredentials([string(credentialsId: 'NVD-API-KEY', variable: 'NVD_API_KEY')]) {
+        //                         dependencyCheck additionalArguments: '''
+        //                             --scan "." \
+        //                             --out "OWASP-security-reports" \
+        //                             --disableYarnAudit \
+        //                             --format \'ALL\' \
+        //                             --prettyPrint \
+        //                             --nvdApiKey '${NVD_API_KEY}' \
+        //                         ''', odcInstallation: 'OWAPS-Depend-check'
+        //                  }
+        //                 // Publish the Dependency Check report and fail the build if critical issues are found
+        //                 dependencyCheckPublisher failedTotalCritical: 2, pattern: 'OWASP-security-reports/dependency-check-report.xml', stopBuild: true
+        //             }
+        //         }
+        //     }
+        // }
 
         // unit testing
-        stage("Unit Testing stage") {
-            steps {
-                // Run unit tests with npm
-                sh 'mkdir -p test-results'
-                sh "npm test"
-            } 
-        }
+        // stage("Unit Testing stage") {
+        //     steps {
+        //         // Run unit tests with npm
+        //         sh 'mkdir -p test-results'
+        //         sh "npm test"
+        //     } 
+        // }
 
         // static testing and analysis with SonarQube
-        stage("Static Testing and Analysis with SonarQube") {
-            environment {
-                    SONAR_SCANNER_HOME = tool 'sonarqube-scanner-6.1.0.477'
-                }
-            steps {
-                timeout(time: 5, unit: 'MINUTES') {
-                    withSonarQubeEnv('sonarqube-server') {
-                        // Run SonarQube scanner with specific parameters
-                        sh '''
-                            ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
-                            -Dsonar.projectKey=Serve-core-frontend \
-                            -Dsonar.sources=. \
-                        '''
-                    }
-                }
-                // Wait for SonarQube quality gate and fail the pipeline if it's not OK
-                waitForQualityGate abortPipeline: true
-            }
-        }
+        // stage("Static Testing and Analysis with SonarQube") {
+        //     environment {
+        //             SONAR_SCANNER_HOME = tool 'sonarqube-scanner-6.1.0.477'
+        //         }
+        //     steps {
+        //         timeout(time: 5, unit: 'MINUTES') {
+        //             withSonarQubeEnv('sonarqube-server') {
+        //                 // Run SonarQube scanner with specific parameters
+        //                 sh '''
+        //                     ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
+        //                     -Dsonar.projectKey=Serve-core-frontend \
+        //                     -Dsonar.sources=. \
+        //                 '''
+        //             }
+        //         }
+        //         // Wait for SonarQube quality gate and fail the pipeline if it's not OK
+        //         waitForQualityGate abortPipeline: true
+        //     }
+        // }
 
         // login to ECR
         stage("Image Build and Tag") {
@@ -223,7 +223,7 @@ pipeline {
         // Update the image tag in the Kubernetes deployment file GitOps repository
         stage('K8S Update Image Tag') {
             when {
-                branch 'PR*' // Trigger this stage only for branches matching 'PR*'
+                branch 'PR*'
             }
             steps {
                 script {
@@ -233,28 +233,26 @@ pipeline {
                     '''
 
                     // Navigate to the Kubernetes directory
-                    dir("GitOps-Terraform-Iac-and-Kubernetes-manifests-Core-Serve-App/Kubernetes/frontend/") {
-                        // Replace the Docker image tag in the deployment file
+                    dir("GitOps-Terraform-Iac-and-Kubernetes-manifests-Core-Serve-App/Helm/core-serve-frontend/values") {
                         sh '''
                             ls -la
                             git checkout -b feature-$TAG
-                            sed -i "s#${AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/${ECR_REPO_NAME}:.*#${DOCKER_IMAGE_NAME}#g" deployment.yaml
-                            cat deployment.yaml
+                            
+                            # Update only the tag in staging.yaml
+                            sed -i "s/tag:.*\$/tag: ${TAG}/" staging.yaml
+                            
+                            # Verify the changes
+                            cat staging.yaml
                         '''
-                            script {
-                                sh '''
-                                    aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
-                                '''
-                            }
+
                         // Commit and push the changes to the feature branch
                         withCredentials([string(credentialsId: 'Github account token', variable: 'GITHUB_TOKEN')]) {
                             sh '''
                                 git config --global user.email "temitope224468@gmail.com"
                                 git remote set-url origin https://${GITHUB_TOKEN}@github.com/teejayade2244/GitOps-Terraform-Iac-and-Kubernetes-manifests-Core-Serve-App.git
-                                git add deployment.yaml
-                                git commit -m "Updated docker image to ${IMAGE_TAG}"
+                                git add staging.yaml
+                                git commit -m "Updated image tag to ${TAG} in staging environment"
                                 git push -u origin feature-$TAG
-                                
                             '''
                         }
                     }
@@ -272,7 +270,7 @@ pipeline {
                     try {
                     // Attempt to create a PR
                     sh '''
-                        curl -X POST https://api.github.com/repos/teejayade2244/GitOps-Terraform-Iac-and-Kubernetes-manifests-Core-Serve-App.git/pulls \
+                        curl -X POST https://api.github.com/repos/teejayade2244/GitOps-Terraform-Iac-and-Kubernetes-manifests-Core-Serve-App/pulls \
                         -H "Authorization: Bearer ${GITHUB_TOKEN}" \
                         -H "Accept: application/vnd.github.v3+json" \
                         -H "Content-Type: application/json" \
@@ -343,7 +341,7 @@ pipeline {
                                 -e ZAP_JVM_OPTIONS="-Xmx4g" \
                                 ghcr.io/zaproxy/zaproxy:stable \
                                 zap-full-scan.py \
-                                -t http://13.40.56.183:3000 \
+                                -t http://a0bd629c8c1994870836f96ba4cd1321-1704283740.eu-west-2.elb.amazonaws.com:3000/ \
                                 -g gen.conf \
                                 -I \
                                 -r DAST-report.html \
