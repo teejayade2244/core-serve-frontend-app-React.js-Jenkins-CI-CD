@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="jest tests" tests="12" failures="0" errors="0" time="22.451">
-  <testsuite name="src\components\__tests__\Footer.test.jsx" errors="0" failures="0" skipped="0" timestamp="2025-06-01T23:43:35" time="3.737" tests="1">
-    <testcase classname="Footer Component" name="renders the Footer correctly" time="0.223">
+<testsuites name="jest tests" tests="12" failures="0" errors="0" time="29.059">
+  <testsuite name="src\components\__tests__\Footer.test.jsx" errors="0" failures="0" skipped="0" timestamp="2025-06-01T23:46:59" time="3.429" tests="1">
+    <testcase classname="Footer Component" name="renders the Footer correctly" time="0.182">
     </testcase>
   </testsuite>
-  <testsuite name="src\components\__tests__\Modal.test.jsx" errors="0" failures="0" skipped="0" timestamp="2025-06-01T23:43:35" time="4.132" tests="2">
-    <testcase classname="Modal Component" name="renders the Modal correctly" time="0.289">
+  <testsuite name="src\components\__tests__\Modal.test.jsx" errors="0" failures="0" skipped="0" timestamp="2025-06-01T23:46:59" time="3.813" tests="2">
+    <testcase classname="Modal Component" name="renders the Modal correctly" time="0.259">
     </testcase>
-    <testcase classname="Modal Component" name="closes the Modal when the close button is clicked" time="0.12">
-    </testcase>
-  </testsuite>
-  <testsuite name="src\pages\LoginPage\__tests__\LoginPage.test.jsx" errors="0" failures="0" skipped="0" timestamp="2025-06-01T23:43:35" time="4.92" tests="5">
-    <testcase classname="LoginPage" name="renders login form" time="0.119">
-    </testcase>
-    <testcase classname="LoginPage" name="renders the LoginPage correctly" time="0.128">
-    </testcase>
-    <testcase classname="LoginPage" name="displays validation errors when fields are empty" time="0.113">
-    </testcase>
-    <testcase classname="LoginPage" name="handles user input correctly" time="0.023">
-    </testcase>
-    <testcase classname="LoginPage" name="displays loading state when isLoading is true" time="0.015">
+    <testcase classname="Modal Component" name="closes the Modal when the close button is clicked" time="0.122">
     </testcase>
   </testsuite>
-  <testsuite name="src\components\__tests__\Header.test.jsx" errors="0" failures="0" skipped="0" timestamp="2025-06-01T23:43:35" time="19.292" tests="1">
-    <testcase classname="Header Component" name="renders the Header correctly" time="0.11">
+  <testsuite name="src\pages\LoginPage\__tests__\LoginPage.test.jsx" errors="0" failures="0" skipped="0" timestamp="2025-06-01T23:46:59" time="4.483" tests="5">
+    <testcase classname="LoginPage" name="renders login form" time="0.106">
+    </testcase>
+    <testcase classname="LoginPage" name="renders the LoginPage correctly" time="0.122">
+    </testcase>
+    <testcase classname="LoginPage" name="displays validation errors when fields are empty" time="0.092">
+    </testcase>
+    <testcase classname="LoginPage" name="handles user input correctly" time="0.019">
+    </testcase>
+    <testcase classname="LoginPage" name="displays loading state when isLoading is true" time="0.014">
     </testcase>
   </testsuite>
-  <testsuite name="src\pages\HomePage\__tests__\mainHomePage.test.jsx" errors="0" failures="0" skipped="0" timestamp="2025-06-01T23:43:35" time="19.544" tests="3">
-    <testcase classname="LayOut Component" name="renders user details correctly" time="0.142">
+  <testsuite name="src\components\__tests__\Header.test.jsx" errors="0" failures="0" skipped="0" timestamp="2025-06-01T23:46:59" time="25.98" tests="1">
+    <testcase classname="Header Component" name="renders the Header correctly" time="0.235">
     </testcase>
-    <testcase classname="LayOut Component" name="shows the modal when &apos;Apply for Correction/Rearrangement of Name&apos; is clicked" time="0.058">
+  </testsuite>
+  <testsuite name="src\pages\HomePage\__tests__\mainHomePage.test.jsx" errors="0" failures="0" skipped="0" timestamp="2025-06-01T23:46:59" time="26.379" tests="3">
+    <testcase classname="LayOut Component" name="renders user details correctly" time="0.248">
     </testcase>
-    <testcase classname="LayOut Component" name="renders the loading skeleton when data is loading" time="0.025">
+    <testcase classname="LayOut Component" name="shows the modal when &apos;Apply for Correction/Rearrangement of Name&apos; is clicked" time="0.109">
+    </testcase>
+    <testcase classname="LayOut Component" name="renders the loading skeleton when data is loading" time="0.041">
     </testcase>
   </testsuite>
 </testsuites>
