@@ -221,7 +221,7 @@ pipeline {
         // }
 
         // Update the image tag in the Kubernetes deployment file GitOps repository
-        stage('K8S Update Image Tag') {
+        stage('K8S Update Image Tag In staging.yaml') {
             when {
                 branch 'PR*'
             }
@@ -341,7 +341,7 @@ pipeline {
                                 -e ZAP_JVM_OPTIONS="-Xmx4g" \
                                 ghcr.io/zaproxy/zaproxy:stable \
                                 zap-full-scan.py \
-                                -t http://a0bd629c8c1994870836f96ba4cd1321-1704283740.eu-west-2.elb.amazonaws.com:3000/ \
+                                -t http://k8s-staging-coreserv-0b883551de-1001476474.eu-west-2.elb.amazonaws.com/ \
                                 -g gen.conf \
                                 -I \
                                 -r DAST-report.html \
@@ -356,22 +356,61 @@ pipeline {
                         currentBuild.result = 'FAILED'
                     }
                        archiveArtifacts artifacts: 'ZAP-reports/DAST-report.*', allowEmptyArchive: true
+                       sh 'cp -r  ZAP-reports reports-${TAG}'
+                       s3Upload(file:"reports-${TAG}", bucket:'jenkins-build-reports-core-serve-frontend', path:"Jenkins-${TAG}-reports/")
                 }
             }
         }
         
-        // Deploy to production using ArgoCD
-        stage('Production ?') {
+        // Update the image tag in the Kubernetes deployment file for production
+        stage('K8S Update Image Tag In prod.yaml') {
             when {
                 branch 'master'
             }
             steps {
-                timeout(time: 2, unit: 'DAYS') {
-                        input message: 'Please approve to deploy to Production', ok: 'Approved, Deploy to Production'
-                }   
+                script {
+                    // Clone the GitOps repository
+                    sh '''
+                        git clone -b master https://github.com/teejayade2244/GitOps-Terraform-Iac-and-Kubernetes-manifests-Core-Serve-App.git
+                    '''
+
+                    // Navigate to the Kubernetes directory
+                    dir("GitOps-Terraform-Iac-and-Kubernetes-manifests-Core-Serve-App/Helm/core-serve-frontend/values") {
+                        sh '''
+                            ls -la
+                            # Directly update the tag in prod.yaml on the master branch
+                            sed -i "s/tag:.*\$/tag: ${TAG}/" prod.yaml
+                            
+                            # Verify the changes
+                            cat prod.yaml
+                        '''
+
+                        // Commit and push the changes directly to the master branch
+                        withCredentials([string(credentialsId: 'Github account token', variable: 'GITHUB_TOKEN')]) {
+                            sh '''
+                                git config --global user.email "temitope224468@gmail.com"
+                                git remote set-url origin https://${GITHUB_TOKEN}@github.com/teejayade2244/GitOps-Terraform-Iac-and-Kubernetes-manifests-Core-Serve-App.git
+                                git add prod.yaml
+                                git commit -m "Updated image tag to ${TAG} in prod environment"
+                                git push origin master
+                            '''
+                        }
+                    }
+                }
             }
         }
-        
+
+        // Deploy to production using ArgoCD
+        stage('Production') {
+            when {
+                branch 'master'
+            }
+            steps {
+                script {
+                    echo "Production deployment initiated. ArgoCD will sync changes from the GitOps repository's master branch."
+            }
+        }
+    }
     }
        
     // post actions.
