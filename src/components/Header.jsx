@@ -147,7 +147,7 @@ export function Header() {
                 <div className="border border-x-0 border-t-0 border-[#960000] border-b-[4px]"></div>
                 <div className="bg-[#314ba9] p-[10px] w-full">
                     <h1 className="text-white md:ml-20 font-semibold sm:text-3xl text-2xl md:text-3xl font-sans tracking-wide">
-                        Welcome to the Core Serve Portal{" "}
+                        Welcome to the Portal{" "}
                         <span className="text-3xl font-sans"></span>
                     </h1>
                 </div>
