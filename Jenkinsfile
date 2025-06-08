@@ -6,7 +6,6 @@ pipeline {
     options {
        disableConcurrentBuilds abortPrevious: true
     }
-
     environment {
         AWS_REGION = credentials('AWS-REGION')
         ECR_REPO_NAME = 'core-serve-frontend-app'
