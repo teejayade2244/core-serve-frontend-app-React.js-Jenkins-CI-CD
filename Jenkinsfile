@@ -179,7 +179,7 @@ pipeline {
             }
         }
         
-        // Continuous Deployment - Deploy to AWS EC2
+        // Continuous Deployment Deploy to AWS EC2
         // stage("Deploy to AWS EC2") {
         //     steps {
         //         script {
