@@ -1,106 +1,138 @@
-Project Name: Core Serve Frontend Website
-A modern frontend application built with React.js, containerized with Docker, and deployed using CI/CD and GitOps best practices.
+# Core Serve Frontend
 
-📌 Table of Contents
-- [🌟 Features](#-features)
-- [🔧 Installation](#-installation)
-- [📂 Project Structure](#-project-structure)
-- [🚀 Running the Project](#-running-the-project)
-- [🐳 Docker Setup](#-docker-setup)
-- [📦 CI/CD Pipeline](#-cicd-pipeline)
-- [🚀 Deployment with ArgoCD Helm & Kubernetes](#-deployment-with-helm--kubernetes)
-- Infrastructure as Code (IaC) with Terraform
-- [📜 License](#-license)
-- [👨‍💻 Author](#-author)
+Welcome to **Core Serve Frontend**! This project is the frontend component of the Core Serve system, providing a user interface for interacting with the Core Serve backend services. The application is built to deliver a seamless, modern, and responsive user experience.
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Features](#features)
+- [Getting Started](#getting-started)
+- [Installation](#installation)
+- [Usage](#usage)
+- [CI/CD & Deployment](#cicd--deployment)
+- [Project Structure](#project-structure)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contact](#contact)
+
+## Overview
+
+Core Serve Frontend is designed to offer users an intuitive way to interact with Core Serve's backend APIs and services. It leverages modern frontend technologies for performance and maintainability.
+
+## Features
+
+- Responsive user interface
+- Integration with Core Serve backend APIs
+- Modern authentication and session management
+- Reusable and modular components
+- Easy to customize and extend
+- Containerized with Docker for consistent deployments
+- Automated CI/CD with Jenkins
+- Integrated with [core-serve-gitops](https://github.com/teejayade2244/core-serve-gitops) for GitOps-driven deployment
+
+## Getting Started
+
+To get a local copy up and running, follow these simple steps.
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) (version 14 or higher recommended)
+- [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
+- [Docker](https://www.docker.com/) (for containerized builds)
+- [Jenkins](https://www.jenkins.io/) (optional, for CI/CD)
+
+### Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/teejayade2244/core-serve-frontend.git
+   cd core-serve-frontend
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
+
+## Usage
+
+### Local Development
+
+1. **Start the development server:**
+   ```bash
+   npm start
+   # or
+   yarn start
+   ```
+
+2. Open your browser and navigate to `http://localhost:3000` (or as specified in your settings).
+
+### Docker
+
+To build and run the app in a Docker container:
+
+```bash
+docker build -t core-serve-frontend .
+docker run -p 3000:3000 core-serve-frontend
+```
+![Screenshot 2025-06-08 173740](https://github.com/user-attachments/assets/019a2901-8a93-4ebc-aa9e-92a0af866200)
+![Screenshot 2025-06-08 174255](https://github.com/user-attachments/assets/8ef03da0-7389-45ae-a54a-26a0a00b870f)
+![Screenshot 2025-06-08 173611](https://github.com/user-attachments/assets/2c895b42-d500-4a22-bfc6-5100f12207b8)
+![Screenshot 2025-06-08 173625](https://github.com/user-attachments/assets/e40a9cd0-77ae-4a9f-8f0f-d5e634f60ca1)
+
+### Continuous Integration and Deployment
+
+- This repository includes a `Jenkinsfile` for automated building, testing, and deployment.
+- The project uses [core-serve-gitops](https://github.com/teejayade2244/core-serve-gitops) for GitOps-based deployment workflows.
+- To enable full CI/CD, configure Jenkins and connect it to your preferred GitOps environment.
+
+## CI/CD & Deployment
+
+- **Docker:** Enables reproducible builds and easy deployment across environments.
+- **Jenkins:** Handles automated testing and deployment steps as defined in `Jenkinsfile`.
+- **GitOps:** For production deployment, changes are managed declaratively through the [core-serve-gitops]([https://github.com/teejayade2244/core-serve-gitops](https://github.com/teejayade2244/GitOps-Terraform-Iac-and-Kubernetes-manifests-Core-Serve-App)) repository.
   
-## 🌟 Features
-✅ Modern UI built with
-- **React.js**
-- **Redux Toolkit with Redux Persist**
-- **Tailwind CSS**
-- **Material UI**
-- **Axios for API calls**
-- **Jest for testing**
-- **Fully responsive design**
-- **User Authentication**
-- **Password Management (Forgot/Change Password)**
-- **Batch Registration System**
-- **Responsive Design**
-- **User Dashboard**
-- **Profile Management**
-  
-✅ Automated CI/CD using **Jenkins**  
-✅ Containerized using **Docker**  
-✅ Kubernetes deployment with **Helm and ArgoCD**  
-✅ Security scanning with **Trivy, OWAPS, ZAP & SonarQube**  
-✅ Deployed to **AWS**  
+![Screenshot 2025-06-08 175208](https://github.com/user-attachments/assets/fe223471-4610-40fa-bd79-091a55f35518)
+![Screenshot 2025-06-08 181505](https://github.com/user-attachments/assets/f956abe1-c89a-44ff-b26a-caa2eeae7421)
+![Screenshot 2025-06-08 174224](https://github.com/user-attachments/assets/32563988-d284-4a85-865d-d9d579081996)
 
-## 🔧 Installation
+## Project Structure
 
-### **1️⃣ Clone the Repository**
-```sh
-git clone https://github.com/your-username/your-repo.git
-cd your-repo
+```
+core-serve-frontend/
+├── public/             # Static assets
+├── src/
+│   ├── components/     # Reusable components
+│   ├── pages/          # Page components
+│   ├── services/       # API services
+│   ├── App.js          # Main application component
+│   └── index.js        # Entry point
+├── Dockerfile
+├── Jenkinsfile
+├── package.json
+└── README.md
 ```
 
-### **2️⃣ Install Dependencies**
-```sh
-npm install  # or yarn install
-```
+## Contributing
 
-## 📂 Project Structure
-```
-/your-repo
-│── /public          # Static assets
-│── /src             # Source code
-│── /tests           # Test cases
-│── .github/workflows # CI/CD pipeline
-│── Jenkinsfile      # Jenkins pipeline configuration
-│── Dockerfile       # Docker container setup
-│── helm-chart/      # Helm configuration for Kubernetes
-│── README.md        # Documentation
-│── package.json     # Project metadata
-```
+Contributions are welcome! Please create issues or submit pull requests for any features, fixes, or suggestions.
 
-## 🐳 Docker Setup
-To containerize the application:
-```sh
-docker build -t my-frontend-app .
-```
-## To test the if the application is succesfully running in the container
-```sh
-docker run -p 3000:3000 my-frontend-app
-```
-Now, open **http://localhost:3000**.
+1. Fork the repository
+2. Create a new branch (`git checkout -b feature/YourFeature`)
+3. Commit your changes (`git commit -am 'Add new feature'`)
+4. Push to the branch (`git push origin feature/YourFeature`)
+5. Open a pull request
 
-## 📦 CI/CD Pipeline
-### **Proposed CI/CD Pipeline strategy with PR Integration**
-1️⃣ Continuous Integration (CI)
-- Checkout Code – Fetch latest feature branch code.
-- Install Dependencies – Install required packages.
-- Security Scans – OWASP Dependency Check (Generates HTML/XML reports).
-- Run Unit Tests – Jest test suites.
-- Static Code Analysis – SonarQube.
-- Build Artifacts – Build and create Docker image.
-- Container Security Scan – Trivy for LOW/MEDIUM/CRITICAL vulnerabilities (Generates HTML & XML reports).
-- Upload Build Reports to AWS S3 – Store scan and test reports for analysis.
-- Deploy to Dev Testing Environment – EC2 for Integration testing.
-- If CI passes, a PR will be raised.
+## License
 
-2️⃣ Pull Request Process
-PR is raised for review.
+Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
 
-3️⃣ Post-Merge Continuous Deployment pipeline (CD) ang GitOps
-- Manifest Repo – Dedicated repository for Kubernetes manifests.
-- PR Branch – Create a new branch for updating image tags.
-- Clone Manifest Repo and Update K8S Image Tag – Update Kubernetes deployment with the latest image.
-- Raise PR on the Manifest Repo using GitHub API – Automate PR creation for Kubernetes manifests.
-- PR is reviewed and merged to Main Branch in Manifest Repo – Ensures controlled deployment updates.
-- ArgoCD Deployment – ArgoCD syncs changes from the manifest repo.
-- Deploy to AWS EKS Staging Environment – Application is deployed to the staging cluster.
-- DAST (Dynamic Application Security Testing) – Perform security testing on the running application using OWASP ZAP.
-- Final Approval Step – Manual production approval.
-- Deploy to Production!!!
+## Contact
 
+Project maintained by [@teejayade2244](https://github.com/teejayade2244).
 
-sqp_0e637c6ad6b6d53dfbcc255cbf59765fea483591
+---
+
+Thank you for checking out Core Serve Frontend!
