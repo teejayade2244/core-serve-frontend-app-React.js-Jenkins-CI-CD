@@ -78,7 +78,6 @@ docker build -t core-serve-frontend .
 docker run -p 3000:3000 core-serve-frontend
 ```
 ![Screenshot 2025-06-08 173740](https://github.com/user-attachments/assets/019a2901-8a93-4ebc-aa9e-92a0af866200)
-![Screenshot 2025-06-08 174255](https://github.com/user-attachments/assets/8ef03da0-7389-45ae-a54a-26a0a00b870f)
 ![Screenshot 2025-06-08 173611](https://github.com/user-attachments/assets/2c895b42-d500-4a22-bfc6-5100f12207b8)
 ![Screenshot 2025-06-08 173625](https://github.com/user-attachments/assets/e40a9cd0-77ae-4a9f-8f0f-d5e634f60ca1)
 
@@ -94,7 +93,7 @@ docker run -p 3000:3000 core-serve-frontend
 - **Jenkins:** Handles automated testing and deployment steps as defined in `Jenkinsfile`.
 - **GitOps:** For production deployment, changes are managed declaratively through the [core-serve-gitops]([https://github.com/teejayade2244/core-serve-gitops](https://github.com/teejayade2244/GitOps-Terraform-Iac-and-Kubernetes-manifests-Core-Serve-App)) repository.
   
-![Screenshot 2025-06-08 175208](https://github.com/user-attachments/assets/fe223471-4610-40fa-bd79-091a55f35518)
+![Screenshot 2025-06-08 174103](https://github.com/user-attachments/assets/02940c34-d885-4072-918b-f1de1d59a851)
 ![Screenshot 2025-06-08 181505](https://github.com/user-attachments/assets/f956abe1-c89a-44ff-b26a-caa2eeae7421)
 ![Screenshot 2025-06-08 174224](https://github.com/user-attachments/assets/32563988-d284-4a85-865d-d9d579081996)
 
