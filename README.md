@@ -94,7 +94,6 @@ docker run -p 3000:3000 core-serve-frontend
 - **GitOps:** For production deployment, changes are managed declaratively through the [core-serve-gitops]([https://github.com/teejayade2244/core-serve-gitops](https://github.com/teejayade2244/GitOps-Terraform-Iac-and-Kubernetes-manifests-Core-Serve-App)) repository.
   
 ![Screenshot 2025-06-08 174103](https://github.com/user-attachments/assets/02940c34-d885-4072-918b-f1de1d59a851)
-![Screenshot 2025-06-08 181505](https://github.com/user-attachments/assets/f956abe1-c89a-44ff-b26a-caa2eeae7421)
 ![Screenshot 2025-06-08 174224](https://github.com/user-attachments/assets/32563988-d284-4a85-865d-d9d579081996)
 
 ## Project Structure
