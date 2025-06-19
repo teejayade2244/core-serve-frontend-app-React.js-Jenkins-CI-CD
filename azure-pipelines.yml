@@ -13,7 +13,7 @@ variables:
   dockerRegistryServiceConnection: '94deaa05-5d9e-4af9-a688-98795a0456de'
   imageRepository: 'frontend'
   containerRegistry: 'temitope.azurecr.io'
-  dockerfilePath: '$(core-serve-frontend)/Dockerfile'
+  dockerfilePath: 'Dockerfile'
   tag: '$(Build.BuildId)'
 
   # Agent VM image name
