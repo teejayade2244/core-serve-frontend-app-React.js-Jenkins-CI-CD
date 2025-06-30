@@ -14,15 +14,22 @@ module.exports = {
             },
         ],
     ],
+    setupFilesAfterEnv: ["<rootDir>/src/setupTests.js"],
     testEnvironment: "jsdom",
     moduleNameMapper: {
-        "\\.(png|jpg|jpeg|gif|webp|svg)$": "<rootDir>/__mocks__/fileMock.js",
-        "\\.(css|less|scss|sass)$": "identity-obj-proxy",
+        "\\.(css|less|sass|scss)$": "identity-obj-proxy",
+        "\\.(gif|ttf|eot|svg|png)$": "<rootDir>/__mocks__/fileMock.js",
     },
-    setupFilesAfterEnv: ["<rootDir>/src/setupTests.js"],
     transform: {
         "^.+\\.(js|jsx)$": "babel-jest",
     },
-    transformIgnorePatterns: ["/node_modules/(?!(@mui|@babel|react-icons)/)"],
-    moduleDirectories: ["node_modules", "src"],
+    collectCoverageFrom: ["src/**/*.{js,jsx}", "!src/index.jsx"],
+    coverageThreshold: {
+        global: {
+            branches: 80,
+            functions: 80,
+            lines: 80,
+            statements: 80,
+        },
+    },
 }

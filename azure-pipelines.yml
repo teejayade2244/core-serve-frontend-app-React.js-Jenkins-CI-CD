@@ -1,0 +1,99 @@
+trigger:
+  branches:
+    include:
+      - master 
+      - feature/* 
+pr:
+  branches:
+    include:
+      - "*" 
+
+pool:
+  name: MyLinuxAgents 
+
+stages:
+- stage: BuildAndTest
+  displayName: 'Build and Test Frontend'
+  jobs:
+  - job: FrontendCI
+    displayName: 'Frontend Continuous Integration'
+    pool:
+      name: MyLinuxAgents 
+    steps:
+    - task: Bash@3 
+      displayName: 'Clean node_modules and package-lock.json for PRs'
+      inputs:
+        targetType: 'inline'
+        script: |
+          # Azure DevOps built-in variables for branch name:
+          # Build.SourceBranch (e.g., refs/heads/master, refs/pull/123/merge)
+          # Build.SourceBranchName (e.g., master, pull/123/merge)
+          # System.PullRequest.PullRequestNumber (if it's a PR build)
+          
+          # Check if it's a PR build by looking for System.PullRequest.PullRequestNumber
+          # Or, check if the branch name contains 'pull/'
+          if [[ "$(Build.SourceBranch)" == refs/pull/* ]]; then
+            echo "This is a PR branch. Cleaning workspace before npm install."
+            rm -rf node_modules package-lock.json || true
+          else
+            echo "Not a PR branch. Skipping pre-install cleanup."
+          fi
+        workingDirectory: '$(Build.SourcesDirectory)' # Ensure it runs in the repo root
+
+    # Using Node.js Tool Installer task for specific Node.js version
+    # ────── Setup and Install ──────
+    - task: NodeTool@0
+      displayName: 'Use Node.js 22.x' 
+      inputs:
+        versionSpec: '22.x' 
+
+    - script: npm install --no-audit
+      displayName: 'Install Node.js Dependencies'
+      workingDirectory: '$(Build.SourcesDirectory)'
+
+    - script: |
+        echo "Running NPM Audit..."
+        npm audit --audit-level=critical
+      displayName: 'Run NPM Audit'
+      workingDirectory: '$(Build.SourcesDirectory)'
+
+    # ────── OWASP Dependency Check ──────
+    - bash: 'mkdir -p OWASP-security-reports'
+      displayName: 'Create OWASP Security Reports Directory'
+      workingDirectory: '$(Build.SourcesDirectory)'
+    
+    - task: dependency-check-build-task@6
+      displayName: 'Run OWASP Dependency Check'
+      inputs:
+        projectName: 'core-serve-frontend-app'
+        scanPath: '$(Build.SourcesDirectory)'
+        format: 'HTML'
+        uploadReports: true
+        failOnCVSS: '8'
+        enableVerbose: true
+        additionalArguments: '--disableYarnAudit --disableNodeAudit'
+        nvdApiKey: '4de09a63-d6ac-46e6-a6b3-c78e9aeae5e8'
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish OWASP Reports'
+      inputs:
+        pathToPublish: '$(Build.SourcesDirectory)/OWASP-security-reports'
+        artifactName: 'OWASPReports'
+
+    # Create a directory for test results
+    # ────── Unit Tests ──────
+    - bash: 'mkdir -p test-results'
+      displayName: 'Create Test Results Directory'
+      workingDirectory: '$(Build.SourcesDirectory)'
+
+    - script: npm test
+      displayName: 'Run Unit Tests'
+      workingDirectory: '$(Build.SourcesDirectory)'
+
+    # Publish test results (assuming 'npm test' generates a JUnit-compatible report)
+    - task: PublishTestResults@2
+      displayName: 'Publish Unit Test Results'
+      inputs:
+        testResultsFormat: 'JUnit' 
+        testResultsFiles: '**/junit.xml' 
+        failTaskOnFailedTests: true

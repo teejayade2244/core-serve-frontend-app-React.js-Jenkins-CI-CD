@@ -1,187 +1,187 @@
 [
     {
         "id": 1,
-        "state": "Abia",
-        "camp": "Umunna, Bende LGA"
+        "state": "Alabama",
+        "camp": "123 Pine Valley Road, Montgomery"
     },
     {
         "id": 2,
-        "state": "Adamawa",
-        "camp": "Lapondo Road, Damare, Girei LGA"
+        "state": "Alaska",
+        "camp": "456 Glacier View Drive, Anchorage"
     },
     {
         "id": 3,
-        "state": "Akwa Ibom",
-        "camp": "Ikot Itie Udung, Nsit Atai LGA"
+        "state": "Arizona",
+        "camp": "789 Desert Palm Avenue, Phoenix"
     },
     {
         "id": 4,
-        "state": "Anambra",
-        "camp": "Umuawulu/Mbaukwu Awka South LGA"
+        "state": "Arkansas",
+        "camp": "321 River Road, Little Rock"
     },
     {
         "id": 5,
-        "state": "Bauchi",
-        "camp": "KM 60 Wailo, Ganjuwa LGA"
+        "state": "California",
+        "camp": "555 Ocean Drive, San Francisco"
     },
     {
         "id": 6,
-        "state": "Bayelsa",
-        "camp": "Kaiama Grammar School, Kolokoma-Opokuma LGA"
+        "state": "Colorado",
+        "camp": "777 Mountain View Road, Denver"
     },
     {
         "id": 7,
-        "state": "Benue",
-        "camp": "Wannune, Tarka LGA"
+        "state": "Connecticut",
+        "camp": "888 Maple Street, Hartford"
     },
     {
         "id": 8,
-        "state": "Borno",
-        "camp": "College of Peace and Disaster Management, Katsina"
+        "state": "Delaware",
+        "camp": "999 Beach Road, Dover"
     },
     {
         "id": 9,
-        "state": "Cross River",
-        "camp": "Obubra, Obubra LGA"
+        "state": "Florida",
+        "camp": "101 Palm Beach Drive, Miami"
     },
     {
         "id": 10,
-        "state": "Delta",
-        "camp": "Former Martins TTC, Issele-Uku, Aniocha North LGA"
+        "state": "Georgia",
+        "camp": "202 Peach Tree Lane, Atlanta"
     },
     {
         "id": 11,
-        "state": "Ebonyi",
-        "camp": "Macgregor College, Afikpo LGA"
+        "state": "Hawaii",
+        "camp": "303 Waikiki Beach Road, Honolulu"
     },
     {
         "id": 12,
-        "state": "Edo",
-        "camp": "Okada Grammar School, Ovia North-East LGA"
+        "state": "Idaho",
+        "camp": "404 Forest Lane, Boise"
     },
     {
         "id": 13,
-        "state": "Ekiti",
-        "camp": "Ise-Orun/Emure LGA"
+        "state": "Illinois",
+        "camp": "505 Lake Shore Drive, Chicago"
     },
     {
         "id": 14,
-        "state": "Enugu",
-        "camp": "Awgu LGA"
+        "state": "Indiana",
+        "camp": "606 Racing Lane, Indianapolis"
     },
     {
         "id": 15,
-        "state": "FCT (Abuja)",
-        "camp": "Kubwa, Bwari Area Council"
+        "state": "Greater London",
+        "camp": "10 Westminster Bridge Road, London"
     },
     {
         "id": 16,
-        "state": "Gombe",
-        "camp": "Science Technical College, Amada"
+        "state": "Scotland",
+        "camp": "15 Royal Mile, Edinburgh"
     },
     {
         "id": 17,
-        "state": "Imo",
-        "camp": "Former Girl's Model Secondary School Eziama Obaire, Nkwerre LGA"
+        "state": "Wales",
+        "camp": "20 Cardiff Bay, Cardiff"
     },
     {
         "id": 18,
-        "state": "Jigawa",
-        "camp": "opposite Army Barrack, Fanisua Dutse LGA"
+        "state": "Northern Ireland",
+        "camp": "25 Falls Road, Belfast"
     },
     {
         "id": 19,
-        "state": "Kaduna",
-        "camp": "Kaduna – Abuja Road"
+        "state": "West Midlands",
+        "camp": "30 Broad Street, Birmingham"
     },
     {
         "id": 20,
-        "state": "Kano",
-        "camp": "Kusala Dam, Karaye, Karaye LGA"
+        "state": "South East",
+        "camp": "35 High Street, Brighton"
     },
     {
         "id": 21,
-        "state": "Katsina",
-        "camp": "Mani Road"
+        "state": "North West",
+        "camp": "40 Albert Dock, Liverpool"
     },
     {
         "id": 22,
-        "state": "Kebbi",
-        "camp": "Dakingari LGA"
+        "state": "East of England",
+        "camp": "45 King's Parade, Cambridge"
     },
     {
         "id": 23,
-        "state": "Kogi",
-        "camp": "Asaya, Kabba LGA"
+        "state": "South West",
+        "camp": "50 Royal Crescent, Bath"
     },
     {
         "id": 24,
-        "state": "Kwara",
-        "camp": "Yikpata, Edu LGA"
+        "state": "Yorkshire",
+        "camp": "55 The Shambles, York"
     },
     {
         "id": 25,
-        "state": "Lagos",
-        "camp": "Iyana Ipaja, Agege"
+        "state": "East Midlands",
+        "camp": "60 Market Square, Nottingham"
     },
     {
         "id": 26,
-        "state": "Nassarawa",
-        "camp": "Keffi"
+        "state": "North East",
+        "camp": "65 Grey Street, Newcastle"
     },
     {
         "id": 27,
-        "state": "Niger",
-        "camp": "Paiko"
+        "state": "Greater Manchester",
+        "camp": "70 Deansgate, Manchester"
     },
     {
         "id": 28,
-        "state": "Ogun",
-        "camp": "Ikenne Road, Sagamu LGA"
+        "state": "Merseyside",
+        "camp": "75 Matthew Street, Liverpool"
     },
     {
         "id": 29,
-        "state": "Ondo",
-        "camp": "Ikare-Akoko LGA"
+        "state": "Kent",
+        "camp": "80 Canterbury High Street, Canterbury"
     },
     {
         "id": 30,
-        "state": "Osun",
-        "camp": "Aisu College Hospital Road, Ede North LGA"
+        "state": "Essex",
+        "camp": "85 High Street, Colchester"
     },
     {
         "id": 31,
-        "state": "Oyo",
-        "camp": "Government Technical College, Iseyin LGA"
+        "state": "Hampshire",
+        "camp": "90 Winchester Road, Southampton"
     },
     {
         "id": 32,
-        "state": "Plateau",
-        "camp": "Mangu, Mangu LGA"
+        "state": "Lancashire",
+        "camp": "95 Blackpool Road, Preston"
     },
     {
         "id": 33,
-        "state": "Rivers",
-        "camp": "Nonwa-Gbam Tai LGA"
+        "state": "Iowa",
+        "camp": "120 Corn Field Road, Des Moines"
     },
     {
         "id": 34,
-        "state": "Sokoto",
-        "camp": "Wamakko, Wamakko LGA"
+        "state": "Kansas",
+        "camp": "130 Sunflower Lane, Topeka"
     },
     {
         "id": 35,
-        "state": "Taraba",
-        "camp": "Sibre Airport Road, Jalingo"
+        "state": "Kentucky",
+        "camp": "140 Derby Road, Louisville"
     },
     {
         "id": 36,
-        "state": "Yobe",
-        "camp": "Dazigau, Nangere LGA"
+        "state": "Louisiana",
+        "camp": "150 French Quarter, New Orleans"
     },
     {
         "id": 37,
-        "state": "Zamfara",
-        "camp": "Beside FRSC Office, Tsafe LGA"
+        "state": "Maine",
+        "camp": "160 Lighthouse Road, Portland"
     }
 ]
