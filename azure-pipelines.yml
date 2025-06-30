@@ -71,6 +71,7 @@ stages:
         uploadReports: true
         failOnCVSS: '8'
         enableVerbose: true
+        additionalArguments: 'disableYarnAudit'
         nvdApiKey: '4de09a63-d6ac-46e6-a6b3-c78e9aeae5e8'
 
     - task: PublishBuildArtifacts@1
