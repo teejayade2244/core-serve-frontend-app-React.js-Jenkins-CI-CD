@@ -4,8 +4,46 @@ import { Provider } from "react-redux"
 import configureStore from "redux-mock-store"
 import { BrowserRouter as Router } from "react-router-dom"
 import { LayOut } from "../MainHomePage"
+import axios from "axios"
 
 const mockStore = configureStore([])
+
+// Mock axios globally for all tests in this file
+jest.mock("axios")
+
+beforeEach(() => {
+    jest.clearAllMocks()
+    axios.get.mockResolvedValue({
+        data: {
+            firstname: "John",
+            lastname: "Doe",
+            email: "john.doe@example.com",
+            mobile: "1234567890",
+            Batch: "A",
+            gender: "Male",
+            CallUpNumber: "NYSC12345",
+            StateCode: "NY123",
+            Image: "https://via.placeholder.com/150",
+        },
+    })
+})
+
+beforeAll(() => {
+    jest.spyOn(console, "warn").mockImplementation((msg) => {
+        if (
+            typeof msg === "string" &&
+            msg.includes("React Router Future Flag Warning")
+        ) {
+            return
+        }
+        // Uncomment to see other warnings
+        // console.warn(msg)
+    })
+})
+
+afterAll(() => {
+    console.warn.mockRestore()
+})
 
 describe("LayOut Component", () => {
     let store
