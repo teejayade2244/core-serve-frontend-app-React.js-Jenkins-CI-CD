@@ -80,6 +80,9 @@
     },
     "main": "index.js",
     "license": "MIT",
-    "repository": "https://github.com/TemitopeAde22/NYSC-CLONE.git",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/TemitopeAde22/NYSC-CLONE.git"
+    },
     "author": "teejay4125 <teejay4125@gmail.com>"
 }
