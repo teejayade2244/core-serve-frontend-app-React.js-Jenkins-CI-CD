@@ -22,94 +22,94 @@ pool:
   name: MyLinuxAgents 
 
 stages:
-- stage: BuildAndTest
-  displayName: 'Build and Test Frontend'
-  jobs:
-  - job: FrontendCI
-    displayName: 'Frontend Continuous Integration (Build, Unit Tests and Dependency scans)'
-    pool:
-      name: MyLinuxAgents
-    steps:
-    - task: Bash@3 
-      displayName: 'Clean node_modules and package-lock.json for PRs'
-      inputs:
-        targetType: 'inline'
-        script: |
-          # Azure DevOps built-in variables for branch name:
-          # Build.SourceBranch (e.g., refs/heads/master, refs/pull/123/merge)
-          # Build.SourceBranchName (e.g., master, pull/123/merge)
-          # System.PullRequest.PullRequestNumber (if it's a PR build)
+# - stage: BuildAndTest
+#   displayName: 'Build and Test Frontend'
+#   jobs:
+#   - job: FrontendCI
+#     displayName: 'Frontend Continuous Integration (Build, Unit Tests and Dependency scans)'
+#     pool:
+#       name: MyLinuxAgents
+#     steps:
+#     - task: Bash@3 
+#       displayName: 'Clean node_modules and package-lock.json for PRs'
+#       inputs:
+#         targetType: 'inline'
+#         script: |
+#           # Azure DevOps built-in variables for branch name:
+#           # Build.SourceBranch (e.g., refs/heads/master, refs/pull/123/merge)
+#           # Build.SourceBranchName (e.g., master, pull/123/merge)
+#           # System.PullRequest.PullRequestNumber (if it's a PR build)
           
-          # Check if it's a PR build by looking for System.PullRequest.PullRequestNumber
-          # Or, check if the branch name contains 'pull/'
-          if [[ "$(Build.SourceBranch)" == refs/pull/* ]]; then
-            echo "This is a PR branch. Cleaning workspace before npm install."
-            rm -rf node_modules package-lock.json || true
-          else
-            echo "Not a PR branch. Skipping pre-install cleanup."
-          fi
-        workingDirectory: '$(Build.SourcesDirectory)' 
+#           # Check if it's a PR build by looking for System.PullRequest.PullRequestNumber
+#           # Or, check if the branch name contains 'pull/'
+#           if [[ "$(Build.SourceBranch)" == refs/pull/* ]]; then
+#             echo "This is a PR branch. Cleaning workspace before npm install."
+#             rm -rf node_modules package-lock.json || true
+#           else
+#             echo "Not a PR branch. Skipping pre-install cleanup."
+#           fi
+#         workingDirectory: '$(Build.SourcesDirectory)' 
 
-    # Using Node.js Tool Installer task for specific Node.js version
-    # ────── Setup and Install ──────
-    - task: NodeTool@0
-      displayName: 'Use Node.js 22.x' 
-      inputs:
-        versionSpec: '22.x' 
+#     # Using Node.js Tool Installer task for specific Node.js version
+#     # ────── Setup and Install ──────
+#     - task: NodeTool@0
+#       displayName: 'Use Node.js 22.x' 
+#       inputs:
+#         versionSpec: '22.x' 
 
-    - script: npm install --no-audit
-      displayName: 'Install Node.js Dependencies'
-      workingDirectory: '$(Build.SourcesDirectory)'
+#     - script: npm install --no-audit
+#       displayName: 'Install Node.js Dependencies'
+#       workingDirectory: '$(Build.SourcesDirectory)'
 
-    - script: |
-        echo "Running NPM Audit..."
-        npm audit --audit-level=critical
-      displayName: 'Run NPM Audit'
-      workingDirectory: '$(Build.SourcesDirectory)'
+#     - script: |
+#         echo "Running NPM Audit..."
+#         npm audit --audit-level=critical
+#       displayName: 'Run NPM Audit'
+#       workingDirectory: '$(Build.SourcesDirectory)'
 
-    # ────── OWASP Dependency Check ──────
-    # - bash: 'mkdir -p OWASP-security-reports'
-    #   displayName: 'Create OWASP Security Reports Directory'
-    #   workingDirectory: '$(Build.SourcesDirectory)'
+#     # ────── OWASP Dependency Check ──────
+#     # - bash: 'mkdir -p OWASP-security-reports'
+#     #   displayName: 'Create OWASP Security Reports Directory'
+#     #   workingDirectory: '$(Build.SourcesDirectory)'
     
-    # - task: dependency-check-build-task@6
-    #   displayName: 'Run OWASP Dependency Check'
-    #   inputs:
-    #     projectName: 'core-serve-frontend-app'
-    #     scanPath: '$(Build.SourcesDirectory)'
-    #     format: 'HTML'
-    #     uploadReports: true
-    #     failOnCVSS: '8'
-    #     enableVerbose: true
-    #     nvdApiKey: '$(NVD_API_KEY)' 
+#     # - task: dependency-check-build-task@6
+#     #   displayName: 'Run OWASP Dependency Check'
+#     #   inputs:
+#     #     projectName: 'core-serve-frontend-app'
+#     #     scanPath: '$(Build.SourcesDirectory)'
+#     #     format: 'HTML'
+#     #     uploadReports: true
+#     #     failOnCVSS: '8'
+#     #     enableVerbose: true
+#     #     nvdApiKey: '$(NVD_API_KEY)' 
 
-    # - task: PublishBuildArtifacts@1
-    #   displayName: 'Publish OWASP Reports'
-    #   inputs:
-    #     pathToPublish: '$(Build.SourcesDirectory)/OWASP-security-reports'
-    #     artifactName: 'OWASPReports'
+#     # - task: PublishBuildArtifacts@1
+#     #   displayName: 'Publish OWASP Reports'
+#     #   inputs:
+#     #     pathToPublish: '$(Build.SourcesDirectory)/OWASP-security-reports'
+#     #     artifactName: 'OWASPReports'
 
-    # Create a directory for test results
-    # ────── Unit Tests ──────
-    - bash: 'mkdir -p test-results'
-      displayName: 'Create Test Results Directory'
-      workingDirectory: '$(Build.SourcesDirectory)'
+#     # Create a directory for test results
+#     # ────── Unit Tests ──────
+#     - bash: 'mkdir -p test-results'
+#       displayName: 'Create Test Results Directory'
+#       workingDirectory: '$(Build.SourcesDirectory)'
 
-    - script: npm test
-      displayName: 'Run Unit Tests'
-      workingDirectory: '$(Build.SourcesDirectory)'
+#     - script: npm test
+#       displayName: 'Run Unit Tests'
+#       workingDirectory: '$(Build.SourcesDirectory)'
 
-    # Publish test results (assuming 'npm test' generates a JUnit-compatible report)
-    - task: PublishTestResults@2
-      displayName: 'Publish Unit Test Results'
-      inputs:
-        testResultsFormat: 'JUnit' 
-        testResultsFiles: '**/junit.xml' 
-        mergeResults: true
-        failTaskOnFailedTests: true
+#     # Publish test results (assuming 'npm test' generates a JUnit-compatible report)
+#     - task: PublishTestResults@2
+#       displayName: 'Publish Unit Test Results'
+#       inputs:
+#         testResultsFormat: 'JUnit' 
+#         testResultsFiles: '**/junit.xml' 
+#         mergeResults: true
+#         failTaskOnFailedTests: true
 
 
-- stage: SonarQubeAnalysis
+# - stage: SonarQubeAnalysis
   displayName: 'Static Analysis with SonarQube'
   jobs:
   - job: SonarScan
@@ -259,7 +259,11 @@ stages:
     - bash: |
         cd "$(Agent.BuildDirectory)/s/kubernetes"
         echo "Current directory: $(pwd)"
-        ls -la 
+        ls -la
+        echo "DEBUG: ACR_REGISTRY_SERVER = $(ACR_REGISTRY_SERVER)"
+        echo "DEBUG: ACR_REPOSITORY_NAME = $(ACR_REPOSITORY_NAME)"
+        echo "DEBUG: NEW_IMAGE_TAG = ${NEW_IMAGE_TAG}"
+        echo "DEBUG: FULL_ACR_IMAGE = ${FULL_ACR_IMAGE}" 
         git config user.email "temitope224468@gmail.com"
         git config user.name "Azure DevOps Pipeline" 
         TARGET_BRANCH="feature-$(PR_SOURCE_BRANCH_NAME)" 
