@@ -10,6 +10,13 @@ pr:
   branches:
     include:
       - "*" 
+resources:
+  repositories:
+  - repository: GitOpsRepo 
+    type: github
+    name: teejayade2244/Azure-DevOps-Terraform-Iac 
+    ref: master 
+    endpoint: github.com_teejayade2244 
 
 pool:
   name: MyLinuxAgents 
@@ -41,7 +48,7 @@ stages:
           else
             echo "Not a PR branch. Skipping pre-install cleanup."
           fi
-        workingDirectory: '$(Build.SourcesDirectory)' # Ensure it runs in the repo root
+        workingDirectory: '$(Build.SourcesDirectory)' 
 
     # Using Node.js Tool Installer task for specific Node.js version
     # ────── Setup and Install ──────
@@ -249,14 +256,7 @@ stages:
       NEW_IMAGE_TAG: '$(Build.BuildId)'
       PR_SOURCE_BRANCH_NAME: '$(System.PullRequest.SourceBranch)'
       FULL_ACR_IMAGE: '$(ACR_REGISTRY_SERVER)/$(ACR_REPOSITORY_NAME):$(NEW_IMAGE_TAG)'
-    resources:
-      repositories:
-      - repository: GitOpsRepo 
-        type: github
-        name: teejayade2244/Azure-DevOps-Terraform-Iac 
-        ref: master 
-        endpoint: github.com_teejayade2244 
-
+      
     steps:
     - checkout: GitOpsRepo
       displayName: 'Checkout GitOps Repository'
