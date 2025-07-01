@@ -284,7 +284,7 @@ stages:
         git checkout -b "$TARGET_BRANCH" || git checkout "$TARGET_BRANCH" 
 
         # Update the 'image' tag in deployment.yaml
-        sed -i "s|\(image: [^[:space:]]*\):.*|\1:${NEW_IMAGE_TAG}|" deployment.yaml
+        sed -i '/image:/ s|:[^[:space:]]*|:'${NEW_IMAGE_TAG}'|' deployment.yaml
 
         # Verify the changes
         echo "--- Contents of deployment.yaml after update ---"
