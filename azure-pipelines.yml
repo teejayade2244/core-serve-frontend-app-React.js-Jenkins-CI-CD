@@ -71,7 +71,7 @@ stages:
     #     uploadReports: true
     #     failOnCVSS: '8'
     #     enableVerbose: true
-    #     nvdApiKey: '4de09a63-d6ac-46e6-a6b3-c78e9aeae5e8'
+    #     nvdApiKey: '$(NVD_API_KEY)' 
 
     # - task: PublishBuildArtifacts@1
     #   displayName: 'Publish OWASP Reports'
@@ -113,7 +113,7 @@ stages:
           SonarQube: 'sonarqube' # IMPORTANT: Ensure this is the EXACT name of your SonarQube Service Connection
           scannerMode: 'CLI'
           configMode: 'manual'
-          cliProjectKey: 'temitope_temitope_AZfDZjVNGDuyZaniNcK3' 
+          cliProjectKey: '$(SONARQUBE_PROJECT_KEY)' 
           cliProjectName: 'temitope'
           extraProperties: |
               sonar.sources=src
@@ -143,8 +143,6 @@ stages:
     pool:
       name: MyLinuxAgents
     variables:
-      ACR_REGISTRY_SERVER: 'demotesting2332.azurecr.io'
-      ACR_REPOSITORY_NAME:  'demotesting2332'
       IMAGE_TAG: '$(Build.BuildId)' 
       DOCKER_IMAGE_FULL_NAME: '$(ACR_REGISTRY_SERVER)/$(ACR_REPOSITORY_NAME):$(IMAGE_TAG)'
     steps:
