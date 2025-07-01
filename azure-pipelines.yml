@@ -120,7 +120,7 @@ stages:
     - task: SonarQubePrepare@5
       displayName: 'Prepare SonarQube Analysis'
       inputs:
-          SonarQube: 'sonarqube' # IMPORTANT: Ensure this is the EXACT name of your SonarQube Service Connection
+          SonarQube: 'sonarqube'
           scannerMode: 'CLI'
           configMode: 'manual'
           cliProjectKey: $(SONARQUBE_PROJECT_KEY)
@@ -132,17 +132,13 @@ stages:
 
     - task: SonarQubeAnalyze@5
       displayName: 'Run SonarQube Analysis'
+      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest')) 
      
-    # - task: PublishBuildArtifacts@1
-    #   displayName: 'Publish SonarQube Reports'
-    #   inputs:
-    #     pathToPublish: '$(Build.SourcesDirectory)/.scannerwork/report-task.txt' 
-    #     artifactName: 'SonarQubeReports'
-
     - task: SonarQubePublish@5
       displayName: 'Publish SonarQube Results and Wait for Quality Gate'
       inputs:
         pollingTimeoutSec: '300' 
+      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest')) # This ensures the SonarQube publish step runs only for non-PR builds
 
 
 - stage: BuildAndScanDockerImage
@@ -256,7 +252,7 @@ stages:
       NEW_IMAGE_TAG: '$(Build.BuildId)'
       PR_SOURCE_BRANCH_NAME: '$(System.PullRequest.SourceBranch)'
       FULL_ACR_IMAGE: '$(ACR_REGISTRY_SERVER)/$(ACR_REPOSITORY_NAME):$(NEW_IMAGE_TAG)'
-      
+
     steps:
     - checkout: GitOpsRepo
       displayName: 'Checkout GitOps Repository'
