@@ -251,15 +251,31 @@ stages:
     variables:
       NEW_IMAGE_TAG: '$(Build.BuildId)'
       PR_SOURCE_BRANCH_NAME: '$(System.PullRequest.SourceBranch)'
-
     steps:
+    # Clean the GitOps repository directory to ensure no stale files remain
+    - bash: |
+        TARGET_CLEAN_DIR="$(Agent.BuildDirectory)/s/kubernetes" 
+        echo "Attempting to clean directory: ${TARGET_CLEAN_DIR}"
+        if [ -d "${TARGET_CLEAN_DIR}" ]; then
+          echo "Removing existing directory: ${TARGET_CLEAN_DIR}"
+          rm -rf "${TARGET_CLEAN_DIR}"
+        else
+          echo "Directory not found, no cleanup needed: ${TARGET_CLEAN_DIR}"
+        fi
+      displayName: 'Clean GitOps Repo Directory'
+
     - checkout: GitOpsRepo
       displayName: 'Checkout GitOps Repository'
+      
+    # Update the Kubernetes manifest with the new image tag
     - bash: |
         cd "$(Agent.BuildDirectory)/s/kubernetes"
         echo "Current directory: $(pwd)"
         ls -la
         echo "DEBUG: NEW_IMAGE_TAG = ${NEW_IMAGE_TAG}"
+        echo "--- Contents of deployment.yaml BEFORE update ---"
+        cat deployment.yaml
+        echo "------------------------------------------------"
         git config user.email "temitope224468@gmail.com"
         git config user.name "Azure DevOps Pipeline" 
         TARGET_BRANCH="feature-$(PR_SOURCE_BRANCH_NAME)" 
