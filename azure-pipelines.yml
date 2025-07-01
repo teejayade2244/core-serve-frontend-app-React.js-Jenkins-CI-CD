@@ -118,7 +118,7 @@ stages:
           extraProperties: |
               sonar.sources=src
               sonar.exclusions=**/node_modules/**,**/bin/**,**/obj/**
-              sonar.testExecutionReportPaths=test-results/junit.xml
+             
 
     - task: SonarQubeAnalyze@5
       displayName: 'Run SonarQube Analysis'
