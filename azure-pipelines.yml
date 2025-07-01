@@ -249,6 +249,7 @@ stages:
       name: MyLinuxAgents 
     
     variables:
+      - group: MyProject-Env-Dev 
       NEW_IMAGE_TAG: '$(Build.BuildId)'
       PR_SOURCE_BRANCH_NAME: '$(System.PullRequest.SourceBranch)'
     steps:
@@ -272,7 +273,11 @@ stages:
         cd "$(Agent.BuildDirectory)/s/kubernetes"
         echo "Current directory: $(pwd)"
         ls -la
+        FULL_ACR_IMAGE="${ACR_REGISTRY_SERVER}/${ACR_REPOSITORY_NAME}:${NEW_IMAGE_TAG}"
+        echo "DEBUG (Bash-constructed): ACR_REGISTRY_SERVER = ${ACR_REGISTRY_SERVER}"
+        echo "DEBUG (Bash-constructed): ACR_REPOSITORY_NAME = ${ACR_REPOSITORY_NAME}"
         echo "DEBUG: NEW_IMAGE_TAG = ${NEW_IMAGE_TAG}"
+        echo "DEBUG (Bash-constructed): FULL_ACR_IMAGE = ${FULL_ACR_IMAGE}"
         echo "--- Contents of deployment.yaml BEFORE update ---"
         cat deployment.yaml
         echo "------------------------------------------------"
@@ -284,7 +289,7 @@ stages:
         git checkout -b "$TARGET_BRANCH" || git checkout "$TARGET_BRANCH" 
 
         # Update the 'image' tag in deployment.yaml
-        sed -i '/image:/ s|:[^[:space:]]*|:'${NEW_IMAGE_TAG}'|' deployment.yaml
+        sed -i "s#image: .*#image: ${FULL_ACR_IMAGE}#g" deployment.yaml
 
         # Verify the changes
         echo "--- Contents of deployment.yaml after update ---"
