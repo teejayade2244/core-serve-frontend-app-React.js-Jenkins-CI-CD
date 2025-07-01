@@ -252,8 +252,6 @@ stages:
       NEW_IMAGE_TAG: '$(Build.BuildId)'
       PR_SOURCE_BRANCH_NAME: '$(System.PullRequest.SourceBranch)'
     steps:
-    - checkout: GitOpsRepo
-      displayName: 'Checkout GitOps Repository'
     # Clean the GitOps repository directory to ensure no stale files remain
     - bash: |
         TARGET_CLEAN_DIR="$(Agent.BuildDirectory)/s/kubernetes" 
@@ -265,7 +263,10 @@ stages:
           echo "Directory not found, no cleanup needed: ${TARGET_CLEAN_DIR}"
         fi
       displayName: 'Clean GitOps Repo Directory'
-    
+
+    - checkout: GitOpsRepo
+      displayName: 'Checkout GitOps Repository'
+      
     # Update the Kubernetes manifest with the new image tag
     - bash: |
         cd "$(Agent.BuildDirectory)/s/kubernetes"
