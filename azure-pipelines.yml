@@ -118,15 +118,16 @@ stages:
           extraProperties: |
               sonar.sources=src
               sonar.exclusions=**/node_modules/**,**/bin/**,**/obj/**
+              sonar.testExecutionReportPaths=test-results/junit.xml
 
     - task: SonarQubeAnalyze@5
       displayName: 'Run SonarQube Analysis'
      
-    - task: PublishBuildArtifacts@1
-      displayName: 'Publish SonarQube Reports'
-      inputs:
-        pathToPublish: '$(Build.SourcesDirectory)/.scannerwork/report-task.txt' 
-        artifactName: 'SonarQubeReports'
+    # - task: PublishBuildArtifacts@1
+    #   displayName: 'Publish SonarQube Reports'
+    #   inputs:
+    #     pathToPublish: '$(Build.SourcesDirectory)/.scannerwork/report-task.txt' 
+    #     artifactName: 'SonarQubeReports'
 
     - task: SonarQubePublish@5
       displayName: 'Publish SonarQube Results and Wait for Quality Gate'
