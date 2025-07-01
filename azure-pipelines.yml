@@ -257,7 +257,7 @@ stages:
     - checkout: GitOpsRepo
       displayName: 'Checkout GitOps Repository'
     - bash: |
-        cd "$(Agent.BuildDirectory)/GitOpsRepo/kubernetes"
+        cd "$(Agent.BuildDirectory)/s/kubernetes"
         echo "Current directory: $(pwd)"
         ls -la 
         git config user.email "temitope224468@gmail.com"
