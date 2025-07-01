@@ -216,4 +216,8 @@ stages:
       displayName: 'Publish Trivy Reports'
       inputs:
         pathToPublish: '$(Build.SourcesDirectory)/Trivy-Image-Reports'
+<<<<<<< HEAD
         artifactName: 'TrivyReports'
+=======
+        artifactName: 'TrivyReports'
+>>>>>>> 70b5e6b3712718a48704bc748452eda45ff276ae
