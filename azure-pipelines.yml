@@ -1,3 +1,6 @@
+variables:
+- group: MyProject-Env-Dev
+
 trigger:
   branches:
     include:
@@ -113,7 +116,7 @@ stages:
           SonarQube: 'sonarqube' # IMPORTANT: Ensure this is the EXACT name of your SonarQube Service Connection
           scannerMode: 'CLI'
           configMode: 'manual'
-          cliProjectKey: '$(SONARQUBE_PROJECT_KEY)' 
+          cliProjectKey: $(SONARQUBE_PROJECT_KEY)
           cliProjectName: 'temitope'
           extraProperties: |
               sonar.sources=src
