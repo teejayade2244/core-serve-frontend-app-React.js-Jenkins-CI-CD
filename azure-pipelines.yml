@@ -251,7 +251,7 @@ stages:
     variables:
       NEWAGE_TAG: '$(Build.BuildId)'
       PR_SOURCE_BRANCH_NAME: '$(System.PullRequest.SourceBranch)'
-      - group: MyProject-Env-Dev
+        - group: MyProject-Env-Dev
      
 
     steps:
