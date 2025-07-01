@@ -1,4 +1,6 @@
 module.exports = {
+    collectCoverage: true,
+    coverageReporters: ["lcov", "text"], // LCOV is for SonarQube
     reporters: [
         "default",
         [

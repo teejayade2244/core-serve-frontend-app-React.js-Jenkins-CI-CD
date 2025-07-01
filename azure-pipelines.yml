@@ -1,3 +1,6 @@
+variables:
+- group: MyProject-Env-Dev
+
 trigger:
   branches:
     include:
@@ -18,7 +21,7 @@ stages:
   - job: FrontendCI
     displayName: 'Frontend Continuous Integration'
     pool:
-      name: MyLinuxAgents 
+      name: MyLinuxAgents
     steps:
     - task: Bash@3 
       displayName: 'Clean node_modules and package-lock.json for PRs'
@@ -58,27 +61,26 @@ stages:
       workingDirectory: '$(Build.SourcesDirectory)'
 
     # ────── OWASP Dependency Check ──────
-    - bash: 'mkdir -p OWASP-security-reports'
-      displayName: 'Create OWASP Security Reports Directory'
-      workingDirectory: '$(Build.SourcesDirectory)'
+    # - bash: 'mkdir -p OWASP-security-reports'
+    #   displayName: 'Create OWASP Security Reports Directory'
+    #   workingDirectory: '$(Build.SourcesDirectory)'
     
-    - task: dependency-check-build-task@6
-      displayName: 'Run OWASP Dependency Check'
-      inputs:
-        projectName: 'core-serve-frontend-app'
-        scanPath: '$(Build.SourcesDirectory)'
-        format: 'HTML'
-        uploadReports: true
-        failOnCVSS: '8'
-        enableVerbose: true
-        additionalArguments: '--disableYarnAudit --disableNodeAudit'
-        nvdApiKey: '4de09a63-d6ac-46e6-a6b3-c78e9aeae5e8'
+    # - task: dependency-check-build-task@6
+    #   displayName: 'Run OWASP Dependency Check'
+    #   inputs:
+    #     projectName: 'core-serve-frontend-app'
+    #     scanPath: '$(Build.SourcesDirectory)'
+    #     format: 'HTML'
+    #     uploadReports: true
+    #     failOnCVSS: '8'
+    #     enableVerbose: true
+    #     nvdApiKey: '$(NVD_API_KEY)' 
 
-    - task: PublishBuildArtifacts@1
-      displayName: 'Publish OWASP Reports'
-      inputs:
-        pathToPublish: '$(Build.SourcesDirectory)/OWASP-security-reports'
-        artifactName: 'OWASPReports'
+    # - task: PublishBuildArtifacts@1
+    #   displayName: 'Publish OWASP Reports'
+    #   inputs:
+    #     pathToPublish: '$(Build.SourcesDirectory)/OWASP-security-reports'
+    #     artifactName: 'OWASPReports'
 
     # Create a directory for test results
     # ────── Unit Tests ──────
@@ -96,4 +98,122 @@ stages:
       inputs:
         testResultsFormat: 'JUnit' 
         testResultsFiles: '**/junit.xml' 
+        mergeResults: true
         failTaskOnFailedTests: true
+
+
+- stage: SonarQubeAnalysis
+  displayName: 'Static Analysis with SonarQube'
+  jobs:
+  - job: SonarScan
+    displayName: 'Run SonarQube Scan'
+    pool:
+      name: MyLinuxAgents
+    steps:
+    - task: SonarQubePrepare@5
+      displayName: 'Prepare SonarQube Analysis'
+      inputs:
+          SonarQube: 'sonarqube' # IMPORTANT: Ensure this is the EXACT name of your SonarQube Service Connection
+          scannerMode: 'CLI'
+          configMode: 'manual'
+          cliProjectKey: $(SONARQUBE_PROJECT_KEY)
+          cliProjectName: 'temitope'
+          extraProperties: |
+              sonar.sources=src
+              sonar.exclusions=**/node_modules/**,**/bin/**,**/obj/**
+            
+
+    - task: SonarQubeAnalyze@5
+      displayName: 'Run SonarQube Analysis'
+     
+    # - task: PublishBuildArtifacts@1
+    #   displayName: 'Publish SonarQube Reports'
+    #   inputs:
+    #     pathToPublish: '$(Build.SourcesDirectory)/.scannerwork/report-task.txt' 
+    #     artifactName: 'SonarQubeReports'
+
+    - task: SonarQubePublish@5
+      displayName: 'Publish SonarQube Results and Wait for Quality Gate'
+      inputs:
+        pollingTimeoutSec: '300' 
+
+
+- stage: BuildAndScanDockerImage
+  displayName: 'Build & Scan Docker Image'
+  jobs:
+  - job: DockerImageOps
+    displayName: 'Docker Image Build & Trivy Scan'
+    pool:
+      name: MyLinuxAgents
+    variables:
+      IMAGE_TAG: '$(Build.BuildId)' 
+      DOCKER_IMAGE_FULL_NAME: '$(ACR_REGISTRY_SERVER)/$(ACR_REPOSITORY_NAME):$(IMAGE_TAG)'
+    steps:
+    - task: Docker@2
+      displayName: 'Login to ACR'
+      inputs:
+        containerRegistry: 'my-acr-connection' 
+        command: 'login'
+
+    # Build and Tag Docker Image
+    # The 'Docker@2 build' command can directly tag the image with the full ACR path.
+    - task: Docker@2
+      displayName: 'Build and Tag Docker Image for ACR'
+      inputs:
+        containerRegistry: 'my-acr-connection' 
+        repository: '$(ACR_REPOSITORY_NAME)' 
+        command: 'build'
+        Dockerfile: 'Dockerfile' 
+        tags: '$(IMAGE_TAG)' 
+        buildContext: '$(Build.SourcesDirectory)' 
+
+    # Trivy Vulnerability Scan
+    # Ensure Trivy is installed on your self-hosted agent.
+    - bash: 'mkdir -p Trivy-Image-Reports'
+      displayName: 'Create Trivy Reports Directory'
+      workingDirectory: '$(Build.SourcesDirectory)'
+
+    - script: |
+        echo "Running Trivy Scan for MEDIUM severity..."
+        trivy image $(DOCKER_IMAGE_FULL_NAME) \
+          --severity LOW,MEDIUM \
+          --exit-code 0 \
+          --quiet \
+          --format json -o Trivy-Image-Reports/trivy-image-MEDIUM-results.json
+
+        echo "Running Trivy Scan for CRITICAL severity..."
+        trivy image $(DOCKER_IMAGE_FULL_NAME) \
+          --severity CRITICAL \
+          --exit-code 1 \
+          --quiet \
+          --format json -o Trivy-Image-Reports/trivy-image-CRITICAL-results.json
+      displayName: 'Run Trivy Vulnerability Scan'
+      workingDirectory: '$(Build.SourcesDirectory)'
+
+    # Convert Trivy reports to HTML and XML
+    # IMPORTANT: Ensure Trivy templates (html.tpl, junit.tpl) are present on your agent at `/usr/local/share/trivy/templates/`.
+    - script: |
+        echo "Converting Trivy JSON reports to HTML and XML..."
+        trivy convert \
+          --format template --template "@/usr/local/share/trivy/templates/html.tpl" \
+          --output Trivy-Image-Reports/trivy-image-MEDIUM-results.html Trivy-Image-Reports/trivy-image-MEDIUM-results.json
+
+        trivy convert \
+          --format template --template "@/usr/local/share/trivy/templates/html.tpl" \
+          --output Trivy-Image-Reports/trivy-image-CRITICAL-results.html Trivy-Image-Reports/trivy-image-CRITICAL-results.json
+
+        trivy convert \
+          --format template --template "@/usr/local/share/trivy/templates/junit.tpl" \
+          --output Trivy-Image-Reports/trivy-image-MEDIUM-results.xml Trivy-Image-Reports/trivy-image-MEDIUM-results.json
+
+        trivy convert \
+          --format template --template "@/usr/local/share/trivy/templates/junit.tpl" \
+          --output Trivy-Image-Reports/trivy-image-CRITICAL-results.xml Trivy-Image-Reports/trivy-image-CRITICAL-results.json
+      displayName: 'Convert Trivy Reports'
+      workingDirectory: '$(Build.SourcesDirectory)'
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Trivy Reports'
+      inputs:
+        pathToPublish: '$(Build.SourcesDirectory)/Trivy-Image-Reports'
+        artifactName: 'TrivyReports'
