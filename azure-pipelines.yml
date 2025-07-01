@@ -83,7 +83,7 @@ stages:
     #     artifactName: 'OWASPReports'
 
     # Create a directory for test results
-    # ────── Unit Tests ──────
+    # ────── Unit Tests ─────
     - bash: 'mkdir -p test-results'
       displayName: 'Create Test Results Directory'
       workingDirectory: '$(Build.SourcesDirectory)'
