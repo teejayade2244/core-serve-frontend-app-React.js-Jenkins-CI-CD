@@ -35,6 +35,13 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
+          # Azure DevOps built-in variables for branch name:
+          # Build.SourceBranch (e.g., refs/heads/master, refs/pull/123/merge)
+          # Build.SourceBranchName (e.g., master, pull/123/merge)
+          # System.PullRequest.PullRequestNumber (if it's a PR build)
+          
+          # Check if it's a PR build by looking for System.PullRequest.PullRequestNumber
+          # Or, check if the branch name contains 'pull/'
           if [[ "$(Build.SourceBranch)" == refs/pull/* ]]; then
             echo "This is a PR branch. Cleaning workspace before npm install."
             rm -rf node_modules package-lock.json || true
@@ -242,9 +249,10 @@ stages:
       name: MyLinuxAgents 
     
     variables:
-      - group: MyProject-Env-Dev 
+    - group: MyProject-Env-Dev 
       NEW_IMAGE_TAG: '$(Build.BuildId)'
       PR_SOURCE_BRANCH_NAME: '$(System.PullRequest.SourceBranch)'
+
     steps:
     # Clean the GitOps repository directory to ensure no stale files remain
     - bash: |
