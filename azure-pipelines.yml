@@ -1,6 +1,3 @@
-variables:
-- group: MyProject-Env-Dev
-
 trigger:
   branches:
     include:
@@ -22,6 +19,8 @@ pool:
   name: MyLinuxAgents 
 
 stages:
+variables:
+- group: MyProject-Env-Dev
 - stage: BuildAndTest
   displayName: 'Build and Test Frontend'
   jobs:
