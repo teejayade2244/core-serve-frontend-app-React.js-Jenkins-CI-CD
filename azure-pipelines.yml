@@ -112,6 +112,7 @@ stages:
       inputs:
         SonarQube: 'sonarqube' 
         scannerMode: 'CLI'
+        configMode: 'manual'
         projectKey: 'temitope_temitope_AZfDZjVNGDuyZaniNcK3'
         projectName: 'temitope' 
         extraProperties: |
