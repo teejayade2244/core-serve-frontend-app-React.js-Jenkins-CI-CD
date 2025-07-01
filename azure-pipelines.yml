@@ -251,7 +251,6 @@ stages:
     variables:
       NEW_IMAGE_TAG: '$(Build.BuildId)'
       PR_SOURCE_BRANCH_NAME: '$(System.PullRequest.SourceBranch)'
-      FULL_ACR_IMAGE: '$(ACR_REGISTRY_SERVER)/$(ACR_REPOSITORY_NAME):$(NEW_IMAGE_TAG)'
 
     steps:
     - checkout: GitOpsRepo
@@ -260,10 +259,13 @@ stages:
         cd "$(Agent.BuildDirectory)/s/kubernetes"
         echo "Current directory: $(pwd)"
         ls -la
-        echo "DEBUG: ACR_REGISTRY_SERVER = $(ACR_REGISTRY_SERVER)"
-        echo "DEBUG: ACR_REPOSITORY_NAME = $(ACR_REPOSITORY_NAME)"
-        echo "DEBUG: NEW_IMAGE_TAG = ${NEW_IMAGE_TAG}"
-        echo "DEBUG: FULL_ACR_IMAGE = ${FULL_ACR_IMAGE}" 
+        FULL_ACR_IMAGE="${ACR_REGISTRY_SERVER}/${ACR_REPOSITORY_NAME}:${NEW_IMAGE_TAG}"
+
+        # --- Re-add DEBUG lines to verify the bash-constructed variable ---
+        echo "DEBUG (Bash-constructed): ACR_REGISTRY_SERVER = ${ACR_REGISTRY_SERVER}"
+        echo "DEBUG (Bash-constructed): ACR_REPOSITORY_NAME = ${ACR_REPOSITORY_NAME}"
+        echo "DEBUG (Bash-constructed): NEW_IMAGE_TAG = ${NEW_IMAGE_TAG}"
+        echo "DEBUG (Bash-constructed): FULL_ACR_IMAGE = ${FULL_ACR_IMAGE}"
         git config user.email "temitope224468@gmail.com"
         git config user.name "Azure DevOps Pipeline" 
         TARGET_BRANCH="feature-$(PR_SOURCE_BRANCH_NAME)" 
