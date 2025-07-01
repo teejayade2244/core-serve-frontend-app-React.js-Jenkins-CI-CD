@@ -110,14 +110,14 @@ stages:
     - task: SonarQubePrepare@5
       displayName: 'Prepare SonarQube Analysis'
       inputs:
-        SonarQube: 'sonarqube' 
-        scannerMode: 'CLI'
-        configMode: 'manual'
-        projectKey: 'temitope_temitope_AZfDZjVNGDuyZaniNcK3'
-        projectName: 'temitope' 
-        extraProperties: |
-            sonar.sources=src
-            sonar.exclusions=**/node_modules/**,**/bin/**,**/obj/**
+          SonarQube: 'sonarqube' # IMPORTANT: Ensure this is the EXACT name of your SonarQube Service Connection
+          scannerMode: 'CLI'
+          configMode: 'manual'
+          cliProjectKey: 'temitope_temitope_AZfDZjVNGDuyZaniNcK3' 
+          cliProjectName: 'temitope'
+          extraProperties: |
+              sonar.sources=src
+              sonar.exclusions=**/node_modules/**,**/bin/**,**/obj/**
 
     - task: SonarQubeAnalyze@5
       displayName: 'Run SonarQube Analysis'
