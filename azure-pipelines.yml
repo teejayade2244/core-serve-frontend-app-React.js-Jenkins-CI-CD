@@ -118,7 +118,7 @@ stages:
           extraProperties: |
               sonar.sources=src
               sonar.exclusions=**/node_modules/**,**/bin/**,**/obj/**
-             
+            
 
     - task: SonarQubeAnalyze@5
       displayName: 'Run SonarQube Analysis'
@@ -143,6 +143,8 @@ stages:
     pool:
       name: MyLinuxAgents
     variables:
+      ACR_REGISTRY_SERVER: 'demotesting2332.azurecr.io'
+      ACR_REPOSITORY_NAME:  'demotesting2332'
       IMAGE_TAG: '$(Build.BuildId)' 
       DOCKER_IMAGE_FULL_NAME: '$(ACR_REGISTRY_SERVER)/$(ACR_REPOSITORY_NAME):$(IMAGE_TAG)'
     steps:
