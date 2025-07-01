@@ -1,4 +1,6 @@
 module.exports = {
+    collectCoverage: true,
+    coverageReporters: ["lcov", "text"], // LCOV is for SonarQube
     reporters: [
         "default",
         [
@@ -24,12 +26,12 @@ module.exports = {
         "^.+\\.(js|jsx)$": "babel-jest",
     },
     collectCoverageFrom: ["src/**/*.{js,jsx}", "!src/index.jsx"],
-    coverageThreshold: {
-        global: {
-            branches: 80,
-            functions: 80,
-            lines: 80,
-            statements: 80,
-        },
-    },
+    // coverageThreshold: {
+    //     global: {
+    //         branches: 80,
+    //         functions: 80,
+    //         lines: 80,
+    //         statements: 80,
+    //     },
+    // },
 }

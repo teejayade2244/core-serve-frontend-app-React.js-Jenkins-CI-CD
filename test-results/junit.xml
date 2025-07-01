@@ -1,4 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="12" failures="0" errors="0" time="43">
+  <testsuite name="src\components\__tests__\Footer.test.jsx" errors="0" failures="0" skipped="0" timestamp="2025-07-01T12:29:31" time="4.571" tests="1">
+    <testcase classname="Footer Component" name="renders the Footer correctly" time="0.432">
+    </testcase>
+  </testsuite>
+  <testsuite name="src\components\__tests__\Modal.test.jsx" errors="0" failures="0" skipped="0" timestamp="2025-07-01T12:29:31" time="5.062" tests="2">
+    <testcase classname="Modal Component" name="renders the Modal correctly" time="0.378">
+    </testcase>
+    <testcase classname="Modal Component" name="closes the Modal when the close button is clicked" time="0.179">
+    </testcase>
+  </testsuite>
+  <testsuite name="src\pages\LoginPage\__tests__\LoginPage.test.jsx" errors="0" failures="0" skipped="0" timestamp="2025-07-01T12:29:31" time="6.388" tests="5">
+    <testcase classname="LoginPage" name="renders login form" time="0.206">
+    </testcase>
+    <testcase classname="LoginPage" name="renders the LoginPage correctly" time="0.193">
+    </testcase>
+    <testcase classname="LoginPage" name="displays validation errors when fields are empty" time="0.122">
+    </testcase>
+    <testcase classname="LoginPage" name="handles user input correctly" time="0.034">
+    </testcase>
+    <testcase classname="LoginPage" name="displays loading state when isLoading is true" time="0.018">
+    </testcase>
+  </testsuite>
+  <testsuite name="src\components\__tests__\Header.test.jsx" errors="0" failures="0" skipped="0" timestamp="2025-07-01T12:29:31" time="36.857" tests="1">
+    <testcase classname="Header Component" name="renders the Header correctly" time="0.322">
+    </testcase>
+  </testsuite>
+  <testsuite name="src\pages\HomePage\__tests__\mainHomePage.test.jsx" errors="0" failures="0" skipped="0" timestamp="2025-07-01T12:29:31" time="38.282" tests="3">
+    <testcase classname="LayOut Component" name="renders user details correctly" time="0.353">
+    </testcase>
+    <testcase classname="LayOut Component" name="shows the modal when &apos;Apply for Correction/Rearrangement of Name&apos; is clicked" time="0.132">
+    </testcase>
+    <testcase classname="LayOut Component" name="renders the loading skeleton when data is loading" time="0.061">
     </testcase>
   </testsuite>
 </testsuites>

@@ -32,9 +32,7 @@ beforeAll(() => {
     })
 })
 
-afterAll(() => {
-    console.warn.mockRestore()
-})
+
 
 const mockStore = configureStore([])
 
