@@ -19,7 +19,7 @@ stages:
   displayName: 'Build and Test Frontend'
   jobs:
   - job: FrontendCI
-    displayName: 'Frontend Continuous Integration'
+    displayName: 'Frontend Continuous Integration (Build, Unit Tests and Dependency scans)'
     pool:
       name: MyLinuxAgents
     steps:
@@ -149,6 +149,7 @@ stages:
       IMAGE_TAG: '$(Build.BuildId)' 
       DOCKER_IMAGE_FULL_NAME: '$(ACR_REGISTRY_SERVER)/$(ACR_REPOSITORY_NAME):$(IMAGE_TAG)'
     steps:
+    # Login to Azure Container Registry (ACR)
     - task: Docker@2
       displayName: 'Login to ACR'
       inputs:
@@ -156,7 +157,6 @@ stages:
         command: 'login'
 
     # Build and Tag Docker Image
-    # The 'Docker@2 build' command can directly tag the image with the full ACR path.
     - task: Docker@2
       displayName: 'Build and Tag Docker Image for ACR'
       inputs:
@@ -168,7 +168,6 @@ stages:
         buildContext: '$(Build.SourcesDirectory)' 
 
     # Trivy Vulnerability Scan
-    # Ensure Trivy is installed on your self-hosted agent.
     - bash: 'mkdir -p Trivy-Image-Reports'
       displayName: 'Create Trivy Reports Directory'
       workingDirectory: '$(Build.SourcesDirectory)'
@@ -212,12 +211,18 @@ stages:
       displayName: 'Convert Trivy Reports'
       workingDirectory: '$(Build.SourcesDirectory)'
 
+    # Publish Trivy reports as build artifacts
     - task: PublishBuildArtifacts@1
       displayName: 'Publish Trivy Reports'
       inputs:
         pathToPublish: '$(Build.SourcesDirectory)/Trivy-Image-Reports'
-<<<<<<< HEAD
         artifactName: 'TrivyReports'
-=======
-        artifactName: 'TrivyReports'
->>>>>>> 70b5e6b3712718a48704bc748452eda45ff276ae
+
+    # Push Docker Image to ACR
+    - task: Docker@2
+      displayName: 'Push Docker Image to ACR'
+      inputs:
+        containerRegistry: 'my-acr-connection' 
+        repository: '$(ACR_REPOSITORY_NAME)' 
+        command: 'push'
+        tags: '$(IMAGE_TAG)' 
