@@ -357,7 +357,7 @@ stages:
   - job: ApprovePR
     displayName: 'Await Manual PR Approval'
     pool:
-      name: MyLinuxAgents
+      name: server
     steps:
     - task: ManualValidation@0
       displayName: 'Approve PR for Master Branch Merge'
