@@ -267,7 +267,12 @@ stages:
 
     - checkout: GitOpsRepo
       displayName: 'Checkout GitOps Repository'
-
+    - bash: |
+        echo "ACR_REGISTRY_SERVER: ${ACR_REGISTRY_SERVER}"
+        echo "ACR_REPOSITORY_NAME: ${ACR_REPOSITORY_NAME}"
+        echo "NEW_IMAGE_TAG: ${NEW_IMAGE_TAG}"
+        echo "Full image path would be: ${ACR_REGISTRY_SERVER}/${ACR_REPOSITORY_NAME}:${NEW_IMAGE_TAG}"
+      displayName: 'Verify ACR Variables'
     # Update the Kubernetes manifest with the new image tag
     - bash: |
         cd "$(Agent.BuildDirectory)/s/kubernetes"
