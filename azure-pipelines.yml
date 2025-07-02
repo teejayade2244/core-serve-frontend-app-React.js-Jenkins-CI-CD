@@ -1,5 +1,11 @@
 variables:
   - group: MyProject-Env-Dev
+  - name: PR_SOURCE_BRANCH_NAME
+    value: '$(System.PullRequest.SourceBranch)'
+  - name: NEW_IMAGE_TAG
+    value: '$(Build.BuildId)'
+  - name: GITHUB_REPO
+    value: 'teejayade2244/Azure-DevOps-Terraform-Iac'
 
 trigger:
   branches:
@@ -242,12 +248,12 @@ stages:
   dependsOn: BuildAndScanDockerImage
   condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
   
-  variables:
-    - group: MyProject-Env-Dev
-    - name: NEW_IMAGE_TAG
-      value: '$(Build.BuildId)'
-    - name: GITHUB_REPO
-      value: 'teejayade2244/Azure-DevOps-Terraform-Iac'
+  # variables:
+  #   - group: MyProject-Env-Dev
+  #   - name: NEW_IMAGE_TAG
+  #     value: '$(Build.BuildId)'
+  #   - name: GITHUB_REPO
+  #     value: 'teejayade2244/Azure-DevOps-Terraform-Iac'
 
   jobs:
   - job: UpdateK8SManifest
@@ -322,6 +328,12 @@ stages:
         PR_BODY="Updated Docker Image in deployment manifest for build $(Build.BuildId)"
         PR_HEAD_BRANCH="feature-$(PR_SOURCE_BRANCH_NAME)" 
         PR_BASE_BRANCH="master" 
+        echo "DEBUG: NEW_IMAGE_TAG (global) = $(NEW_IMAGE_TAG)"
+        echo "DEBUG: PR_SOURCE_BRANCH_NAME (global) = $(PR_SOURCE_BRANCH_NAME)"
+        echo "DEBUG: SOURCE_BRANCH_SIMPLE = ${SOURCE_BRANCH_SIMPLE}"
+        echo "DEBUG: PR_HEAD_BRANCH (constructed for PR API) = ${PR_HEAD_BRANCH}"
+        echo "DEBUG: PR_BASE_BRANCH = ${PR_BASE_BRANCH}"
+        echo "DEBUG: GITHUB_REPO (from K8SImageUpdateStaging stage variable) = $(GITHUB_REPO)"
 
         curl -X POST https://api.github.com/repos/teejayade2244/Azure-DevOps-Terraform-Iac/pulls \
         -H "Authorization: Bearer $(GITHUB_PAT_FOR_GITOPS)" \
@@ -335,6 +347,23 @@ stages:
             "assignees": ["teejayade2244"]
         }'
       displayName: 'Create GitHub Pull Request'
+
+
+- stage: ManualApproval
+  displayName: 'Manual Approval for Deployment'
+  dependsOn: GitHubRaisePR
+  condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
+  jobs:
+  - job: ApprovePR
+    displayName: 'Await Manual PR Approval'
+    pool:
+      name: MyLinuxAgents
+    steps:
+    - task: ManualValidation@0
+      displayName: 'Approve PR for Master Branch Merge'
+      inputs:
+        instructions: 'The Kubernetes manifest has been updated and a Pull Request has been created in the GitOps repository. Please review and merge the PR on GitHub to proceed with the deployment. Once merged, approve this step to allow the pipeline to complete.'
+        timeoutInMinutes: 2880
 
 
 
