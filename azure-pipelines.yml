@@ -22,50 +22,50 @@ pool:
   name: MyLinuxAgents 
 
 stages:
-- stage: BuildAndTest
-  displayName: 'Build and Test Frontend'
-  jobs:
-  - job: FrontendCI
-    displayName: 'Frontend Continuous Integration (Build, Unit Tests and Dependency scans)'
-    pool:
-      name: MyLinuxAgents
-    steps:
-    - task: Bash@3 
-      displayName: 'Clean node_modules and package-lock.json for PRs'
-      inputs:
-        targetType: 'inline'
-        script: |
-          # Azure DevOps built-in variables for branch name:
-          # Build.SourceBranch (e.g., refs/heads/master, refs/pull/123/merge)
-          # Build.SourceBranchName (e.g., master, pull/123/merge)
-          # System.PullRequest.PullRequestNumber (if it's a PR build)
+# - stage: BuildAndTest
+#   displayName: 'Build and Test Frontend'
+#   jobs:
+#   - job: FrontendCI
+#     displayName: 'Frontend Continuous Integration (Build, Unit Tests and Dependency scans)'
+#     pool:
+#       name: MyLinuxAgents
+#     steps:
+#     - task: Bash@3 
+#       displayName: 'Clean node_modules and package-lock.json for PRs'
+#       inputs:
+#         targetType: 'inline'
+#         script: |
+#           # Azure DevOps built-in variables for branch name:
+#           # Build.SourceBranch (e.g., refs/heads/master, refs/pull/123/merge)
+#           # Build.SourceBranchName (e.g., master, pull/123/merge)
+#           # System.PullRequest.PullRequestNumber (if it's a PR build)
           
-          # Check if it's a PR build by looking for System.PullRequest.PullRequestNumber
-          # Or, check if the branch name contains 'pull/'
-          if [[ "$(Build.SourceBranch)" == refs/pull/* ]]; then
-            echo "This is a PR branch. Cleaning workspace before npm install."
-            rm -rf node_modules package-lock.json || true
-          else
-            echo "Not a PR branch. Skipping pre-install cleanup."
-          fi
-        workingDirectory: '$(Build.SourcesDirectory)' 
+#           # Check if it's a PR build by looking for System.PullRequest.PullRequestNumber
+#           # Or, check if the branch name contains 'pull/'
+#           if [[ "$(Build.SourceBranch)" == refs/pull/* ]]; then
+#             echo "This is a PR branch. Cleaning workspace before npm install."
+#             rm -rf node_modules package-lock.json || true
+#           else
+#             echo "Not a PR branch. Skipping pre-install cleanup."
+#           fi
+#         workingDirectory: '$(Build.SourcesDirectory)' 
 
-    # Using Node.js Tool Installer task for specific Node.js version
-    # ────── Setup and Install ──────
-    - task: NodeTool@0
-      displayName: 'Use Node.js 22.x' 
-      inputs:
-        versionSpec: '22.x' 
+#     # Using Node.js Tool Installer task for specific Node.js version
+#     # ────── Setup and Install ──────
+#     - task: NodeTool@0
+#       displayName: 'Use Node.js 22.x' 
+#       inputs:
+#         versionSpec: '22.x' 
 
-    - script: npm install --no-audit
-      displayName: 'Install Node.js Dependencies'
-      workingDirectory: '$(Build.SourcesDirectory)'
+#     - script: npm install --no-audit
+#       displayName: 'Install Node.js Dependencies'
+#       workingDirectory: '$(Build.SourcesDirectory)'
 
-    - script: |
-        echo "Running NPM Audit..."
-        npm audit --audit-level=critical
-      displayName: 'Run NPM Audit'
-      workingDirectory: '$(Build.SourcesDirectory)'
+#     - script: |
+#         echo "Running NPM Audit..."
+#         npm audit --audit-level=critical
+#       displayName: 'Run NPM Audit'
+#       workingDirectory: '$(Build.SourcesDirectory)'
 
     # ────── OWASP Dependency Check ──────
     # - bash: 'mkdir -p OWASP-security-reports'
@@ -91,54 +91,54 @@ stages:
 
     # Create a directory for test results
     # ────── Unit Tests ──────
-    - bash: 'mkdir -p test-results'
-      displayName: 'Create Test Results Directory'
-      workingDirectory: '$(Build.SourcesDirectory)'
+    # - bash: 'mkdir -p test-results'
+    #   displayName: 'Create Test Results Directory'
+    #   workingDirectory: '$(Build.SourcesDirectory)'
 
-    - script: npm test
-      displayName: 'Run Unit Tests'
-      workingDirectory: '$(Build.SourcesDirectory)'
+    # - script: npm test
+    #   displayName: 'Run Unit Tests'
+    #   workingDirectory: '$(Build.SourcesDirectory)'
 
-    # Publish test results (assuming 'npm test' generates a JUnit-compatible report)
-    - task: PublishTestResults@2
-      displayName: 'Publish Unit Test Results'
-      inputs:
-        testResultsFormat: 'JUnit' 
-        testResultsFiles: '**/junit.xml' 
-        mergeResults: true
-        failTaskOnFailedTests: true
+    # # Publish test results (assuming 'npm test' generates a JUnit-compatible report)
+    # - task: PublishTestResults@2
+    #   displayName: 'Publish Unit Test Results'
+    #   inputs:
+    #     testResultsFormat: 'JUnit' 
+    #     testResultsFiles: '**/junit.xml' 
+    #     mergeResults: true
+    #     failTaskOnFailedTests: true
 
 
-- stage: SonarQubeAnalysis
-  displayName: 'Static Analysis with SonarQube'
-  jobs:
-  - job: SonarScan
-    displayName: 'Run SonarQube Scan'
-    pool:
-      name: MyLinuxAgents
-    steps:
-    - task: SonarQubePrepare@5
-      displayName: 'Prepare SonarQube Analysis'
-      inputs:
-          SonarQube: 'sonarqube'
-          scannerMode: 'CLI'
-          configMode: 'manual'
-          cliProjectKey: $(SONARQUBE_PROJECT_KEY)
-          cliProjectName: 'temitope'
-          extraProperties: |
-              sonar.sources=src
-              sonar.exclusions=**/node_modules/**,**/bin/**,**/obj/**
+# - stage: SonarQubeAnalysis
+#   displayName: 'Static Analysis with SonarQube'
+#   jobs:
+#   - job: SonarScan
+#     displayName: 'Run SonarQube Scan'
+#     pool:
+#       name: MyLinuxAgents
+#     steps:
+#     - task: SonarQubePrepare@5
+#       displayName: 'Prepare SonarQube Analysis'
+#       inputs:
+#           SonarQube: 'sonarqube'
+#           scannerMode: 'CLI'
+#           configMode: 'manual'
+#           cliProjectKey: $(SONARQUBE_PROJECT_KEY)
+#           cliProjectName: 'temitope'
+#           extraProperties: |
+#               sonar.sources=src
+#               sonar.exclusions=**/node_modules/**,**/bin/**,**/obj/**
             
 
-    - task: SonarQubeAnalyze@5
-      displayName: 'Run SonarQube Analysis'
-      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest')) 
+#     - task: SonarQubeAnalyze@5
+#       displayName: 'Run SonarQube Analysis'
+#       condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest')) 
      
-    - task: SonarQubePublish@5
-      displayName: 'Publish SonarQube Results and Wait for Quality Gate'
-      inputs:
-        pollingTimeoutSec: '300' 
-      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest')) # This ensures the SonarQube publish step runs only for non-PR builds
+#     - task: SonarQubePublish@5
+#       displayName: 'Publish SonarQube Results and Wait for Quality Gate'
+#       inputs:
+#         pollingTimeoutSec: '300' 
+#       condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest')) # This ensures the SonarQube publish step runs only for non-PR builds
 
 
 - stage: BuildAndScanDockerImage
@@ -240,77 +240,163 @@ stages:
 - stage: K8SImageUpdateStaging
   displayName: 'K8S Image Update'
   dependsOn: BuildAndScanDockerImage
-  condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest')) # Run only for PRs
+  condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
+  
+  variables:
+    # Reference variable group FIRST
+    - group: MyProject-Env-Dev
+    
+    # Then define stage-level variables
+    - name: NEW_IMAGE_TAG
+      value: '$(Build.BuildId)'
+    - name: GITHUB_REPO
+      value: 'teejayade2244/Azure-DevOps-Terraform-Iac'
+    - name: ACR_NAME
+      value: 'myacr'  # REPLACE with your actual ACR name
+
   jobs:
   - job: UpdateK8SManifest
     displayName: 'Update K8S Manifest in GitOps Repo'
     pool:
-      name: MyLinuxAgents 
+      name: MyLinuxAgents
     
-    variables:
-      - group: MyProject-Env-Dev  
-      - name: NEW_IMAGE_TAG
-        value: '$(Build.BuildId)'
-      - name: PR_SOURCE_BRANCH
-        value: '$(System.PullRequest.SourceBranch)'  
-      - name: GITHUB_REPO
-        value: 'teejayade2244/Azure-DevOps-Terraform-Iac'
-
     steps:
-    # Clean the GitOps repository directory
+    # First verify ALL variables
     - bash: |
-        set -e  
-        TARGET_CLEAN_DIR="$(Agent.BuildDirectory)/s/kubernetes" 
-        echo "Cleaning directory: ${TARGET_CLEAN_DIR}"
-        rm -rf "${TARGET_CLEAN_DIR}" || true
+        echo "##[group]Variable Verification"
+        echo "ACR_NAME: $(ACR_NAME)"
+        echo "ACR_REGISTRY_SERVER: $(ACR_REGISTRY_SERVER)"
+        echo "ACR_REPOSITORY_NAME: $(ACR_REPOSITORY_NAME)"
+        echo "NEW_IMAGE_TAG: $(NEW_IMAGE_TAG)"
+        echo "GITHUB_PAT_FOR_GITOPS: $(GITHUB_PAT_FOR_GITOPS)"  # Should show as masked
+        echo "##[endgroup]"
+        
+        # Fail if required variables are missing
+        if [ -z "$(ACR_REGISTRY_SERVER)" ]; then
+          echo "##vso[task.logissue type=error]ACR_REGISTRY_SERVER is not set!"
+          echo "##vso[task.complete result=Failed;]"
+          exit 1
+        fi
+        
+        if [ -z "$(ACR_REPOSITORY_NAME)" ]; then
+          echo "##vso[task.logissue type=error]ACR_REPOSITORY_NAME is not set!"
+          echo "##vso[task.complete result=Failed;]"
+          exit 1
+        fi
+      displayName: 'Verify All Required Variables'
+
+    - bash: |
+        rm -rf "$(Agent.BuildDirectory)/s/kubernetes" || true
       displayName: 'Clean GitOps Repo Directory'
 
     - checkout: GitOpsRepo
       displayName: 'Checkout GitOps Repository'
+
     - bash: |
-        echo "ACR_REGISTRY_SERVER: ${ACR_REGISTRY_SERVER}"
-        echo "ACR_REPOSITORY_NAME: ${ACR_REPOSITORY_NAME}"
-        echo "NEW_IMAGE_TAG: ${NEW_IMAGE_TAG}"
-        echo "Full image path would be: ${ACR_REGISTRY_SERVER}/${ACR_REPOSITORY_NAME}:${NEW_IMAGE_TAG}"
-      displayName: 'Verify ACR Variables'
-    # Update the Kubernetes manifest with the new image tag
-    - bash: |
+        set -e
         cd "$(Agent.BuildDirectory)/s/kubernetes"
-        echo "Current directory: $(pwd)"
-        ls -la
         
-        FULL_ACR_IMAGE="${ACR_REGISTRY_SERVER}/${ACR_REPOSITORY_NAME}:${NEW_IMAGE_TAG}"
-        echo "Image path: ${FULL_ACR_IMAGE}"
-        
-        # Show current deployment.yaml
-        echo "--- Current deployment.yaml ---"
-        cat deployment.yaml
-        echo "-------------------------------"
+        # Construct FULL image path
+        FULL_ACR_IMAGE="$(ACR_REGISTRY_SERVER)/$(ACR_REPOSITORY_NAME):$(NEW_IMAGE_TAG)"
+        echo "##[section]Updating to image: ${FULL_ACR_IMAGE}"
         
         # Configure git
         git config user.email "temitope224468@gmail.com"
         git config user.name "Azure DevOps Pipeline"
         
-        # Extract branch name without refs/heads/ prefix
-        BRANCH_NAME=${PR_SOURCE_BRANCH#refs/heads/}
+        # Handle branch name
+        BRANCH_NAME=$(echo "$(System.PullRequest.SourceBranch)" | sed 's/refs\/heads\///')
         TARGET_BRANCH="update-${BRANCH_NAME}"
-        echo "Creating/checking out branch: ${TARGET_BRANCH}"
+        echo "Working with branch: ${TARGET_BRANCH}"
         
-        # Create or checkout branch
+        # Branch management
         git checkout -b "${TARGET_BRANCH}" 2>/dev/null || git checkout "${TARGET_BRANCH}"
         
-        # Update image tag in deployment.yaml
-        sed -i "s#image: .*#image: ${FULL_ACR_IMAGE}#" deployment.yaml
+        # Update deployment.yaml
+        echo "Current image in deployment.yaml:"
+        grep 'image:' deployment.yaml
         
-        # Verify changes
-        echo "--- Updated deployment.yaml ---"
+        echo "Updating image..."
+        sed -i "s|image: .*|image: ${FULL_ACR_IMAGE}|" deployment.yaml
+        
+        echo "Updated deployment.yaml:"
         cat deployment.yaml
-        echo "-------------------------------"
         
         # Commit and push
         git add deployment.yaml
-        git commit -m "CI: Update image to ${NEW_IMAGE_TAG} for PR $(System.PullRequest.PullRequestId)"
+        git commit -m "CI: Update image to $(NEW_IMAGE_TAG) [skip ci]"
         
-        echo "Pushing to ${GITHUB_REPO} branch ${TARGET_BRANCH}"
-        git push https://$(GITHUB_PAT_FOR_GITOPS)@github.com/${GITHUB_REPO}.git "${TARGET_BRANCH}"
-      displayName: 'Update Kubernetes Manifest and Push'
+        echo "Pushing changes..."
+        git push https://$(GITHUB_PAT_FOR_GITOPS)@github.com/$(GITHUB_REPO).git "${TARGET_BRANCH}"
+      displayName: 'Update Kubernetes Manifest'
+      env:
+        GITHUB_PAT_FOR_GITOPS: $(GITHUB_PAT_FOR_GITOPS)
+
+
+# - stage: K8SImageUpdateStaging
+#   displayName: 'K8S Image Update'
+#   dependsOn: BuildAndScanDockerImage
+#   condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest')) # Run only for PRs
+  
+#   jobs:
+#   - job: UpdateK8SManifest
+#     displayName: 'Update K8S Manifest in GitOps Repo'
+#     pool:
+#       name: MyLinuxAgents 
+    
+#     variables:
+#       NEW_IMAGE_TAG: '$(Build.BuildId)'
+#       PR_SOURCE_BRANCH_NAME: '$(System.PullRequest.SourceBranch)'
+  
+
+#     steps:
+#     # Clean the GitOps repository directory to ensure no stale files remain
+#     - bash: |
+#         TARGET_CLEAN_DIR="$(Agent.BuildDirectory)/s/kubernetes" 
+#         echo "Attempting to clean directory: ${TARGET_CLEAN_DIR}"
+#         if [ -d "${TARGET_CLEAN_DIR}" ]; then
+#           echo "Removing existing directory: ${TARGET_CLEAN_DIR}"
+#           rm -rf "${TARGET_CLEAN_DIR}"
+#         else
+#           echo "Directory not found, no cleanup needed: ${TARGET_CLEAN_DIR}"
+#         fi
+#       displayName: 'Clean GitOps Repo Directory'
+
+#     - checkout: GitOpsRepo
+#       displayName: 'Checkout GitOps Repository'
+
+#     # Update the Kubernetes manifest with the new image tag
+#     - bash: |
+#         cd "$(Agent.BuildDirectory)/s/kubernetes"
+#         echo "Current directory: $(pwd)"
+#         ls -la
+#         FULL_ACR_IMAGE="${ACR_REGISTRY_SERVER}/${ACR_REPOSITORY_NAME}:${NEW_IMAGE_TAG}"
+#         echo "DEBUG (Bash-constructed): ACR_REGISTRY_SERVER = ${ACR_REGISTRY_SERVER}"
+#         echo "DEBUG (Bash-constructed): ACR_REPOSITORY_NAME = ${ACR_REPOSITORY_NAME}"
+#         echo "DEBUG: NEW_IMAGE_TAG = ${NEW_IMAGE_TAG}"
+#         echo "DEBUG (Bash-constructed): FULL_ACR_IMAGE = ${FULL_ACR_IMAGE}"
+#         echo "--- Contents of deployment.yaml BEFORE update ---"
+#         cat deployment.yaml
+#         echo "------------------------------------------------"
+#         git config user.email "temitope224468@gmail.com"
+#         git config user.name "Azure DevOps Pipeline" 
+#         TARGET_BRANCH="feature-$(PR_SOURCE_BRANCH_NAME)" 
+#         echo "Target branch for update: $TARGET_BRANCH"
+#         # Checkout to the new feature branch. 
+#         git checkout -b "$TARGET_BRANCH" || git checkout "$TARGET_BRANCH" 
+
+#         # Update the 'image' tag in deployment.yaml
+#         sed -i "s#image: .*#image: ${FULL_ACR_IMAGE}#g" deployment.yaml
+
+#         # Verify the changes
+#         echo "--- Contents of deployment.yaml after update ---"
+#         cat deployment.yaml
+#         echo "--------------------------------------------"
+
+#         git add deployment.yaml
+#         git commit -m "Azure DevOps Pipeline: Updated image tag to ${NEW_IMAGE_TAG} for PR $(System.PullRequest.PullRequestId)"
+#         # Push the changes to the GitOps repository
+#         echo "Pushing changes to GitOps repository..."
+#         git push https://$(GITHUB_PAT_FOR_GITOPS)@github.com/teejayade2244/Azure-DevOps-Terraform-Iac.git "$TARGET_BRANCH"
+#       displayName: 'Update Kubernetes Manifest and Push'
+#       workingDirectory: '$(Agent.BuildDirectory)' # This is the base directory for the agent's work
