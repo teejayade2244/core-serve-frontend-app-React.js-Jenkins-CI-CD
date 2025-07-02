@@ -28,50 +28,50 @@ pool:
   name: MyLinuxAgents 
 
 stages:
-# - stage: BuildAndTest
-#   displayName: 'Build and Test Frontend'
-#   jobs:
-#   - job: FrontendCI
-#     displayName: 'Frontend Continuous Integration (Build, Unit Tests and Dependency scans)'
-#     pool:
-#       name: MyLinuxAgents
-#     steps:
-#     - task: Bash@3 
-#       displayName: 'Clean node_modules and package-lock.json for PRs'
-#       inputs:
-#         targetType: 'inline'
-#         script: |
-#           # Azure DevOps built-in variables for branch name:
-#           # Build.SourceBranch (e.g., refs/heads/master, refs/pull/123/merge)
-#           # Build.SourceBranchName (e.g., master, pull/123/merge)
-#           # System.PullRequest.PullRequestNumber (if it's a PR build)
+- stage: BuildAndTest
+  displayName: 'Build and Test Frontend'
+  jobs:
+  - job: FrontendCI
+    displayName: 'Frontend Continuous Integration (Build, Unit Tests and Dependency scans)'
+    pool:
+      name: MyLinuxAgents
+    steps:
+    - task: Bash@3 
+      displayName: 'Clean node_modules and package-lock.json for PRs'
+      inputs:
+        targetType: 'inline'
+        script: |
+          # Azure DevOps built-in variables for branch name:
+          # Build.SourceBranch (e.g., refs/heads/master, refs/pull/123/merge)
+          # Build.SourceBranchName (e.g., master, pull/123/merge)
+          # System.PullRequest.PullRequestNumber (if it's a PR build)
           
-#           # Check if it's a PR build by looking for System.PullRequest.PullRequestNumber
-#           # Or, check if the branch name contains 'pull/'
-#           if [[ "$(Build.SourceBranch)" == refs/pull/* ]]; then
-#             echo "This is a PR branch. Cleaning workspace before npm install."
-#             rm -rf node_modules package-lock.json || true
-#           else
-#             echo "Not a PR branch. Skipping pre-install cleanup."
-#           fi
-#         workingDirectory: '$(Build.SourcesDirectory)' 
+          # Check if it's a PR build by looking for System.PullRequest.PullRequestNumber
+          # Or, check if the branch name contains 'pull/'
+          if [[ "$(Build.SourceBranch)" == refs/pull/* ]]; then
+            echo "This is a PR branch. Cleaning workspace before npm install."
+            rm -rf node_modules package-lock.json || true
+          else
+            echo "Not a PR branch. Skipping pre-install cleanup."
+          fi
+        workingDirectory: '$(Build.SourcesDirectory)' 
 
-#     # Using Node.js Tool Installer task for specific Node.js version
-#     # ────── Setup and Install ──────
-#     - task: NodeTool@0
-#       displayName: 'Use Node.js 22.x' 
-#       inputs:
-#         versionSpec: '22.x' 
+    # Using Node.js Tool Installer task for specific Node.js version
+    # ────── Setup and Install ──────
+    - task: NodeTool@0
+      displayName: 'Use Node.js 22.x' 
+      inputs:
+        versionSpec: '22.x' 
 
-#     - script: npm install --no-audit
-#       displayName: 'Install Node.js Dependencies'
-#       workingDirectory: '$(Build.SourcesDirectory)'
+    - script: npm install --no-audit
+      displayName: 'Install Node.js Dependencies'
+      workingDirectory: '$(Build.SourcesDirectory)'
 
-#     - script: |
-#         echo "Running NPM Audit..."
-#         npm audit --audit-level=critical
-#       displayName: 'Run NPM Audit'
-#       workingDirectory: '$(Build.SourcesDirectory)'
+    - script: |
+        echo "Running NPM Audit..."
+        npm audit --audit-level=critical
+      displayName: 'Run NPM Audit'
+      workingDirectory: '$(Build.SourcesDirectory)'
 
     # ────── OWASP Dependency Check ──────
     # - bash: 'mkdir -p OWASP-security-reports'
@@ -97,54 +97,54 @@ stages:
 
     # Create a directory for test results
     # ────── Unit Tests ──────
-    # - bash: 'mkdir -p test-results'
-    #   displayName: 'Create Test Results Directory'
-    #   workingDirectory: '$(Build.SourcesDirectory)'
+    - bash: 'mkdir -p test-results'
+      displayName: 'Create Test Results Directory'
+      workingDirectory: '$(Build.SourcesDirectory)'
 
-    # - script: npm test
-    #   displayName: 'Run Unit Tests'
-    #   workingDirectory: '$(Build.SourcesDirectory)'
+    - script: npm test
+      displayName: 'Run Unit Tests'
+      workingDirectory: '$(Build.SourcesDirectory)'
 
-    # # Publish test results (assuming 'npm test' generates a JUnit-compatible report)
-    # - task: PublishTestResults@2
-    #   displayName: 'Publish Unit Test Results'
-    #   inputs:
-    #     testResultsFormat: 'JUnit' 
-    #     testResultsFiles: '**/junit.xml' 
-    #     mergeResults: true
-    #     failTaskOnFailedTests: true
+    # Publish test results (assuming 'npm test' generates a JUnit-compatible report)
+    - task: PublishTestResults@2
+      displayName: 'Publish Unit Test Results'
+      inputs:
+        testResultsFormat: 'JUnit' 
+        testResultsFiles: '**/junit.xml' 
+        mergeResults: true
+        failTaskOnFailedTests: true
 
 
-# - stage: SonarQubeAnalysis
-#   displayName: 'Static Analysis with SonarQube'
-#   jobs:
-#   - job: SonarScan
-#     displayName: 'Run SonarQube Scan'
-#     pool:
-#       name: MyLinuxAgents
-#     steps:
-#     - task: SonarQubePrepare@6
-#       displayName: 'Prepare SonarQube Analysis'
-#       inputs:
-#           SonarQube: 'sonarqube'
-#           scannerMode: 'CLI'
-#           configMode: 'manual'
-#           cliProjectKey: $(SONARQUBE_PROJECT_KEY)
-#           cliProjectName: 'temitope'
-#           extraProperties: |
-#               sonar.sources=src
-#               sonar.exclusions=**/node_modules/**,**/bin/**,**/obj/**
+- stage: SonarQubeAnalysis
+  displayName: 'Static Analysis with SonarQube'
+  jobs:
+  - job: SonarScan
+    displayName: 'Run SonarQube Scan'
+    pool:
+      name: MyLinuxAgents
+    steps:
+    - task: SonarQubePrepare@6
+      displayName: 'Prepare SonarQube Analysis'
+      inputs:
+          SonarQube: 'sonarqube'
+          scannerMode: 'CLI'
+          configMode: 'manual'
+          cliProjectKey: $(SONARQUBE_PROJECT_KEY)
+          cliProjectName: 'temitope'
+          extraProperties: |
+              sonar.sources=src
+              sonar.exclusions=**/node_modules/**,**/bin/**,**/obj/**
             
 
-#     - task: SonarQubeAnalyze@6
-#       displayName: 'Run SonarQube Analysis'
-#       condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest')) 
+    - task: SonarQubeAnalyze@6
+      displayName: 'Run SonarQube Analysis'
+      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest')) 
      
-#     - task: SonarQubePublish@6
-#       displayName: 'Publish SonarQube Results and Wait for Quality Gate'
-#       inputs:
-#         pollingTimeoutSec: '300' 
-#       condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest')) # This ensures the SonarQube publish step runs only for non-PR builds
+    - task: SonarQubePublish@6
+      displayName: 'Publish SonarQube Results and Wait for Quality Gate'
+      inputs:
+        pollingTimeoutSec: '300' 
+      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest')) # This ensures the SonarQube publish step runs only for non-PR builds
 
 
 - stage: BuildAndScanDockerImage
@@ -247,14 +247,6 @@ stages:
   displayName: 'K8S Image Update'
   dependsOn: BuildAndScanDockerImage
   condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
-  
-  # variables:
-  #   - group: MyProject-Env-Dev
-  #   - name: NEW_IMAGE_TAG
-  #     value: '$(Build.BuildId)'
-  #   - name: GITHUB_REPO
-  #     value: 'teejayade2244/Azure-DevOps-Terraform-Iac'
-
   jobs:
   - job: UpdateK8SManifest
     displayName: 'Update K8S Manifest in GitOps Repo'
@@ -312,8 +304,7 @@ stages:
       env:
         GITHUB_PAT_FOR_GITOPS: $(GITHUB_PAT_FOR_GITOPS)
 
-# This stage is responsible for raising a PR in the GitOps repository after updating the K8S manifest
-# This stage is responsible for raising a PR in the GitOps repository after updating the K8S manifest
+
 - stage: GitHubRaisePR
   displayName: 'GitHub - Raise PR'
   dependsOn: K8SImageUpdateStaging 
@@ -329,17 +320,7 @@ stages:
         PR_BODY="Updated Docker Image in deployment manifest for build $(Build.BuildId)"
         ORIGINAL_SOURCE_BRANCH_NAME=$(echo "$(PR_SOURCE_BRANCH_NAME)" | sed 's/refs\/heads\///')
         PR_HEAD_BRANCH="feature-${ORIGINAL_SOURCE_BRANCH_NAME}-$(NEW_IMAGE_TAG)"
-        PR_BASE_BRANCH="master" # The target branch to merge into
-
-        # --- DEBUG ECHO STATEMENTS (KEEP THESE!) ---
-        echo "DEBUG: NEW_IMAGE_TAG (global) = $(NEW_IMAGE_TAG)"
-        echo "DEBUG: PR_SOURCE_BRANCH_NAME (global, from ADO) = $(PR_SOURCE_BRANCH_NAME)"
-        echo "DEBUG: ORIGINAL_SOURCE_BRANCH_NAME (after sed) = ${ORIGINAL_SOURCE_BRANCH_NAME}"
-        echo "DEBUG: PR_HEAD_BRANCH (constructed for PR API) = ${PR_HEAD_BRANCH}"
-        echo "DEBUG: PR_BASE_BRANCH = ${PR_BASE_BRANCH}"
-        echo "DEBUG: GITHUB_REPO (global) = $(GITHUB_REPO)"
-        # --- END DEBUG ECHO STATEMENTS ---
-
+        PR_BASE_BRANCH="master" 
         curl -X POST https://api.github.com/repos/$(GITHUB_REPO)/pulls \
         -H "Authorization: Bearer $(GITHUB_PAT_FOR_GITOPS)" \
         -H "Accept: application/vnd.github.v3+json" \
