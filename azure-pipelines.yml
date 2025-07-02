@@ -241,7 +241,6 @@ stages:
   displayName: 'K8S Image Update'
   dependsOn: BuildAndScanDockerImage
   condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest')) # Run only for PRs
-  
   jobs:
   - job: UpdateK8SManifest
     displayName: 'Update K8S Manifest in GitOps Repo'
@@ -249,21 +248,21 @@ stages:
       name: MyLinuxAgents 
     
     variables:
-      NEW_IMAGE_TAG: '$(Build.BuildId)'
-      PR_SOURCE_BRANCH_NAME: '$(System.PullRequest.SourceBranch)'
-  
+      - group: MyProject-Env-Dev  
+      - name: NEW_IMAGE_TAG
+        value: '$(Build.BuildId)'
+      - name: PR_SOURCE_BRANCH
+        value: '$(System.PullRequest.SourceBranch)'  
+      - name: GITHUB_REPO
+        value: 'teejayade2244/Azure-DevOps-Terraform-Iac'
 
     steps:
-    # Clean the GitOps repository directory to ensure no stale files remain
+    # Clean the GitOps repository directory
     - bash: |
+        set -e  
         TARGET_CLEAN_DIR="$(Agent.BuildDirectory)/s/kubernetes" 
-        echo "Attempting to clean directory: ${TARGET_CLEAN_DIR}"
-        if [ -d "${TARGET_CLEAN_DIR}" ]; then
-          echo "Removing existing directory: ${TARGET_CLEAN_DIR}"
-          rm -rf "${TARGET_CLEAN_DIR}"
-        else
-          echo "Directory not found, no cleanup needed: ${TARGET_CLEAN_DIR}"
-        fi
+        echo "Cleaning directory: ${TARGET_CLEAN_DIR}"
+        rm -rf "${TARGET_CLEAN_DIR}" || true
       displayName: 'Clean GitOps Repo Directory'
 
     - checkout: GitOpsRepo
@@ -274,33 +273,39 @@ stages:
         cd "$(Agent.BuildDirectory)/s/kubernetes"
         echo "Current directory: $(pwd)"
         ls -la
+        
         FULL_ACR_IMAGE="${ACR_REGISTRY_SERVER}/${ACR_REPOSITORY_NAME}:${NEW_IMAGE_TAG}"
-        echo "DEBUG (Bash-constructed): ACR_REGISTRY_SERVER = ${ACR_REGISTRY_SERVER}"
-        echo "DEBUG (Bash-constructed): ACR_REPOSITORY_NAME = ${ACR_REPOSITORY_NAME}"
-        echo "DEBUG: NEW_IMAGE_TAG = ${NEW_IMAGE_TAG}"
-        echo "DEBUG (Bash-constructed): FULL_ACR_IMAGE = ${FULL_ACR_IMAGE}"
-        echo "--- Contents of deployment.yaml BEFORE update ---"
+        echo "Image path: ${FULL_ACR_IMAGE}"
+        
+        # Show current deployment.yaml
+        echo "--- Current deployment.yaml ---"
         cat deployment.yaml
-        echo "------------------------------------------------"
+        echo "-------------------------------"
+        
+        # Configure git
         git config user.email "temitope224468@gmail.com"
-        git config user.name "Azure DevOps Pipeline" 
-        TARGET_BRANCH="feature-$(PR_SOURCE_BRANCH_NAME)" 
-        echo "Target branch for update: $TARGET_BRANCH"
-        # Checkout to the new feature branch. 
-        git checkout -b "$TARGET_BRANCH" || git checkout "$TARGET_BRANCH" 
-
-        # Update the 'image' tag in deployment.yaml
-        sed -i "s#image: .*#image: ${FULL_ACR_IMAGE}#g" deployment.yaml
-
-        # Verify the changes
-        echo "--- Contents of deployment.yaml after update ---"
+        git config user.name "Azure DevOps Pipeline"
+        
+        # Extract branch name without refs/heads/ prefix
+        BRANCH_NAME=${PR_SOURCE_BRANCH#refs/heads/}
+        TARGET_BRANCH="update-${BRANCH_NAME}"
+        echo "Creating/checking out branch: ${TARGET_BRANCH}"
+        
+        # Create or checkout branch
+        git checkout -b "${TARGET_BRANCH}" 2>/dev/null || git checkout "${TARGET_BRANCH}"
+        
+        # Update image tag in deployment.yaml
+        sed -i "s#image: .*#image: ${FULL_ACR_IMAGE}#" deployment.yaml
+        
+        # Verify changes
+        echo "--- Updated deployment.yaml ---"
         cat deployment.yaml
-        echo "--------------------------------------------"
-
+        echo "-------------------------------"
+        
+        # Commit and push
         git add deployment.yaml
-        git commit -m "Azure DevOps Pipeline: Updated image tag to ${NEW_IMAGE_TAG} for PR $(System.PullRequest.PullRequestId)"
-        # Push the changes to the GitOps repository
-        echo "Pushing changes to GitOps repository..."
-        git push https://$(GITHUB_PAT_FOR_GITOPS)@github.com/teejayade2244/Azure-DevOps-Terraform-Iac.git "$TARGET_BRANCH"
+        git commit -m "CI: Update image to ${NEW_IMAGE_TAG} for PR $(System.PullRequest.PullRequestId)"
+        
+        echo "Pushing to ${GITHUB_REPO} branch ${TARGET_BRANCH}"
+        git push https://$(GITHUB_PAT_FOR_GITOPS)@github.com/${GITHUB_REPO}.git "${TARGET_BRANCH}"
       displayName: 'Update Kubernetes Manifest and Push'
-      workingDirectory: '$(Agent.BuildDirectory)' # This is the base directory for the agent's work
