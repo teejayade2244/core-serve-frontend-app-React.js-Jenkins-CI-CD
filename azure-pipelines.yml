@@ -117,7 +117,7 @@ stages:
     pool:
       name: MyLinuxAgents
     steps:
-    - task: SonarQubePrepare@5
+    - task: SonarQubePrepare@6
       displayName: 'Prepare SonarQube Analysis'
       inputs:
           SonarQube: 'sonarqube'
@@ -130,11 +130,11 @@ stages:
               sonar.exclusions=**/node_modules/**,**/bin/**,**/obj/**
             
 
-    - task: SonarQubeAnalyze@5
+    - task: SonarQubeAnalyze@6
       displayName: 'Run SonarQube Analysis'
       condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest')) 
      
-    - task: SonarQubePublish@5
+    - task: SonarQubePublish@6
       displayName: 'Publish SonarQube Results and Wait for Quality Gate'
       inputs:
         pollingTimeoutSec: '300' 
@@ -256,6 +256,14 @@ stages:
       name: MyLinuxAgents
     
     steps:      
+    - bash: |
+        echo "##[group]Variable Verification"
+        echo "ACR_REGISTRY_SERVER: $(ACR_REGISTRY_SERVER)"
+        echo "ACR_REPOSITORY_NAME: $(ACR_REPOSITORY_NAME)"
+        echo "NEW_IMAGE_TAG: $(NEW_IMAGE_TAG)"
+        echo "##[endgroup]"
+      displayName: 'Verify All Required Variables'
+
     # Clean the GitOps repository directory to ensure no stale files remain
     - bash: |
         rm -rf "$(Agent.BuildDirectory)/s/kubernetes" || true
@@ -276,7 +284,7 @@ stages:
         git config user.name "Azure DevOps Pipeline"
         
         BRANCH_NAME=$(echo "$(System.PullRequest.SourceBranch)" | sed 's/refs\/heads\///')
-        TARGET_BRANCH="feature-${BRANCH_NAME}"
+        TARGET_BRANCH="feature-${BRANCH_NAME}-$(NEW_IMAGE_TAG)"
         echo "Target branch: ${TARGET_BRANCH}"
         
         # Branch management
