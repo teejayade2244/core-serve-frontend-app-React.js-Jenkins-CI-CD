@@ -251,7 +251,7 @@ stages:
     variables:
       NEW_IMAGE_TAG: '$(Build.BuildId)'
       PR_SOURCE_BRANCH_NAME: '$(System.PullRequest.SourceBranch)'
-    - group: MyProject-Env-Dev
+  
 
     steps:
     # Clean the GitOps repository directory to ensure no stale files remain
