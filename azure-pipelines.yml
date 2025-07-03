@@ -20,7 +20,7 @@ resources:
   repositories:
   - repository: GitOpsRepo 
     type: github
-    name: teejayade2244/Azure-DevOps-Terraform-Iac 
+    name: teejayade2244/Jenkins-CICD-Migration-to-Azure-DevOps-Terraform-Iac 
     ref: master 
     endpoint: github.com_teejayade2244 
 
