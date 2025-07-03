@@ -359,51 +359,51 @@ stages:
 
 
 
-# - stage: DAST_Scan
-#   displayName: 'Dynamic Application Security Testing (DAST)'
-#   dependsOn: ManualApproval 
-#   condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'master'))
+- stage: DAST_Scan
+  displayName: 'Dynamic Application Security Testing (DAST)'
+  dependsOn: ManualApproval 
+  condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'master'))
   
-#   jobs:
-#   - job: OWASP_ZAP_Scan
-#     displayName: 'OWASP ZAP Full Scan'
-#     pool:
-#       name: MyLinuxAgents
+  jobs:
+  - job: OWASP_ZAP_Scan
+    displayName: 'OWASP ZAP Full Scan'
+    pool:
+      name: MyLinuxAgents
     
-#     variables:
-#       ZAP_VERSION: 'stable'
-#       ARTIFACT_NAME: 'DAST_Reports_$(Build.BuildNumber)'
+    variables:
+      ZAP_VERSION: 'stable'
+      ARTIFACT_NAME: 'DAST_Reports_$(Build.BuildNumber)'
     
-#     steps:
-#     - bash: |
-#         mkdir -p $(Pipeline.Workspace)/ZAP-reports
-#         docker pull ghcr.io/zaproxy/zaproxy:$(ZAP_VERSION)
-#       displayName: 'Prepare ZAP Environment'
+    steps:
+    - bash: |
+        mkdir -p $(Pipeline.Workspace)/ZAP-reports
+        docker pull ghcr.io/zaproxy/zaproxy:$(ZAP_VERSION)
+      displayName: 'Prepare ZAP Environment'
     
-#     - bash: |
-#         docker run --rm \
-#           -v $(Pipeline.Workspace)/ZAP-reports:/zap/wrk/:rw \
-#           -e ZAP_JVM_OPTIONS="-Xmx4g" \
-#           ghcr.io/zaproxy/zaproxy:$(ZAP_VERSION) \
-#           zap-full-scan.py \
-#           -t $(SCAN_TARGET) \
-#           -g gen.conf \
-#           -I \
-#           -r DAST-report.html \
-#           -J DAST-report.json \
-#           -x DAST-report.xml \
-#           --hook=/zap/auth_hook.py \
-#           -d
-#       displayName: 'Execute ZAP Full Scan'
-#       continueOnError: false  
-#       timeoutInMinutes: 120  
+    - bash: |
+        docker run --rm \
+          -v $(Pipeline.Workspace)/ZAP-reports:/zap/wrk/:rw \
+          -e ZAP_JVM_OPTIONS="-Xmx4g" \
+          ghcr.io/zaproxy/zaproxy:$(ZAP_VERSION) \
+          zap-full-scan.py \
+          -t $(SCAN_TARGET) \
+          -g gen.conf \
+          -I \
+          -r DAST-report.html \
+          -J DAST-report.json \
+          -x DAST-report.xml \
+          --hook=/zap/auth_hook.py \
+          -d
+      displayName: 'Execute ZAP Full Scan'
+      continueOnError: false  
+      timeoutInMinutes: 120  
     
-#     - task: PublishBuildArtifacts@1
-#       displayName: 'Publish DAST Reports'
-#       inputs:
-#         PathtoPublish: '$(Pipeline.Workspace)/ZAP-reports'
-#         ArtifactName: '$(ARTIFACT_NAME)'
-#         publishLocation: 'Container'
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish DAST Reports'
+      inputs:
+        PathtoPublish: '$(Pipeline.Workspace)/ZAP-reports'
+        ArtifactName: '$(ARTIFACT_NAME)'
+        publishLocation: 'Container'
 
 
 
