@@ -360,8 +360,7 @@ stages:
 
 
 - stage: DAST_Scan
-  displayName: 'Dynamic Application Security Testing (DAST)'
-  dependsOn: ManualApproval 
+  displayName: 'Dynamic Application Security Testing (DAST)' 
   condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'master'))
   
   jobs:
