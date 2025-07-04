@@ -1,5 +1,5 @@
 {
-    "name": "nysc-project",
+    "name": "core-serve-app",
     "version": "0.1.0",
     "private": true,
     "dependencies": {
