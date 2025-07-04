@@ -372,7 +372,7 @@ stages:
 
 
 - stage: DAST_Scan
-  displayName: 'Dynamic Application Security Testing (DAST)'
+  displayName: 'Dynamic Application Security Testing (DAST)
   condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'master'))
   
   jobs:
