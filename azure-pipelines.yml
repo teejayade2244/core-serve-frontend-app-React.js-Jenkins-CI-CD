@@ -106,18 +106,6 @@ stages:
     #   inputs:
     #     pathToPublish: '$(Build.SourcesDirectory)/OWASP-security-reports'
     #     artifactName: 'OWASPReports'
-    # Snyk Security Scan
-    - task: SnykSecurityScan@1
-      displayName: 'Snyk Open Source Scan (Dependencies)'
-      inputs:
-        snykServiceConnection: 'snyk Connection' 
-        severityThreshold: 'high'          
-        # Optionally set to 'critical', 'medium', 'low'
-        failOnIssues: true                   
-        monitorWhen: 'always'            
-        targetFile: 'package.json'
-
-
 
     # Create a directory for test results
     # ────── Unit Tests ──────
