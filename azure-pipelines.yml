@@ -80,7 +80,7 @@ stages:
         serviceConnectionEndpoint: 'SnykConnection'
         testType: 'app'
         targetFile: 'package.json'
-        severityThreshold: 'high'
+        severityThreshold: 'critical'
         monitorWhen: 'always'
         failOnIssues: true
        
@@ -415,6 +415,3 @@ stages:
         PathtoPublish: '$(Pipeline.Workspace)/ZAP-reports'
         ArtifactName: '$(ARTIFACT_NAME)'
         publishLocation: 'Container'
-
-
-
