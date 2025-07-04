@@ -20,7 +20,7 @@ resources:
   repositories:
   - repository: GitOpsRepo 
     type: github
-    name: teejayade2244/Azure-DevOps-Terraform-Iac 
+    name: teejayade2244/Jenkins-CICD-Migration-to-Azure-DevOps-Terraform-Iac 
     ref: master 
     endpoint: github.com_teejayade2244 
 
@@ -94,6 +94,18 @@ stages:
     #   inputs:
     #     pathToPublish: '$(Build.SourcesDirectory)/OWASP-security-reports'
     #     artifactName: 'OWASPReports'
+    # Snyk Security Scan
+    - task: SnykSecurityScan@1
+      displayName: 'Snyk Open Source Scan (Dependencies)'
+      inputs:
+        snykServiceConnection: 'snyk Connection' 
+        severityThreshold: 'high'          
+        # Optionally set to 'critical', 'medium', 'low'
+        failOnIssues: true                   
+        monitorWhen: 'always'            
+        targetFile: 'package.json'
+
+
 
     # Create a directory for test results
     # ────── Unit Tests ──────
@@ -125,6 +137,7 @@ stages:
     steps:
     - task: SonarQubePrepare@6
       displayName: 'Prepare SonarQube Analysis'
+      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest')) # <--- ADD THIS LINE
       inputs:
           SonarQube: 'sonarqube'
           scannerMode: 'CLI'
@@ -135,10 +148,15 @@ stages:
               sonar.sources=src
               sonar.exclusions=**/node_modules/**,**/bin/**,**/obj/**
             
-
     - task: SonarQubeAnalyze@6
       displayName: 'Run SonarQube Analysis'
       condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest')) 
+      
+    - task: SonarQubePublish@6
+      displayName: 'Publish SonarQube Results and Wait for Quality Gate'
+      inputs:
+        pollingTimeoutSec: '300' 
+      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest')) # This ensures the SonarQube publish step runs only for non-PR builds
      
     - task: SonarQubePublish@6
       displayName: 'Publish SonarQube Results and Wait for Quality Gate'
@@ -353,51 +371,50 @@ stages:
 
 
 
-# - stage: DAST_Scan
-#   displayName: 'Dynamic Application Security Testing (DAST)'
-#   dependsOn: ManualApproval 
-#   condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'master'))
+- stage: DAST_Scan
+  displayName: 'Dynamic Application Security Testing (DAST)'
+  condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'master'))
   
-#   jobs:
-#   - job: OWASP_ZAP_Scan
-#     displayName: 'OWASP ZAP Full Scan'
-#     pool:
-#       name: MyLinuxAgents
+  jobs:
+  - job: OWASP_ZAP_Scan
+    displayName: 'OWASP ZAP Full Scan'
+    pool:
+      name: MyLinuxAgents
     
-#     variables:
-#       ZAP_VERSION: 'stable'
-#       ARTIFACT_NAME: 'DAST_Reports_$(Build.BuildNumber)'
+    variables:
+      ZAP_VERSION: 'stable'
+      ARTIFACT_NAME: 'DAST_Reports_$(Build.BuildNumber)'
     
-#     steps:
-#     - bash: |
-#         mkdir -p $(Pipeline.Workspace)/ZAP-reports
-#         docker pull ghcr.io/zaproxy/zaproxy:$(ZAP_VERSION)
-#       displayName: 'Prepare ZAP Environment'
+    steps:
+    - bash: |
+        mkdir -p $(Pipeline.Workspace)/ZAP-reports
+        docker pull ghcr.io/zaproxy/zaproxy:$(ZAP_VERSION)
+      displayName: 'Prepare ZAP Environment'
     
-#     - bash: |
-#         docker run --rm \
-#           -v $(Pipeline.Workspace)/ZAP-reports:/zap/wrk/:rw \
-#           -e ZAP_JVM_OPTIONS="-Xmx4g" \
-#           ghcr.io/zaproxy/zaproxy:$(ZAP_VERSION) \
-#           zap-full-scan.py \
-#           -t $(SCAN_TARGET) \
-#           -g gen.conf \
-#           -I \
-#           -r DAST-report.html \
-#           -J DAST-report.json \
-#           -x DAST-report.xml \
-#           --hook=/zap/auth_hook.py \
-#           -d
-#       displayName: 'Execute ZAP Full Scan'
-#       continueOnError: false  
-#       timeoutInMinutes: 120  
+    - bash: |
+        docker run --rm \
+          -v $(Pipeline.Workspace)/ZAP-reports:/zap/wrk/:rw \
+          -e ZAP_JVM_OPTIONS="-Xmx4g" \
+          ghcr.io/zaproxy/zaproxy:$(ZAP_VERSION) \
+          zap-full-scan.py \
+          -t $(SCAN_TARGET) \
+          -g gen.conf \
+          -I \
+          -r DAST-report.html \
+          -J DAST-report.json \
+          -x DAST-report.xml \
+          --hook=/zap/auth_hook.py \
+          -d
+      displayName: 'Execute ZAP Full Scan'
+      continueOnError: false  
+      timeoutInMinutes: 120  
     
-#     - task: PublishBuildArtifacts@1
-#       displayName: 'Publish DAST Reports'
-#       inputs:
-#         PathtoPublish: '$(Pipeline.Workspace)/ZAP-reports'
-#         ArtifactName: '$(ARTIFACT_NAME)'
-#         publishLocation: 'Container'
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish DAST Reports'
+      inputs:
+        PathtoPublish: '$(Pipeline.Workspace)/ZAP-reports'
+        ArtifactName: '$(ARTIFACT_NAME)'
+        publishLocation: 'Container'
 
 
 
