@@ -127,42 +127,42 @@ stages:
         failTaskOnFailedTests: true
 
 
-- stage: SonarQubeAnalysis
-  displayName: 'Static Analysis with SonarQube'
-  jobs:
-  - job: SonarScan
-    displayName: 'Run SonarQube Scan'
-    pool:
-      name: MyLinuxAgents
-    steps:
-    - task: SonarQubePrepare@6
-      displayName: 'Prepare SonarQube Analysis'
-      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest')) # <--- ADD THIS LINE
-      inputs:
-          SonarQube: 'sonarqube'
-          scannerMode: 'CLI'
-          configMode: 'manual'
-          cliProjectKey: $(SONARQUBE_PROJECT_KEY)
-          cliProjectName: 'temitope'
-          extraProperties: |
-              sonar.sources=src
-              sonar.exclusions=**/node_modules/**,**/bin/**,**/obj/**
+# - stage: SonarQubeAnalysis
+#   displayName: 'Static Analysis with SonarQube'
+#   jobs:
+#   - job: SonarScan
+#     displayName: 'Run SonarQube Scan'
+#     pool:
+#       name: MyLinuxAgents
+#     steps:
+#     - task: SonarQubePrepare@6
+#       displayName: 'Prepare SonarQube Analysis'
+#       condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest')) # <--- ADD THIS LINE
+#       inputs:
+#           SonarQube: 'sonarqube'
+#           scannerMode: 'CLI'
+#           configMode: 'manual'
+#           cliProjectKey: $(SONARQUBE_PROJECT_KEY)
+#           cliProjectName: 'temitope'
+#           extraProperties: |
+#               sonar.sources=src
+#               sonar.exclusions=**/node_modules/**,**/bin/**,**/obj/**
             
-    - task: SonarQubeAnalyze@6
-      displayName: 'Run SonarQube Analysis'
-      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest')) 
+#     - task: SonarQubeAnalyze@6
+#       displayName: 'Run SonarQube Analysis'
+#       condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest')) 
       
-    - task: SonarQubePublish@6
-      displayName: 'Publish SonarQube Results and Wait for Quality Gate'
-      inputs:
-        pollingTimeoutSec: '300' 
-      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest')) # This ensures the SonarQube publish step runs only for non-PR builds
+#     - task: SonarQubePublish@6
+#       displayName: 'Publish SonarQube Results and Wait for Quality Gate'
+#       inputs:
+#         pollingTimeoutSec: '300' 
+#       condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest')) # This ensures the SonarQube publish step runs only for non-PR builds
      
-    - task: SonarQubePublish@6
-      displayName: 'Publish SonarQube Results and Wait for Quality Gate'
-      inputs:
-        pollingTimeoutSec: '300' 
-      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest')) # This ensures the SonarQube publish step runs only for non-PR builds
+#     - task: SonarQubePublish@6
+#       displayName: 'Publish SonarQube Results and Wait for Quality Gate'
+#       inputs:
+#         pollingTimeoutSec: '300' 
+#       condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest')) # This ensures the SonarQube publish step runs only for non-PR builds
 
 
 - stage: BuildAndScanDockerImage
